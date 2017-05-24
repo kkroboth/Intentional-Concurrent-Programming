@@ -5,11 +5,13 @@ lazy val root = (project in file(".")).
     crossPaths := false,
     autoScalaLibrary := false,
     javacOptions in (Compile,compile) ++= Seq("-deprecation", "-Xlint"),
-    libraryDependencies +=  "org.javassist" % "javassist" % "3.21.0-GA",
+    libraryDependencies ++=  Seq(
+      "org.javassist" % "javassist" % "3.21.0-GA",
+      "com.novocode" % "junit-interface" % "0.11" % "test"
+    ),
 
     artifactPath in (Compile, packageBin) :=
       baseDirectory.value / (artifact.value.name + "-" + version.value + ".jar"),
-
 
     javaSource in Compile := baseDirectory.value / "src" / "main",
     javaSource in Test := baseDirectory.value / "src" / "test",
