@@ -1,10 +1,14 @@
 // $Id$
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
+@RunWith(JUnitParamsRunner.class)
 public class DemoSuite {
 
   @Test
@@ -27,5 +31,28 @@ public class DemoSuite {
     synchronized (this) {
       wait();
     }
+  }
+
+  @Test
+  @Parameters({
+      "-1, 1",
+      "2, 4",
+      "10, 100"
+  })
+  public void aTestWithArguments(int x, int y) throws Exception {
+    assertEquals(y, x*x);
+  }
+
+  @Test
+  @Parameters(method = "data")
+  public void anotherTestWithArguments(String s, int l) throws Exception {
+    assertEquals(l, s.length());
+  }
+  Object[] data() {
+    return new Object[][] {
+        {"foo", 3},
+        {"bar", 3},
+        {"foobar", 6}
+    };
   }
 }

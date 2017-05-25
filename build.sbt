@@ -7,7 +7,8 @@ lazy val root = (project in file(".")).
     javacOptions in (Compile,compile) ++= Seq("-deprecation", "-Xlint"),
     libraryDependencies ++=  Seq(
       "org.javassist" % "javassist" % "3.21.0-GA",
-      "com.novocode" % "junit-interface" % "0.11" % "test"
+      "com.novocode" % "junit-interface" % "0.11" % "test",
+      "pl.pragmatists" % "JUnitParams" % "1.1.0" % "test"
     ),
 
     artifactPath in (Compile, packageBin) :=
