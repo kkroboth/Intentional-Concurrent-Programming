@@ -7,7 +7,7 @@ public class TestClass
 {
   private int x;
 
-  public Test(int x)
+  public TestClass(int x)
   {
     this.x = x;
   }

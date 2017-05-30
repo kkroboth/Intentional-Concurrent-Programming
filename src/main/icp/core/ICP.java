@@ -7,6 +7,8 @@ import icp.lib.Task;
 import javassist.ClassPool;
 import javassist.Loader;
 import javassist.Translator;
+import javassist.NotFoundException;;
+import javassist.CannotCompileException;;
 
 import java.util.logging.Logger;
 
@@ -21,8 +23,9 @@ import java.util.logging.Logger;
  * potentially insert code after every call to a superclass constructor, in
  * order to generate the initial permission for a new object.
  *
+ * Class must be public because we require user app to call ICP.initialize.
  */
-final class ICP {
+final public class ICP {
 
   private static final Logger logger = Logger.getLogger("icp.core");
 
@@ -33,12 +36,16 @@ final class ICP {
     Translator t = new BytecodeTranslator();
     ClassPool pool = ClassPool.getDefault();
     Loader cl = new Loader();
-    cl.addTranslator(pool, t);
+    try {
+      cl.addTranslator(pool, t);
+    } catch (NotFoundException | CannotCompileException e) {
+      Message.fatal("internal error in icp.core.Main (addTranslator call):" +e);
+    }
     logger.fine("ICP initialized");
     try {
-      cl.run("icp.core.Main$BootStrap", new String[0]);
-    } catch (ClassNotFoundException | NoSuchMethodError e) {
-      Message.fatal("internal error in icp.core.Main");
+      cl.run("icp.core.ICP$BootStrap", new String[0]);
+    } catch (Throwable e) {
+      Message.fatal("internal error in icp.core.Main (BootStrap call):" +e);
     }
   }
 

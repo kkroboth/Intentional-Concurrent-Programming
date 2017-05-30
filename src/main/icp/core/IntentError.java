@@ -7,6 +7,9 @@ package icp.core;
  */
 final public class IntentError extends RuntimeException
 {
+  // Runtime Exception is serializable
+  private static final long serialVersionUID = 1;
+
   public IntentError()
   {
   }

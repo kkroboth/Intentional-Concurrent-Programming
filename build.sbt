@@ -12,7 +12,8 @@ lazy val root = (project in file(".")).
     ),
 
     artifactPath in (Compile, packageBin) :=
-      baseDirectory.value / (artifact.value.name + "-" + version.value + ".jar"),
+      baseDirectory.value / (artifact.value.name + "-" + version.value +
+      ".jar"),
 
     javaSource in Compile := baseDirectory.value / "src" / "main",
     javaSource in Test := baseDirectory.value / "src" / "test",
@@ -23,5 +24,14 @@ lazy val root = (project in file(".")).
       "-doctitle", "Intentional Concurrent Programming",
       "-bottom", "Copyright UNH/CS, 2017",
       "-link", "http://docs.oracle.com/javase/8/docs/api/"
+    ),
+
+    // Enable assertions and logging
+    // don't know if this will co-exist with JUnit...
+    fork in run := true,
+    javaOptions in run ++= Seq(
+      "-ea",
+      "-Djava.util.logging.config.file=" + baseDirectory.value +
+        "/logging.properties"
     )
   )
