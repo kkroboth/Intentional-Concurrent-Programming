@@ -47,7 +47,7 @@ final public class ICP {
     // need to add the class name to the args before passing them to the
     // bootstrap main method
     String[] newArgs = new String[args.length+1];
-    newArgs[0] = "TestApp1$Inner";
+    newArgs[0] = className;
     for (int i = 0; i < args.length; i++)
     {
       newArgs[i+1] = args[i];

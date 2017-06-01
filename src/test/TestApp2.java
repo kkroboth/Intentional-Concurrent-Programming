@@ -8,12 +8,12 @@ import icp.core.ICP;
 import icp.lib.Thread;
 
 // this class will be loaded by the normal class loader
-public class TestApp1
+public class TestApp2
 {
   public static void main(String[] args) throws Throwable
   {
     // initialize ICP and invoke the "real" user main method
-    ICP.initialize("TestApp1$Inner", args);
+    ICP.initialize("TestApp2$Inner", args);
   }
 
   // this inner class will not be loaded until its main method is

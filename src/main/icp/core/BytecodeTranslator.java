@@ -59,6 +59,13 @@ final class BytecodeTranslator implements Translator {
       return;
     }
 
+    // also do not want to edit icp.lib.Thread in order to make its
+    // run method thread safe
+    if (classname.equals("icp.lib.Thread"))
+    {
+      return;
+    }
+
     logger.fine(String.format("checking and editing class %s", classname));
 
     CtClass cc = pool.get(classname);
