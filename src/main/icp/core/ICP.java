@@ -12,6 +12,10 @@ import javassist.CannotCompileException;;
 
 import java.util.logging.Logger;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 /**
  * Main class for ICP, a Java-based intentional concurrent programming system.
  *
@@ -31,8 +35,24 @@ final public class ICP {
 
   /** Initialize ICP: create a class loader that will edit
    *  user bytecode; establish the initial Task for the main thread.
+   *
+   @  @param className name of user class to be executed
+   *  @param args arguments to be passed to the user's main method
+   *
+   *  @throws java.lang.Throwable propagates on any user exception
    */
-  public static void initialize() {
+  public static void initialize(String className, String[] args)
+    throws Throwable
+  {
+    // need to add the class name to the args before passing them to the
+    // bootstrap main method
+    String[] newArgs = new String[args.length+1];
+    newArgs[0] = "TestApp1$Inner";
+    for (int i = 0; i < args.length; i++)
+    {
+      newArgs[i+1] = args[i];
+    }
+
     Translator t = new BytecodeTranslator();
     ClassPool pool = ClassPool.getDefault();
     Loader cl = new Loader();
@@ -43,8 +63,8 @@ final public class ICP {
     }
     logger.fine("ICP initialized");
     try {
-      cl.run("icp.core.ICP$BootStrap", new String[0]);
-    } catch (Throwable e) {
+      cl.run("icp.core.ICP$BootStrap", newArgs);
+    } catch (ClassNotFoundException | NoSuchMethodError e) {
       Message.fatal("internal error in icp.core.Main (BootStrap call):" +e);
     }
   }
@@ -62,10 +82,47 @@ final public class ICP {
    */
   public final static class BootStrap {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Throwable {
 
       // Establish an initial task for the main thread
       Task.CURRENT_TASK.set(Task.getFirstInitialTask());
+
+      // invoke the main method of the user's class
+      try {
+
+        // Get the Class object associated with the first string in args.
+        Class<?> clazz = Class.forName(args[0]);
+
+        // Get the "main" method.
+        Method main = clazz.getMethod("main", String[].class);
+
+        // Provide the remainder of the arguments as args to the main method.
+        String[] mainArgs = Arrays.copyOfRange(args, 1, args.length);
+
+        // Main is a static method so send null for first argument when calling
+        // the main method.
+        main.invoke(null, new Object[]{mainArgs});
+      }
+      catch (IllegalAccessException iae)
+      {
+        Message.error("IllegalAccessException, " +
+          "\"main\" class provided on command line cannot be accessed");
+      }
+      catch (ClassNotFoundException cnfe)
+      {
+        Message.error("ClassNotFoundException,  " +
+          "\"main\" class provided on command line cannot be found");
+      }
+      catch (NoSuchMethodException nsme)
+      {
+        Message.error("NoSuchMethodException, " +
+          "\"main\" class provided on command line does not have" +
+                " a main method");
+      }
+      catch (InvocationTargetException ite)
+      {
+        throw ite.getCause();
+      }
     }
   }
 }
