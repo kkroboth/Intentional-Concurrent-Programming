@@ -24,7 +24,7 @@ public final class PermissionSupport
   private PermissionSupport() {}
 
   // obscured name to be used for the field added to hold the permission
-  private static String AddedPermissionFieldName = "icp$1066$permissionField";
+  private static String AddedPermissionFieldName = "icp$42$permissionField";
 
   /** Add the field for the permission
    *
@@ -293,8 +293,8 @@ public final class PermissionSupport
       throw new NullPointerException();
     }
 
-    // check that current task has permission to set the permission field
-    permission.checkPut();
+    // check that current task has permission to reset the permission field
+    permission.checkResetPermission();
 
     setPermissionFieldValue(obj, permission);
   }

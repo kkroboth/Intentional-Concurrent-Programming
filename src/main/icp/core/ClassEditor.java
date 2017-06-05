@@ -85,6 +85,10 @@ final class ClassEditor
       // HACK to skip methods inserted into class to implement lambdas
       // that capture instance variables.
       // this may only work for the current version of Oracle javac
+      // usually lambdas are implemented with static methods, but
+      // in some cases they are implemented with virtual methods
+      // for instance, if the lambda appears in a virtual method and it
+      // captures a variable, then it is implemented with a virtual method
       if (name.startsWith("lambda$"))
       {
         continue;

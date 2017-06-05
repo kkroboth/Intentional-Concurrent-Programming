@@ -102,4 +102,18 @@ final class PrivatePermission implements Permission
       throw new IntentError("running task does not have access to object");
     }
   }
+
+  /** Validate permission for calling task to reset the permission.
+   *
+   *  @throws IntentError if the reset is not allowed.
+   *
+   */
+  @Override
+  public void checkResetPermission()
+  {
+    if (Task.currentTask() != task)
+    {
+      throw new IntentError("running task cannot reset permission of object");
+    }
+  }
 }

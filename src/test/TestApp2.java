@@ -4,6 +4,7 @@
 // 
 
 import icp.core.ICP;
+import icp.core.IntentError;
 
 import icp.lib.Thread;
 
@@ -28,13 +29,47 @@ public class TestApp2
       TestClass t = new TestClass(42);
 
       // create lambda to access the object
-      Runnable r = () -> System.out.println(t.getX());
+      Runnable r = () -> {
+        assert(t.getX() == 42);
+        t.y = 1999; 
+        assert(t.y == 1999);
+      };
 
-      // thread that created the object should be able to access it
+      // task that created the object should be able to access it
       r.run();
 
-      // but access by a new thread should generate an intent error
-      (new Thread(r)).start();
+      // but access by a different task should generate an intent error
+      // create lambda to be run by a different task
+      r = () -> {
+        boolean caughtIntentError = false;
+        try {
+          assert(t.getX() == 42);
+        }
+        catch (IntentError ie)
+        {
+          caughtIntentError = true;
+        }
+        assert(caughtIntentError);
+        caughtIntentError = false;
+        try {
+          t.y = 1914;
+        }
+        catch (IntentError ie)
+        {
+          caughtIntentError = true;
+        }
+        assert(caughtIntentError);
+        caughtIntentError = false;
+        try {
+          assert(t.y == 1914);
+        }
+        catch (IntentError ie)
+        {
+          caughtIntentError = true;
+        }
+        assert(caughtIntentError);
+      };
+      new Thread(r).start();
     }
   }
 }

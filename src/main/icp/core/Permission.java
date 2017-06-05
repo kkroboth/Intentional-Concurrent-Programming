@@ -28,5 +28,12 @@ public interface Permission
    *  @throws IntentError if a put is not allowed.
    */
   public void checkPut();
+
+  /** Can the current task reset the permission of the object protected by
+   *  this permission? If not, an exception is thrown.
+   *
+   *  @throws IntentError if a reset is not allowed.
+   */
+  public void checkResetPermission();
 }
 
