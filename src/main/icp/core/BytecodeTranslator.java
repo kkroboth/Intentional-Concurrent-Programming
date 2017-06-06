@@ -53,15 +53,17 @@ final class BytecodeTranslator implements Translator {
     if (classname.startsWith("javassist.")) return;
 
     // need to avoid infinite recursion
-    // so do not edit the classes in icp.core below
+    // so do not edit the classes in icp.core
     if (classname.startsWith("icp.core"))
     {
       return;
     }
 
-    // also do not want to edit icp.lib.Thread in order to make its
-    // run method thread safe
-    if (classname.equals("icp.lib.Thread"))
+    // also do not want to edit classes in icp.lib for now
+    // this needs to be thought about
+    // right now I am thinking that lib designer will use Java access control
+    // to protect these classes
+    if (classname.startsWith("icp.lib"))
     {
       return;
     }

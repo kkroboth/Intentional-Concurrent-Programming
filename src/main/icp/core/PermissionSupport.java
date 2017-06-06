@@ -294,7 +294,7 @@ public final class PermissionSupport
     }
 
     // check that current task has permission to reset the permission field
-    permission.checkResetPermission();
+    oldPermission.checkResetPermission();
 
     setPermissionFieldValue(obj, permission);
   }

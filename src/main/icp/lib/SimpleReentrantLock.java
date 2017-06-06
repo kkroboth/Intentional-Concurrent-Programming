@@ -2,121 +2,102 @@
 
 package icp.lib;
 
-import icp.core.IntentError;
+import java.util.concurrent.locks.ReentrantLock;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.MonitorInfo;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
+import icp.core.IntentError;
+import icp.core.Permission;
 
 /**
- * Top level abstract Task class.
- * Provide public access to Task.currentTask, Task.holdsLock and
- * Task.getFirstInitialTask.
- * Default access for inheritance and lower level static methods.
+ * Simple reentrant lock, meaning it has only lock and unlock methods.
+ *
+ * Includes a method to export its underlying permission.
+ *
+ * It wraps a java.util.concurrent.locks.ReentrantLock.
  */
-abstract public class Task{
+public class SimpleReentrantLock {
 
-    /**
-     * default access constructor to only allow classes inside
-       icp.lib to inherit from Task.
-     */
-    Task(){}
+  private final ReentrantLock lock;
+  private Permission locked;
 
-    /**
-     * Returns the current {@code Task}.
-     *
-     * @return long value that is the current task id.
-     * @throws IntentError if the Current thread has no {@code Task}.
-     */
-    public static Task currentTask(){
-      final Task toRtn = CURRENT_TASK.get();
-      if (toRtn == null) {
-        throw new IntentError("Current thread has no task");
+  // private constructor to force use of factory method
+  private SimpleReentrantLock()
+  {
+    lock = new ReentrantLock();
+  }
+
+  /**
+   *  Create and return an instance of a SimpleReentrantLock.
+   *
+   *  @return the created lock.
+   */
+  public static SimpleReentrantLock newInstance()
+  {
+    SimpleReentrantLock ret = new SimpleReentrantLock();
+    ret.locked = new SingleOwnerPermission(ret);
+    return ret;
+  }
+
+  /**
+   *  Lock the lock.
+   */
+  public void lock()
+  {
+    lock.lock();
+  }
+
+  /**
+   *  Unlock the lock.
+   */
+  public void unlock()
+  {
+    lock.unlock();
+  }
+
+  /**
+   *  Return the permission associated with this lock. This permission
+   *  can then be attached to an object, to require that object to be
+   *  protected by this lock.
+   *
+   *  @return the permission associated with the lock.
+   */
+  public Permission lockedPermission() {
+    return locked;
+  }
+
+  private static class SingleOwnerPermission implements Permission
+  {
+    private final SimpleReentrantLock lock;
+
+    private SingleOwnerPermission(SimpleReentrantLock lock)
+    {
+      this.lock = lock;
+    }
+
+    @Override
+    public void checkCall()
+    {
+      if (lock.lock.getHoldCount() < 1)
+      {
+        throw new IntentError("lock not held: " +lock);
       }
-      return toRtn;
     }
 
-    /**
-     * Test if the current task holds a monitor.
-     * WARNING-This method has some small potential
-     * to return a false positive.
-     *
-     * @param object Object on which to test lock ownership.
-     *
-     * @return true if the current task holds the lock.
-     */
-    static boolean holdsLock(Object object){
-      if (Thread.holdsLock(object)){
-        MonitorInfo[] info = MONITOR_INFO.get();
-        if (info != null){
-          MonitorInfo[] currentLockedMonitors = getLockedMonitors();
-          if (currentLockedMonitors.length > info.length) {
-
-            for (MonitorInfo m : info){
-              for (int i = 0; i < currentLockedMonitors.length; i++){
-                if (m == currentLockedMonitors[i]) {
-                  currentLockedMonitors[i] = null;
-                  break;
-                }
-              }
-            }
-
-            MonitorInfo target = null;
-            for (MonitorInfo m : currentLockedMonitors){
-              if (m != null){
-                target = m;
-                break;
-              }
-            }
-
-            return target != null &&
-              object.getClass().getName().equals(target.getClassName()) &&
-              System.identityHashCode(object) == target.getIdentityHashCode();
-          }
-        }
+    @Override
+    public void checkGet()
+    {
+      if (lock.lock.getHoldCount() < 1)
+      {
+        throw new IntentError("lock not held: " +lock);
       }
-      return false;
     }
 
-    private static ThreadMXBean threadMXBean =
-      ManagementFactory.getThreadMXBean();
-
-    /**
-     * Get all Monitors that are currently held.
-     *
-     * @return {@code MonitorInfo[]} of locked monitors.
-     */
-    protected static MonitorInfo[] getLockedMonitors(){
-        long[] threadId = new long[]{Thread.currentThread().getId()};
-        ThreadInfo[] threadInfo = threadMXBean.getThreadInfo(threadId, true,
-          false);
-        return threadInfo[0].getLockedMonitors();
+    @Override
+    public void checkPut()
+    {
+      if (lock.lock.getHoldCount() < 1)
+      {
+        throw new IntentError("lock not held: " +lock);
+      }
     }
-
-    /*
-     * ThreadLocal for task.
-     */
-    public static final ThreadLocal<Task> CURRENT_TASK = new ThreadLocal<>();
-
-    public static Task getFirstInitialTask(){
-        return new InitialTask();
-    }
-
-    /*
-     * ThreadLocal for MonitorInfo length
-     */
-    protected static final ThreadLocal<MonitorInfo[]> MONITOR_INFO =
-      new ThreadLocal<>();
-
-    // TaskLocal values pertaining to this task. This map is maintained
-    // by the TaskLocal class.
-
-    // This is tricky, null is explicitly assigned. This is redundant, as
-    // the JVM will guarantee the field will be null, however this is the
-    // only hook to get the checkPutField method of InitialTaskPermission
-    // to be called. Without explicit assignment we will not be forced to
-    // call checkPutField, hence InitialTasks could be set more than once
-    // for a thread.
-    TaskLocal.TaskLocalMap taskLocals = null;
+  }
 }

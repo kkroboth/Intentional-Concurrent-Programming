@@ -32,8 +32,15 @@ public interface Permission
   /** Can the current task reset the permission of the object protected by
    *  this permission? If not, an exception is thrown.
    *
+   *  A default method, which always throws an IntentError, is provided
+   *  for checkResetPermission because, other than a private permission,
+   *  it will be rare to allow a permission to be reset.
+   *
    *  @throws IntentError if a reset is not allowed.
    */
-  public void checkResetPermission();
+  default void checkResetPermission()
+  {
+    throw new IntentError("cannot reset permission");
+  }
 }
 

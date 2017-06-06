@@ -26,8 +26,6 @@ import java.util.Arrays;
  * is edited as the classes are loaded. The bytecode is also edited to
  * potentially insert code after every call to a superclass constructor, in
  * order to generate the initial permission for a new object.
- *
- * Class must be public because we require user app to call ICP.initialize.
  */
 final public class ICP {
 
@@ -67,6 +65,47 @@ final public class ICP {
     } catch (ClassNotFoundException | NoSuchMethodError e) {
       Message.fatal("internal error in icp.core.Main (BootStrap call):" +e);
     }
+  }
+
+  /**
+   * Reset the permission of one object with the permission from another
+   * object. The existing permission on the first object must allow the
+   * permission to be reset
+   *
+   * @param follower object to have permission set.
+   * @param leader   object to have permission retrieved.
+   */
+  public static void samePermissionAs(Object follower, Object leader)
+  {
+    PermissionSupport.setPermission(follower, 
+      PermissionSupport.getPermission(leader));
+  }
+
+  /**
+   * Reset the permission of an object with the given permission. The
+   * existing permission on the object must allow the permission to be
+   * reset.
+   *
+   * @param target     object to have permission set.
+   * @param permission permission to place in the object.
+   */
+  public static void setPermission(Object target, Permission permission)
+  {
+    System.err.println("set permission: " +target +" " +permission);
+    System.err.println("old permission: "
+      +PermissionSupport.getPermission(target));
+    PermissionSupport.setPermission(target, permission);
+  }
+
+  /**
+   * Chain a permission to the permissions already attached to a given object.
+   *
+   * @param target object to have the permission added to its chain.
+   * @param permission permission to add to the chain in the object.
+   */
+  public static void chainPermission(Object target, Permission permission)
+  {
+    throw new AssertionError("method not yet implemented");
   }
 
   /**
