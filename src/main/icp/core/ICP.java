@@ -102,7 +102,9 @@ final public class ICP {
    */
   public static void chainPermission(Object target, Permission permission)
   {
-    throw new AssertionError("method not yet implemented");
+    ChainedPermission chain = ChainedPermission.newInstance(
+      PermissionSupport.getPermission(target), permission);
+    PermissionSupport.setPermission(target, chain);
   }
 
   /**

@@ -11,7 +11,7 @@ import icp.lib.Task;
  * to access the object. Private permissions are set up for all newly
  * created objects. Instances of this class are immutable.
  */
-final class PrivatePermission implements Permission
+final public class PrivatePermission implements Permission
 {
   // for logging debugging info
   private static final Logger logger = Logger.getLogger("icp.core");
@@ -32,7 +32,7 @@ final class PrivatePermission implements Permission
    *  @return returns a permission private to the calling task
    *
    */
-  static PrivatePermission newInstance()
+  static public PrivatePermission newInstance()
   {
     // no optimization for now
     return new PrivatePermission();
