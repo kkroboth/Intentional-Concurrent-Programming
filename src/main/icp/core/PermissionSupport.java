@@ -13,7 +13,11 @@ import java.util.logging.Logger;
 
 /**
  * Contains static methods to manipulate permissions attached
- * to objects.
+ * to objects. This class is public because the checks inserted
+ * into the bytecode call methods in this class. But library code
+ * (and user code also, of course) should be discouraged from accessing
+ * this class directly. Instead the methods in ICP should be used.
+ * 
  */
 public final class PermissionSupport
 {
@@ -230,6 +234,10 @@ public final class PermissionSupport
     initPermissionFieldValue(obj);
   }
 
+  //
+  // static package-private methods to manipulate permissions on objects
+  //
+
   /** Retrieve the permission attached to an object.
    *
    *  @param obj the object to retrieve the permission from.
@@ -239,7 +247,7 @@ public final class PermissionSupport
    *
    *  @return the permission attached to the object
    */
-  public static Permission getPermission(Object obj)
+  static Permission getPermission(Object obj)
   {
     // it's our internal error if object is null
     if (obj == null)
@@ -271,7 +279,7 @@ public final class PermissionSupport
    *
    *  @throws NullPointerException if <code>obj</code> is null.
    */
-  public static void setPermission(Object obj, Permission permission)
+  static void setPermission(Object obj, Permission permission)
   {
     // it's our internal error if object is null
     if (obj == null)

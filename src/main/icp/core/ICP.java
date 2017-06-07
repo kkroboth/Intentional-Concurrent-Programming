@@ -91,9 +91,6 @@ final public class ICP {
    */
   public static void setPermission(Object target, Permission permission)
   {
-    System.err.println("set permission: " +target +" " +permission);
-    System.err.println("old permission: "
-      +PermissionSupport.getPermission(target));
     PermissionSupport.setPermission(target, permission);
   }
 

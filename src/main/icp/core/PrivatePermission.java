@@ -9,9 +9,7 @@ import icp.lib.Task;
 /**
  * A private permission only allows the task that created the object
  * to access the object. Private permissions are set up for all newly
- * created objects. Care must be taken to be sure that the same task
- * creates the object and its initial private permission. Instances of
- * this class are immutable.
+ * created objects. Instances of this class are immutable.
  */
 final class PrivatePermission implements Permission
 {
@@ -27,12 +25,6 @@ final class PrivatePermission implements Permission
     task = Task.currentTask();
   }
 
-  // private constructor
-  private PrivatePermission(Task t)
-  {
-    task = t;
-  }
-
   /** Create a private permission for the calling task. A static factory
    *  method is used to allow a future optimization to only build one instance
    *  per task.
@@ -40,25 +32,10 @@ final class PrivatePermission implements Permission
    *  @return returns a permission private to the calling task
    *
    */
-  public static PrivatePermission newInstance()
+  static PrivatePermission newInstance()
   {
     // no optimization for now
     return new PrivatePermission();
-  }
-
-  /** Create a private permission for a particular task. A static factory
-   *  method is used to allow a future optimization to only build one instance
-   *  per task.
-   *
-   *  @param t task to create the private permission for
-   *
-   *  @return a permission private to the given task
-   *
-   */
-  public static PrivatePermission newInstance(Task t)
-  {
-    // no optimization for now
-    return new PrivatePermission(t);
   }
 
   /** Validate permission for calling task to make a call.
