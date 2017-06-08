@@ -31,10 +31,13 @@ final public class ICP {
 
   private static final Logger logger = Logger.getLogger("icp.core");
 
+  // private constructor: should not be instantiated
+  private ICP() {}
+
   /** Initialize ICP: create a class loader that will edit
    *  user bytecode; establish the initial Task for the main thread.
    *
-   @  @param className name of user class to be executed
+   *  @param className name of user class to be executed
    *  @param args arguments to be passed to the user's main method
    *
    *  @throws java.lang.Throwable propagates on any user exception
@@ -68,17 +71,18 @@ final public class ICP {
   }
 
   /**
-   * Reset the permission of one object with the permission from another
-   * object. The existing permission on the first object must allow the
-   * permission to be reset
+   * Reset the permission of one object with a same-as permission pointing to
+   * another object. (Checks for the same-as permission are forwarded to the
+   * permission of the second object.) The existing permission on the first
+   * object must allow the permission to be reset.
    *
-   * @param follower object to have permission set.
-   * @param leader   object to have permission retrieved.
+   * @param follower object to have permission reset.
+   * @param leader   object to be pointed to by same-as permission.
    */
   public static void samePermissionAs(Object follower, Object leader)
   {
     PermissionSupport.setPermission(follower, 
-      PermissionSupport.getPermission(leader));
+      SameAsPermission.newInstance(leader));
   }
 
   /**
@@ -95,19 +99,6 @@ final public class ICP {
   }
 
   /**
-   * Chain a permission to the permissions already attached to a given object.
-   *
-   * @param target object to have the permission added to its chain.
-   * @param permission permission to add to the chain in the object.
-   */
-  public static void chainPermission(Object target, Permission permission)
-  {
-    ChainedPermission chain = ChainedPermission.newInstance(
-      PermissionSupport.getPermission(target), permission);
-    PermissionSupport.setPermission(target, chain);
-  }
-
-  /**
    * BootStrap the system for the main thread to get an assigned task.
    *
    * Using a level of indirection allows us to call the bootstrap method
@@ -120,6 +111,19 @@ final public class ICP {
    */
   public final static class BootStrap {
 
+    // private constructor: cannot be instantiated
+    private BootStrap() {}
+
+    /**
+     *  Called by ICP after the Javassist class loader/editor is installed.
+     *  This bootstraps the main thread to have a current task. Then it
+     *  it calls the main method of the user class.
+     *
+     *  @param args the user command line arguments prepended with the
+     *    the name of the user's "main" class.
+     *
+     *  @throws Throwable arising from user code.
+     */
     public static void main(String[] args) throws Throwable {
 
       // Establish an initial task for the main thread

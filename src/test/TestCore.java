@@ -26,7 +26,6 @@ public class TestCore
       testPrivate();
       testSetPermission();
       testSamePermissionAs();
-      testChainPermission();
     }
 
     private static void testPrivate()
@@ -118,13 +117,26 @@ public class TestCore
       // frozen permission
       TestClass obj = new TestClass(42);
       ICP.setPermission(obj, permission);
+      assert(obj.getX() == 42);
+      boolean caught = false;
+      try {
+        obj.y = 1999;
+      }
+      catch (IntentError ie)
+      {
+        caught = true;
+      }
+      assert(caught);
 
-      // create a second object and set its permission from the first object
-      TestClass obj2 = new TestClass(42);
+      // create a second object and set its permission to point to the
+      // first object
+      TestClass obj2 = new TestClass(43);
       ICP.samePermissionAs(obj2, obj);
+      assert(obj.getX() == 42);
+      assert(obj2.getX() == 43);
 
       // put access should now fail for the second obj
-      boolean caught = false;
+      caught = false;
       try {
         obj2.y = 1999;
       }
@@ -144,70 +156,26 @@ public class TestCore
         caught = true;
       }
       assert(caught);
-    }
 
-    private static void testChainPermission()
-    {
-      // create a frozen permission
-      Permission frozen = FrozenPermission.newInstance();
+      // create two objects and make the second have a same-as permission
+      // to the first
+      obj = new TestClass(44);
+      obj2 = new TestClass(45);
+      ICP.samePermissionAs(obj2, obj);
 
-      // create an always fails permission
-      Permission always = AlwaysFailsPermission.newInstance();
-
-      // create an object, which will have a private permission
-      // and chain on the frozen permission
-      TestClass obj = new TestClass(33);
-      ICP.chainPermission(obj, frozen);
-
-      // call and get should work
-      assert(obj.getX() == 33);
-      assert(obj.y == 0);
-
-      // but put should fail
-      boolean caught = false;
-      try {
-        obj.y = 1999;
-      }
-      catch (IntentError ie)
-      {
-        caught = true;
-      }
-      assert(caught);
-      
-
-      // create an object, which will have a private permission
-      // and chain on the always fails permission
-      obj = new TestClass(43);
-      ICP.chainPermission(obj, always);
-
-      // and now nothing should work
-      expectFailureForAllAccesses(obj);
-
-      // including setPermission
-      caught = false;
-      try {
-        ICP.setPermission(obj, always);
-      }
-      catch (IntentError ie)
-      {
-        caught = true;
-      }
-      assert(caught);
-
-      // again create an object, which will have a private permission,
-      // and then chain on a private permission.
-      obj = new TestClass(43);
-      ICP.chainPermission(obj, PrivatePermission.newInstance());
-
-      // call and get should work
-      assert(obj.getX() == 43);
-      assert(obj.y == 0);
-
-      // and I should be able to reset the chain permission
+      // now change the permission of the first object to be always-fails
       ICP.setPermission(obj, AlwaysFailsPermission.newInstance());
 
-      // and now nothing should work
-      expectFailureForAllAccesses(obj);
+      // calls to the second object should now fail
+      caught = false;
+      try {
+        assert(obj2.getX() == 43);
+      }
+      catch (IntentError ie)
+      {
+        caught = true;
+      }
+      assert(caught);
     }
   }
 }

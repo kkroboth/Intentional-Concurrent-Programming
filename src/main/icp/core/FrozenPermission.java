@@ -16,31 +16,48 @@ final public class FrozenPermission implements Permission
 
   private FrozenPermission() { }
 
+  /**
+   *  Return an instance of FrozenPermission.
+   *
+   *  @return FrozenPermission instance.
+   */
   public static FrozenPermission newInstance()
   {
     return new FrozenPermission();
   }
 
+  /**
+   * Always succeeds.
+   */
   @Override
   public void checkCall()
   {
   }
 
+  /**
+   * Always succeeds.
+   */
   @Override
   public void checkGet()
   {
   }
 
+  /**
+   * Always throws an intent error.
+   */
   @Override
   public void checkPut()
   {
-    throw new IntentError("always fails");
+    throw new IntentError("cannot put to frozen object");
   }
 
+  /**
+   * Always throws an intent error.
+   */
   @Override
   public void checkResetPermission()
   {
-    throw new IntentError("always fails");
+    throw new IntentError("cannot reset permission of frozen object");
   }
 }
 

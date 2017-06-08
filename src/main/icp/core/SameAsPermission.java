@@ -7,40 +7,35 @@ import java.util.logging.Logger;
 import icp.lib.Task;
 
 /**
- * A chained permission simply connects two permissions (both of
- * which might be also a chained permission). For a chained permission
- * to be valid for a given operation, both of its permissions must be true
- * for that operation.
+ * A same-as permission points to an object. The check methods for the same-as
+ * permission will be forwarded to the permission of the object pointer to.
+ * However, a same-as permission cannot be reset.
  */
-final class ChainedPermission implements Permission
+final class SameAsPermission implements Permission
 {
   // for logging debugging info
   private static final Logger logger = Logger.getLogger("icp.core");
 
-  // the two permissions 
-  private Permission first;
-  private Permission second;
+  // the object whose permission will be used
+  private final Object obj;
 
   // private constructor
-  private ChainedPermission()
+  private SameAsPermission(Object obj)
   {
+    this.obj = obj;
   }
 
-  /** Create a permission that chains together two given permissions.
+  /** Create a same-as permission.
    *
-   *  @param first first permission to be chained together.
+   *  @param obj the object's whose permission
    *  @param second second permission to be chained together.
    *
    *  @return returns the new chained permission.
    *
    */
-  static ChainedPermission newInstance(Permission first,
-    Permission second)
+  static SameAsPermission newInstance(Object obj)
   {
-    ChainedPermission ret = new ChainedPermission();
-    ret.first = first;
-    ret.second = second;
-    return ret;
+    return new SameAsPermission(obj);
   }
 
   /** Validate permission for calling task to make a call.
@@ -51,8 +46,7 @@ final class ChainedPermission implements Permission
   @Override
   public void checkCall()
   {
-    first.checkCall();
-    second.checkCall();
+    PermissionSupport.getPermission(obj).checkCall();
   }
 
   /** Validate permission for calling task to get a field.
@@ -63,8 +57,7 @@ final class ChainedPermission implements Permission
   @Override
   public void checkGet()
   {
-    first.checkGet();
-    second.checkGet();
+    PermissionSupport.getPermission(obj).checkGet();
   }
 
   /** Validate permission for calling task to put a field.
@@ -75,8 +68,7 @@ final class ChainedPermission implements Permission
   @Override
   public void checkPut()
   {
-    first.checkPut();
-    second.checkPut();
+    PermissionSupport.getPermission(obj).checkPut();
   }
 
   /** Validate permission for calling task to reset the permission.
@@ -87,7 +79,6 @@ final class ChainedPermission implements Permission
   @Override
   public void checkResetPermission()
   {
-    first.checkResetPermission();
-    second.checkResetPermission();
+    throw new IntentError("cannot reset a same-as permission");
   }
 }

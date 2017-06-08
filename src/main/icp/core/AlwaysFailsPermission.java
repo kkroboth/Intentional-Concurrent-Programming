@@ -23,24 +23,36 @@ final public class AlwaysFailsPermission implements Permission
     return new AlwaysFailsPermission();
   }
 
+  /**
+   * Always throws an IntentError.
+   */
   @Override
   public void checkCall()
   {
     throw new IntentError("always fails");
   }
 
+  /**
+   * Always throws an IntentError.
+   */
   @Override
   public void checkGet()
   {
     throw new IntentError("always fails");
   }
 
+  /**
+   * Always throws an IntentError.
+   */
   @Override
   public void checkPut()
   {
     throw new IntentError("always fails");
   }
 
+  /**
+   * Always throws an IntentError.
+   */
   @Override
   public void checkResetPermission()
   {

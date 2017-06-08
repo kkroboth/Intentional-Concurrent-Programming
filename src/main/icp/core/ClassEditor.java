@@ -10,7 +10,7 @@ import javassist.expr.FieldAccess;
 import java.util.logging.Logger;
 
 /**
- * Contains static methods for doing class editing.
+ * Contains static method for doing class editing.
  */
 final class ClassEditor
 {
