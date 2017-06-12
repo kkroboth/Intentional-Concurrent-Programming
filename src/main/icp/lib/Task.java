@@ -15,7 +15,7 @@ import java.lang.management.ThreadMXBean;
  * Task.getFirstInitialTask.
  * Default access for inheritance and lower level static methods.
  */
-abstract public class Task{
+abstract public class Task {
 
     /**
      * default access constructor to only allow classes inside
@@ -27,12 +27,13 @@ abstract public class Task{
      * Returns the current {@code Task}.
      *
      * @return long value that is the current task id.
-     * @throws IntentError if the Current thread has no {@code Task}.
      */
     public static Task currentTask(){
-      final Task toRtn = CURRENT_TASK.get();
+      Task toRtn = CURRENT_TASK.get();
       if (toRtn == null) {
-        throw new IntentError("Current thread has no task");
+        // will be null the first time called, so need to set current task
+        toRtn = Task.getFirstInitialTask();
+        CURRENT_TASK.set(toRtn);
       }
       return toRtn;
     }

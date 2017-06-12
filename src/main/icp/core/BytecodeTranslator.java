@@ -33,7 +33,11 @@ final class BytecodeTranslator implements Translator {
   public void start(ClassPool pool)
     throws NotFoundException, CannotCompileException
   {
-    logger.fine("Translator start method is returning");
+    // apparently cannot call the logger here because of infinite
+    // recursion in the construction of the class loaders
+    //logger.fine("Translator start method is returning");
+    // but I can call System.err.println
+    //System.err.println("Translator start method is returning");
   }
 
   /**

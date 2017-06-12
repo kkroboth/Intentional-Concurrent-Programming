@@ -12,26 +12,14 @@ public class TestApp1
 {
   public static void main(String[] args) throws Throwable
   {
-    // initialize ICP and invoke the "real" user main method
-    ICP.initialize("TestApp1$Inner", args);
-  }
-
-  // this inner class will not be loaded until its main method is
-  // invoked by the Javassist "run" method and so it will be loaded
-  // by the Javassist class loader with our class editing
-  public final static class Inner
-  {
-    public static void main(String[] args)
-    {
-      assert(args.length == 3);
-      assert(args[0].equals("abc"));
-      assert(args[1].equals("def"));
-      assert(args[2].equals("ghi"));
-      System.out.println("Hey!");
-      TestClass a = new TestClass(1066);
-      int x = a.getX();
-      assert(x == 1066);
-    }
+    assert(args.length == 3);
+    assert(args[0].equals("abc"));
+    assert(args[1].equals("def"));
+    assert(args[2].equals("ghi"));
+    System.out.println("Hey!");
+    TestClass a = new TestClass(1066);
+    int x = a.getX();
+    assert(x == 1066);
   }
 }
 
