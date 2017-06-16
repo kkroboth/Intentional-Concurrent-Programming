@@ -4,8 +4,10 @@ package icp.lib;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import icp.core.ICP;
 import icp.core.IntentError;
 import icp.core.Permission;
+import icp.core.FrozenPermission;
 
 /**
  * Simple reentrant lock, meaning it has only lock and unlock methods.
@@ -33,7 +35,8 @@ public class SimpleReentrantLock {
   public static SimpleReentrantLock newInstance()
   {
     SimpleReentrantLock ret = new SimpleReentrantLock();
-    ret.locked = new SingleOwnerPermission(ret);
+    ret.locked = SingleOwnerPermission.newInstance(ret);
+    ICP.setPermission(ret, FrozenPermission.newInstance());
     return ret;
   }
 
@@ -71,6 +74,13 @@ public class SimpleReentrantLock {
     private SingleOwnerPermission(SimpleReentrantLock lock)
     {
       this.lock = lock;
+    }
+
+    private static SingleOwnerPermission newInstance(SimpleReentrantLock lock)
+    {
+      SingleOwnerPermission ret = new SingleOwnerPermission(lock);
+      ICP.setPermission(ret, FrozenPermission.newInstance());
+      return ret;
     }
 
     @Override

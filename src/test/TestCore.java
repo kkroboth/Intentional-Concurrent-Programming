@@ -15,6 +15,7 @@ public class TestCore
     testPrivate();
     testSetPermission();
     testSamePermissionAs();
+    testBogusThreadBootstrap();
   }
 
   private static void testPrivate()
@@ -165,6 +166,33 @@ public class TestCore
       caught = true;
     }
     assert(caught);
+  }
+
+  // if user creates a non-ICP thread, then we want to issue an error
+  // if they try to use it with ICP
+  private static void testBogusThreadBootstrap()
+  {
+    Runnable r = () -> {
+      boolean caught = false;
+      try {
+        TestClass obj = new TestClass(13);
+        ICP.setPermission(obj, FrozenPermission.newInstance());
+      }
+      catch (IntentError ie)
+      {
+        caught = true;
+      }
+     assert (caught == true);
+    };
+    java.lang.Thread t = new java.lang.Thread(r);
+    t.start();
+    try {
+      t.join();
+    }
+    catch (InterruptedException ie)
+    {
+      assert false;
+    }
   }
 }
 

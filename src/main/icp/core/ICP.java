@@ -62,6 +62,26 @@ final public class ICP {
     PermissionSupport.setPermission(target, permission);
   }
 
+  // track whether the main thread has been bootstrapped
+  private static boolean mainThreadBootstrapped = false;
+
+  /**
+   *  Has the main thread been bootstrapped?
+   *
+   *  @return true if the main thread has been bootstrapped
+   */
+  public static boolean mainThreadBootstrapped()
+  {
+    return mainThreadBootstrapped;
+  }
+
+  /**
+   *  Announce that the main thread has been bootstrapped.
+   */
+  public static void announceMainThreadBootstrapped()
+  {
+    mainThreadBootstrapped = true;
+  }
 }
 
 
