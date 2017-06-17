@@ -170,6 +170,8 @@ public class TestCore
 
   // if user creates a non-ICP thread, then we want to issue an error
   // if they try to use it with ICP
+  // this test assumes that the main thread has already performed an ICP
+  // action
   private static void testBogusThreadBootstrap()
   {
     Runnable r = () -> {
