@@ -4,8 +4,8 @@ import icp.core.*;
 import icp.lib.Thread;
 import icp.lib.SimpleReentrantLock;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 //@RunWith(JUnitParamsRunner.class)
 public class TestSimpleReentrantLock
@@ -80,7 +80,7 @@ public class TestSimpleReentrantLock
       }
       catch (InterruptedException ie)
       {
-        assertTrue("caught InterruptedException with join", false);
+        assertTrue(false, "caught InterruptedException with join");
       }
     }
     lock.lock();

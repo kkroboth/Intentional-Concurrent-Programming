@@ -2,13 +2,10 @@
 
 package icp.core;
 
-import javassist.ClassPool;
-import javassist.Loader;
-import javassist.Translator;
-import javassist.NotFoundException;;
-import javassist.CannotCompileException;;
+import javassist.*;
 
-import java.util.logging.Logger;
+;
+;
 
 /**
  *  ICP's Javassist class loader.
@@ -27,6 +24,10 @@ public class ICPLoader extends Loader {
     // apparently critical to use this constructor in order to avoid
     // recursive invocation of java.lang.ClassLoader constructor
     super(parent, null);
+
+    // keeping sbt and testng out
+    delegateLoadingOf("sbt.");
+    delegateLoadingOf("org.testng.");
 
     // need to attach bytecode editor to the loader
     Translator t = new BytecodeTranslator();

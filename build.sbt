@@ -1,3 +1,5 @@
+import de.johoop.testngplugin.TestNGPlugin._
+
 lazy val root = (project in file(".")).
   settings(
     name := "ICP",
@@ -6,14 +8,11 @@ lazy val root = (project in file(".")).
     autoScalaLibrary := false,
     javacOptions in (Compile,compile) ++= Seq("-deprecation", "-Xlint"),
     libraryDependencies ++=  Seq(
-      "org.javassist" % "javassist" % "3.21.0-GA",
-      "com.novocode" % "junit-interface" % "0.11" % "test",
-      "pl.pragmatists" % "JUnitParams" % "1.1.0" % "test"
+      "org.javassist" % "javassist" % "3.21.0-GA"
     ),
 
     artifactPath in (Compile, packageBin) :=
-      baseDirectory.value / (artifact.value.name + "-" + version.value +
-      ".jar"),
+      baseDirectory.value / (artifact.value.name + "-" + version.value + ".jar"),
 
     javaSource in Compile := baseDirectory.value / "src" / "main",
     javaSource in Test := baseDirectory.value / "src" / "test",
@@ -29,11 +28,14 @@ lazy val root = (project in file(".")).
     // Select the ICP class loader
     // Enable assertions and logging
     // don't know if this will co-exist with JUnit...
-    fork in run := true,
+    fork in Global := true,
     javaOptions in run ++= Seq(
       "-ea",
-      "-Djava.util.logging.config.file=" + baseDirectory.value +
-        "/logging.properties",
+      "-Djava.util.logging.config.file=" + baseDirectory.value + "/logging.properties",
       "-Djava.system.class.loader=icp.core.ICPLoader"
-    )
+    ),
+    javaOptions in Global ++= Seq(
+      "-Djava.system.class.loader=icp.core.ICPLoader"
+    ),
+    testNGSettings
   )

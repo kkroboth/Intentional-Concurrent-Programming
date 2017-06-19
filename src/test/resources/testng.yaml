@@ -1,0 +1,7 @@
+name: ICPSuite
+verbose: 1
+
+tests:
+  - name: Demo
+    classes:
+      - DemoSuite
