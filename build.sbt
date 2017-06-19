@@ -25,17 +25,13 @@ lazy val root = (project in file(".")).
       "-link", "http://docs.oracle.com/javase/8/docs/api/"
     ),
 
-    // Select the ICP class loader
-    // Enable assertions and logging
-    // don't know if this will co-exist with JUnit...
-    fork in Global := true,
-    javaOptions in run ++= Seq(
+    fork := true,
+
+    javaOptions ++= Seq(
       "-ea",
       "-Djava.util.logging.config.file=" + baseDirectory.value + "/logging.properties",
       "-Djava.system.class.loader=icp.core.ICPLoader"
     ),
-    javaOptions in Global ++= Seq(
-      "-Djava.system.class.loader=icp.core.ICPLoader"
-    ),
+    parallelExecution in Test := false,
     testNGSettings
   )

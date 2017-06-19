@@ -1,11 +1,11 @@
 // $Id$
 //
 // simple test for Javassist bytecode editing
-// 
+//
 // log file will trace the loading and the editing of the classes
 //
 
-import icp.core.ICP;
+import core.TestClass;
 
 // this class will be loaded by the normal class loader
 public class TestApp1

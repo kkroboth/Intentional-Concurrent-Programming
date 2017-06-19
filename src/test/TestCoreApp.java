@@ -1,14 +1,14 @@
 // $Id: TestApp2.java 9 2017-06-05 20:23:55Z pjh $
 //
 // test the ICP core
-// 
+//
 
+import core.TestClass;
 import icp.core.*;
-
 import icp.lib.Thread;
 
 // this class will be loaded by the normal class loader
-public class TestCore
+public class TestCoreApp
 {
   public static void main(String[] args) throws Throwable
   {
@@ -27,7 +27,7 @@ public class TestCore
     // create lambda to access the object
     Runnable r = () -> {
       assert(t.getX() == 42);
-      t.y = 1999; 
+      t.y = 1999;
       assert(t.y == 1999);
     };
 

@@ -1,5 +1,6 @@
 // $Id$
 
+import core.TestClass;
 import icp.core.*;
 import icp.lib.Thread;
 import icp.lib.SimpleReentrantLock;

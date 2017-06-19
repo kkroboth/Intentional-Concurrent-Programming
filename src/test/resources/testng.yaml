@@ -2,6 +2,7 @@ name: ICPSuite
 verbose: 1
 
 tests:
-  - name: Demo
+  - name: Core
     classes:
-      - DemoSuite
+      - core.TestPrivate
+      - core.TestSetPermission

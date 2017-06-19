@@ -10,9 +10,6 @@ public class DemoSuite {
 
   @Test
   public void aSuccessfulTest() throws Exception {
-    //System.out.println(getClass().getClassLoader());
-    System.out.println(System.getProperty("java.system.class.loader"));
-    System.out.println(System.getProperty("java.io.tmpdir"));
     assertEquals(4, 2 + 2);
   }
 
