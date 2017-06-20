@@ -9,7 +9,7 @@ import org.testng.annotations.Test;
 import static core.Utils.executeInNewThread;
 import static org.testng.Assert.assertNull;
 
-public class TestSetPermission {
+public class TestPermission {
 
   @Test(
       description = "no access permission (cannot call/read)",

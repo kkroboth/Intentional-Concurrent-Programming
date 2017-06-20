@@ -31,7 +31,7 @@ public class TestPrivate {
   }
 
   // Note: this test fails if field z is final.  Is it OK?
-  @Test(description = "non creator cannot write")
+  @Test(description = "non creator cannot read")
   public void testPrivate4() throws Exception {
     TestClass t = new TestClass(42);
     assert (executeInNewThread(() -> System.out.println(t.z)) instanceof IntentError);
