@@ -1,6 +1,6 @@
 // $Id$
 
-package icp.lib;
+package icp.core;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,8 @@ import java.util.Map;
  * This class provides task-local variables.
  *
  * It is largely derived from java.lang.ThreadLocal.
+ *
+ * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
 public class TaskLocal<T> {
 
@@ -28,7 +30,7 @@ public class TaskLocal<T> {
      * subclassed, and this method overridden. Typically, an
      * anonymous inner class will be used. In this case, initialValue
      * will need to be annotated with {@code @Shared("ThreadSafe")},
-     * and registered with the {@code ThreadSafe} psudo-synchronizer.
+     * and registered with the {@code ThreadSafe} pseudo-synchronizer.
      * If the task-local variable is a static member of a class,
      * registration with {@code ThreadSafe} must be done in a static
      * initializer block.
@@ -52,12 +54,9 @@ public class TaskLocal<T> {
         Task t = Task.currentTask();
         TaskLocalMap map = getMap(t);
         if(map != null){
-            Object value = map.get(this);
-            if(value != null){
-                @SuppressWarnings("unchecked")
-                T toRtn = (T)value;
-                return toRtn;
-            }
+          T value = map.get(this);
+          if (value != null)
+            return value;
         }
         return setInitialValue();
     }
@@ -138,25 +137,26 @@ public class TaskLocal<T> {
      * The class is package private to allow declaration of fields in class
      * TaskFactory.AbstractTask
      */
-    static class TaskLocalMap{
+    @SuppressWarnings("unchecked")
+    static class TaskLocalMap {
 
-        private Map<TaskLocal<?>, Object> map;
+      private final Map<TaskLocal<?>, Object> map;
 
-        TaskLocalMap(TaskLocal<?> k, Object v){
+      public <T> TaskLocalMap(TaskLocal<T> k, T v) {
             map = new HashMap<>();
             map.put(k, v);
         }
 
-        private Object get(TaskLocal<?> key) {
-            return map.get(key);
+      public <T> T get(TaskLocal<T> key) {
+        return (T) map.get(key);
         }
 
-        private Object set(TaskLocal<?> key, Object value) {
-            return map.put(key, value);
+      public <T> T set(TaskLocal<T> key, T value) {
+        return (T) map.put(key, value);
         }
 
-        private Object remove(TaskLocal<?> key) {
-            return map.remove(key);
+      public <T> T remove(TaskLocal<T> key) {
+        return (T) map.remove(key);
         }
     }
 }

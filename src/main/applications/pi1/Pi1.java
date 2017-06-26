@@ -1,17 +1,24 @@
 // $Id$
+package applications.pi1;
+
 //
-// compute Pi using only SimpleRentrantLock
-// 
+// compute Pi using only SimpleReentrantLock
+//
 
 import icp.core.ICP;
-import icp.core.IntentError;
-
-import icp.lib.Thread;
+import icp.core.Task;
+import icp.core.Thread;
 import icp.lib.SimpleReentrantLock;
 
 // this class will be loaded by the normal class loader
 public class Pi1
 {
+
+  private static class Pi1SharedValue {
+    public int i;
+    public double d;
+  }
+
   public static void main(String[] args) throws Throwable
   {
     if (args.length == 0)
@@ -43,14 +50,14 @@ public class Pi1
     final int split = sp;
 
     // create a lock to protect the shared global sum
-    final SimpleReentrantLock lock = SimpleReentrantLock.newInstance();
+    final SimpleReentrantLock lock = new SimpleReentrantLock();
 
     // create a object to contain the shared global sum
     final Pi1SharedValue sum = new Pi1SharedValue();
 
     // make the global sum shareable by attaching the lock's
     // permission to it
-    ICP.setPermission(sum, lock.lockedPermission());
+    ICP.setPermission(sum, lock.getLockedPermission());
 
      // create and start a set of tasks to do the pi computation
     for (int i = 0; i < n; i++)
@@ -58,7 +65,7 @@ public class Pi1
       final int id = i;
 
       // create the task
-      Runnable task = () -> {
+      Task task = Task.fromThreadSafeRunnable(() -> {
         int low;
         int high;
         if (id < split) {
@@ -86,7 +93,7 @@ public class Pi1
             sum.d * width).startsWith("3.141592653"));
         }
         lock.unlock();
-      };
+      });
 
       // start the task on a new Thread
       new Thread(task).start();

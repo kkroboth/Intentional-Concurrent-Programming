@@ -1,14 +1,12 @@
 // $Id$
 
-package icp.lib;
-
-import icp.core.IntentError;
-import icp.core.ICP;
+package icp.core;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Top level abstract Task class.
@@ -16,51 +14,92 @@ import java.lang.management.ThreadMXBean;
  * Task.getFirstInitialTask.
  * Default access for inheritance and lower level static methods.
  */
-abstract public class Task {
+public class Task implements Runnable {
+
+  /**
+   * The permission field.  It is set as <em>private</em> at construction time, like for any other
+   * class, except for {@code InitTask}, where it is left null.
+   */
+  Permission icp$42$permissionField;
+
+  private final Runnable theTask;
+  private final AtomicBoolean running;
+
+  Task() {
+    theTask = null;
+    running = null;
+  }
 
     /**
      * default access constructor to only allow classes inside
        icp.lib to inherit from Task.
      */
-    Task(){}
+    private Task(Runnable task) {
+      if (task == null)
+        throw new NullPointerException();
+      theTask = task;
+      running = new AtomicBoolean();
+      icp$42$permissionField = Permissions.getTransferPermission();
+    }
+
+  public static Task fromPrivateRunnable(Runnable r) {
+    Task task = new Task(r);
+    PermissionSupport.setPermission(r, Permissions.getSamePermissionAs(task));
+    return task;
+  }
+
+  public static Task fromThreadSafeRunnable(Runnable r) {
+    return new Task(r);
+  }
+
+  /**
+   * Runs the task.  Memory barriers ensure that a task that is re-run will see the effects
+   * of its previous run.  There is no such guarantee across tasks.  It is invalid for multiple
+   * threads to run a task concurrently.  Note that this enable tasks to have the same property
+   * that threads have (i.e., they can see their own writes), even across multiple (but not
+   * concurrent) executions by different threads.
+   */
+  public void run() {
+    assert running != null; // only null in init task, which is not run
+    if (running.getAndSet(true))
+      throw new IntentError("task already running");
+    Task current = CURRENT_TASK.get();
+    CURRENT_TASK.set(this);
+    try {
+      assert theTask != null;
+      // we are now a task and can check permissions
+      PermissionSupport.checkCall(this);
+      theTask.run();
+    } finally {
+      CURRENT_TASK.set(current);
+      running.set(false);
+    }
+  }
+
+  private static final AtomicBoolean INITIALIZED = new AtomicBoolean();
 
     /**
      * Returns the current {@code Task}.
      *
      * @return long value that is the current task id.
      */
-    public static Task currentTask(){
-      Task toRtn = CURRENT_TASK.get();
-      // what if no current task established for this thread?
-      if (toRtn == null) {
-        // if the current thread is an instance of icp.lib.Thread then
-        // there is an internal error.
-        java.lang.Thread thread = java.lang.Thread.currentThread();
-        assert(!(thread instanceof icp.lib.Thread));
-
-        // otherwise, this should be the "main" thread, which is okay
-        // and we give it an initial task.
-        // but it is possible that the user has created a non-icp.lib.Thread,
-        // which we want to treat as an error.
-        // to catch this, we will only allow one non-icp.lib.Thread to be
-        // given an initial task.
-        // there could be a race between two non-ICP threads so lock on
-        // the Task class object
-        synchronized(Task.class)
-        {
-          if (ICP.mainThreadBootstrapped())
-          {
-            throw new IntentError(
-              "not the main thread and not an instance of icp.lib.Thread");
-          }
-
-          // okay, go ahead and give the main thread a task
-          ICP.announceMainThreadBootstrapped();
-          toRtn = Task.getFirstInitialTask();
-          CURRENT_TASK.set(toRtn);
+    public static Task currentTask() {
+      if (!INITIALIZED.get()) {
+        // bootstrapping an initial thread
+        if (!INITIALIZED.getAndSet(true)) {
+          Task init = new InitTask();
+          assert CURRENT_TASK.get() == null; // what else could it be?
+          CURRENT_TASK.set(init);
+          return init;
         }
       }
-      return toRtn;
+      Task task = CURRENT_TASK.get();
+      if (task == null)
+        throw new IntentError(String.format(
+            "thread '%s' is not a task",
+            Thread.currentThread().getName()
+        ));
+      return task;
     }
 
     /**
@@ -125,10 +164,6 @@ abstract public class Task {
      */
     public static final ThreadLocal<Task> CURRENT_TASK = new ThreadLocal<>();
 
-    public static Task getFirstInitialTask(){
-        return new InitialTask();
-    }
-
     /*
      * ThreadLocal for MonitorInfo length
      */
@@ -138,11 +173,5 @@ abstract public class Task {
     // TaskLocal values pertaining to this task. This map is maintained
     // by the TaskLocal class.
 
-    // This is tricky, null is explicitly assigned. This is redundant, as
-    // the JVM will guarantee the field will be null, however this is the
-    // only hook to get the checkPutField method of InitialTaskPermission
-    // to be called. Without explicit assignment we will not be forced to
-    // call checkPutField, hence InitialTasks could be set more than once
-    // for a thread.
-    TaskLocal.TaskLocalMap taskLocals = null;
+  TaskLocal.TaskLocalMap taskLocals;
 }

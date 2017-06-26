@@ -1,5 +1,5 @@
 name: ICPSuite
-verbose: 1
+verbose: 2
 
 tests:
   - name: Core
@@ -7,3 +7,8 @@ tests:
       - core.TestPrivate
       - core.TestPermission
       - core.TestInit
+      - core.TestLanguage
+
+  - name: Lib
+    classes:
+      - lib.TestReentrantLock

@@ -2,12 +2,9 @@
 
 package icp.lib;
 
-import java.util.concurrent.locks.ReentrantLock;
+import icp.core.*;
 
-import icp.core.ICP;
-import icp.core.IntentError;
-import icp.core.Permission;
-import icp.core.FrozenPermission;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Simple reentrant lock, meaning it has only lock and unlock methods.
@@ -15,99 +12,67 @@ import icp.core.FrozenPermission;
  * Includes a method to export its underlying permission.
  *
  * It wraps a java.util.concurrent.locks.ReentrantLock.
+ *
+ * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
 public class SimpleReentrantLock {
 
   private final ReentrantLock lock;
-  private Permission locked;
+  private final Permission locked;
 
-  // private constructor to force use of factory method
-  private SimpleReentrantLock()
-  {
+  /*
+   * owner field is non volatile.  Uses the same trick as in java.util.concurrent:
+   * - it is always written with the underlying lock help
+   * - it is read in unlock without the underlying lock held.  However, a stale value could only
+   *   be null or another task, which makes the test valid.
+   */
+  private Task owner;
+
+  /**
+   * Primary constructor. The lock is returned unlocked.
+   */
+  public SimpleReentrantLock() {
     lock = new ReentrantLock();
+    locked = new SingleCheckPermission("lock not held") {
+      protected boolean singleCheck() {
+        // safer to base on task and not thread
+        return Task.currentTask() == owner;
+      }
+    };
+    ICP.setPermission(locked, Permissions.getFrozenPermission());
+    // could be setting a fancier permission since owner is only read/written with the lock held
+    ICP.setPermission(this, Permissions.getPermanentlyThreadSafePermission());
   }
 
   /**
-   *  Create and return an instance of a SimpleReentrantLock.
-   *
-   *  @return the created lock.
+   * Lock the lock.
    */
-  public static SimpleReentrantLock newInstance()
-  {
-    SimpleReentrantLock ret = new SimpleReentrantLock();
-    ret.locked = SingleOwnerPermission.newInstance(ret);
-    ICP.setPermission(ret, FrozenPermission.newInstance());
-    return ret;
-  }
-
-  /**
-   *  Lock the lock.
-   */
-  public void lock()
-  {
+  public void lock() {
     lock.lock();
+    if (lock.getHoldCount() == 1)
+      owner = Task.currentTask();
   }
 
   /**
-   *  Unlock the lock.
+   * Unlock the lock.
+   * @throws IntentError if the lock is not held
    */
-  public void unlock()
-  {
+  public void unlock() {
+    if (Task.currentTask() != owner)
+      throw new IntentError("lock not held");
+    if (lock.getHoldCount() == 1)
+      owner = null;
     lock.unlock();
   }
 
   /**
-   *  Return the permission associated with this lock. This permission
-   *  can then be attached to an object, to require that object to be
-   *  protected by this lock.
+   * Return the permission associated with this lock. This permission
+   * can then be attached to an object to require that object to be
+   * protected by this lock.  Cannot be reset.
    *
-   *  @return the permission associated with the lock.
+   * @return the permission associated with the lock.
    */
-  public Permission lockedPermission() {
+  public Permission getLockedPermission() {
     return locked;
-  }
-
-  private static class SingleOwnerPermission implements Permission
-  {
-    private final SimpleReentrantLock lock;
-
-    private SingleOwnerPermission(SimpleReentrantLock lock)
-    {
-      this.lock = lock;
-    }
-
-    private static SingleOwnerPermission newInstance(SimpleReentrantLock lock)
-    {
-      SingleOwnerPermission ret = new SingleOwnerPermission(lock);
-      ICP.setPermission(ret, FrozenPermission.newInstance());
-      return ret;
-    }
-
-    @Override
-    public void checkCall()
-    {
-      if (lock.lock.getHoldCount() < 1)
-      {
-        throw new IntentError("lock not held: " +lock);
-      }
-    }
-
-    @Override
-    public void checkGet()
-    {
-      if (lock.lock.getHoldCount() < 1)
-      {
-        throw new IntentError("lock not held: " +lock);
-      }
-    }
-
-    @Override
-    public void checkPut()
-    {
-      if (lock.lock.getHoldCount() < 1)
-      {
-        throw new IntentError("lock not held: " +lock);
-      }
-    }
   }
 }

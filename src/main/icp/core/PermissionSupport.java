@@ -2,13 +2,9 @@
 
 package icp.core;
 
-import icp.lib.InitialTask;
-
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-
 import javassist.*;
-import javassist.expr.*;
+
+import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
 /**
@@ -17,7 +13,7 @@ import java.util.logging.Logger;
  * into the bytecode call methods in this class. But library code
  * (and user code also, of course) should be discouraged from accessing
  * this class directly. Instead the methods in ICP should be used.
- * 
+ *
  */
 public final class PermissionSupport
 {
@@ -25,44 +21,32 @@ public final class PermissionSupport
   private static final Logger logger = Logger.getLogger("icp.core");
 
   // should not be instantiated
-  private PermissionSupport() {}
+  private PermissionSupport() {
+    throw new AssertionError("this class cannot be instantiated");
+  }
 
   // obscured name to be used for the field added to hold the permission
   private static String AddedPermissionFieldName = "icp$42$permissionField";
 
   /** Add the field for the permission
    *
-   *  @param clss CtClass object for the class to which the field should be
-   *              added.
+   *  @param clss CtClass object for the class to which the field should be added.
    */
   public static void addPermissionField(CtClass clss)
   {
-    // skip interfaces
-    if (clss.isInterface())
-    {
-      return;
-    }
-
-    // also skip abstract classes
-    int mods = clss.getModifiers();
-    if (javassist.Modifier.isAbstract(mods))
-    {
-      return;
-    }
-
-    logger.fine("adding the permission field");
+    logger.fine("entering addPermissionField");
 
     // get the CtClass for the type of the field, which is Object
     // it is actually Wrapper, but I can only manipulate it via reflection
     // as an Object
     ClassPool pool = ClassPool.getDefault();
-    CtClass permissionFieldType = null;
+    CtClass permissionFieldType;
     try {
       permissionFieldType = pool.get("java.lang.Object");
     }
     catch (NotFoundException e)
     {
-      Message.fatal("NotFoundException in addPermissionField");
+      throw new ICPInternalError("NotFoundException in addPermissionField", e);
     }
 
     // see if the field already exists in the class
@@ -79,40 +63,41 @@ public final class PermissionSupport
     {
       // field exists, but it should have the right type
       // I am using equals() so assuming CtClass objects are unique.
-      CtClass t = null;
+      CtClass t;
       try {
         t = oldField.getType();
       }
       catch (NotFoundException e)
       {
-        Message.fatal("NotFoundException in addPermissionField (getType)");
+        throw new ICPInternalError("NotFoundException in addPermissionField (getType)", e);
       }
-      assert(t.equals(permissionFieldType));
+      assert t.equals(permissionFieldType);
 
       // field should not already exist in this class
       // it should be inherited from a superclass
-      assert(!oldField.getDeclaringClass().equals(clss));
+      assert !oldField.getDeclaringClass().equals(clss);
 
       logger.fine("permission field already exists in a super class");
       return;
     }
 
+    logger.fine(String.format("adding permission field to %s", clss.getName()));
     // add the field
-    CtField f = null;
+    CtField f;
     try {
       f = new CtField(permissionFieldType, AddedPermissionFieldName, clss);
     }
     catch (CannotCompileException e)
     {
-      Message.fatal("CannotCompileException in addPermissionField");
+      throw new ICPInternalError("CannotCompileException in addPermissionField", e);
     }
     try {
       clss.addField(f);
     }
     catch (CannotCompileException e)
     {
-      Message.error("Cannot add field %s: already exists?",
-        AddedPermissionFieldName);
+      throw new ICPInternalError(String.format("Cannot add field %s: already exists?",
+          AddedPermissionFieldName), e);
     }
   }
 
@@ -145,7 +130,7 @@ public final class PermissionSupport
     if (permission == null) return;
 
     // if there is a permission, inquire to see if it allows method call
-    permission.checkCall();
+    permission.checkCall(obj);
   }
 
   /** Checks that a field can be read by the executing task on a given
@@ -173,7 +158,7 @@ public final class PermissionSupport
     if (permission == null) return;
 
     // if there is a permission, inquire to see if it allows reading a field
-    permission.checkGet();
+    permission.checkGet(obj);
   }
 
   /** Checks that a field can be written by the executing task on a given
@@ -201,7 +186,7 @@ public final class PermissionSupport
     if (permission == null) return;
 
     // if there is a permission, inquire to see if it allows writing a field
-    permission.checkPut();
+    permission.checkPut(obj);
   }
 
   /** Initialize the permission for a newly created object. The object is
@@ -219,7 +204,7 @@ public final class PermissionSupport
     {
       throw new NullPointerException();
     }
-      
+
     logger.fine(String.format("[%s] permission initialize called for %s",
       Thread.currentThread(), obj.toString()));
 
@@ -238,7 +223,8 @@ public final class PermissionSupport
   // static package-private methods to manipulate permissions on objects
   //
 
-  /** Retrieve the permission attached to an object.
+  /** Retrieve the permission attached to an object.  This is used internally to implement
+   * "same as" permissions.
    *
    *  @param obj the object to retrieve the permission from.
    *
@@ -249,25 +235,15 @@ public final class PermissionSupport
    */
   static Permission getPermission(Object obj)
   {
-    // it's our internal error if object is null
-    if (obj == null)
-    {
-      throw new NullPointerException();
-    }
-
     logger.fine(String.format("[%s] getPermission called for %s",
       Thread.currentThread(), obj.toString()));
 
     Permission permission = getPermissionFieldValue(obj);
-
-    // it's our internal error if permission is null
-    if (permission == null)
-    {
-      throw new NullPointerException();
-    }
+    assert permission != null;
 
     // check that current task has permission to get the permission field
-    permission.checkGet();
+    // do we really want that check?  it's used in the "same as" scheme
+    permission.checkGet(obj);
 
     return permission;
   }
@@ -281,28 +257,17 @@ public final class PermissionSupport
    */
   static void setPermission(Object obj, Permission permission)
   {
-    // it's our internal error if object is null
-    if (obj == null)
-    {
-      throw new NullPointerException();
-    }
-
     logger.fine(String.format("[%s] setPermission called for %s with %s",
-      Thread.currentThread(), obj.toString(), permission.toString()));
+        Thread.currentThread(), obj, permission.toString()));
 
     // need to retrieve the permission to be replaced in order to
     // check that the calling task has permission to re-set the
     // permission
     Permission oldPermission = getPermissionFieldValue(obj);
-
-    // it's our internal error if permission is null
-    if (oldPermission == null)
-    {
-      throw new NullPointerException();
-    }
+    assert oldPermission != null;
 
     // check that current task has permission to reset the permission field
-    oldPermission.checkResetPermission();
+    oldPermission.checkResetPermission(obj);
 
     setPermissionFieldValue(obj, permission);
   }
@@ -310,6 +275,21 @@ public final class PermissionSupport
   //
   // static private methods to do the dirty work
   //
+
+  private static Field findPermissionField(Object obj) {
+    // use standard Java reflection
+    Class<?> c = obj.getClass();
+    do {
+      try {
+        return c.getDeclaredField(AddedPermissionFieldName);
+      } catch (NoSuchFieldException | SecurityException e) {
+        // not found, looking up the inheritance chain
+        c = c.getSuperclass();
+      }
+    } while (c != null);
+    // not found anywhere
+    return null;
+  }
 
   /**
    *  Retrieve the value of the field that holds the permission.
@@ -323,31 +303,21 @@ public final class PermissionSupport
    */
   private static Permission getPermissionFieldValue(Object obj)
   {
-    // use standard Java reflection
-    Permission p = null;
-    Field f = null;
-    try {
-      f = obj.getClass().getDeclaredField(AddedPermissionFieldName);
-    }
-    catch (NoSuchFieldException e)
-    {
-      // do nothing: f will remain null
-    }
+    Field f = findPermissionField(obj);
     if (f == null)
     {
+      // objects with no permission field are considered permanently thread-safe
       logger.fine("permission field is not present");
-      return null;
+      return Permissions.getPermanentlyThreadSafePermission();
     }
     try {
       f.setAccessible(true);
-      p = (Permission) f.get(obj);
-    }
-    catch (Exception e)
+      return (Permission) f.get(obj);
+    } catch (IllegalAccessException e)
     {
       logger.fine("exception while getting permission field: " + e);
-      Message.fatal("get of permission field failed");
+      throw new ICPInternalError("get of permission field failed", e);
     }
-    return p;
   }
 
   /**
@@ -359,11 +329,10 @@ public final class PermissionSupport
    */
   private static void initPermissionFieldValue(Object obj)
   {
-    // InitialTask objects need a special permission
-    Permission perm =  (obj instanceof InitialTask) ?
-      InitialTaskPermission.get() :
-      PrivatePermission.newInstance();
+    logger.fine(String.format("[%s] initPermission called for %s",
+        Thread.currentThread(), obj));
 
+    Permission perm = Permissions.getPrivatePermission();
     setPermissionFieldValue(obj, perm);
   }
 
@@ -377,25 +346,17 @@ public final class PermissionSupport
   private static void setPermissionFieldValue(Object obj,
     Permission permission)
   {
-    // use standard Java reflection
-    Permission p = null;
-    Field f = null;
-    try {
-      f = obj.getClass().getDeclaredField(AddedPermissionFieldName);
-    }
-    catch (NoSuchFieldException e)
-    {
-      logger.fine("exception while setting permission field: " + e);
-      Message.fatal("permission field not found");
-    }
+    logger.fine(String.format("setting permission '%s' on object '%s'", permission, obj));
+
+    Field f = findPermissionField(obj);
+    assert f != null;
     try {
       f.setAccessible(true);
       f.set(obj, permission);
-    }
-    catch (Exception e)
+    } catch (IllegalAccessException e)
     {
       logger.fine("exception while setting permission field: " + e);
-      Message.fatal("set of permission field failed");
+      throw new ICPInternalError("set of permission field failed", e);
     }
   }
 

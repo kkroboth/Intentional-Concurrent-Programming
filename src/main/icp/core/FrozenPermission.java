@@ -4,60 +4,43 @@ package icp.core;
 
 import java.util.logging.Logger;
 
-import icp.lib.Task;
-
 /**
- * This permission allows get and call, but not put or reset.
+ * This permission allows get and call, but not put or reset.  It is permanently thread-safe, like
+ * all permissions.
  */
-final public class FrozenPermission implements Permission
-{
+class FrozenPermission implements Permission {
   // for logging debugging info
   private static final Logger logger = Logger.getLogger("icp.core");
 
-  private FrozenPermission() { }
-
-  /**
-   *  Return an instance of FrozenPermission.
-   *
-   *  @return FrozenPermission instance.
-   */
-  public static FrozenPermission newInstance()
-  {
-    return new FrozenPermission();
+  public FrozenPermission() {
   }
 
   /**
    * Always succeeds.
    */
-  @Override
-  public void checkCall()
-  {
+  public void checkCall(Object target) {
   }
 
   /**
    * Always succeeds.
    */
-  @Override
-  public void checkGet()
-  {
+  public void checkGet(Object target) {
   }
 
   /**
    * Always throws an intent error.
    */
-  @Override
-  public void checkPut()
-  {
-    throw new IntentError("cannot put to frozen object");
+  public void checkPut(Object target) {
+    throw new IntentError(String.format("task '%s' cannot write object '%s' (frozen)",
+        Task.currentTask(), target));
   }
 
   /**
    * Always throws an intent error.
    */
-  @Override
-  public void checkResetPermission()
-  {
-    throw new IntentError("cannot reset permission of frozen object");
+  public void checkResetPermission(Object target) {
+    throw new IntentError(String.format("task '%s' cannot reset permission of object '%s' (frozen)",
+        Task.currentTask(), target));
   }
 }
 

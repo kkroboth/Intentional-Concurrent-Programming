@@ -4,8 +4,6 @@ package icp.core;
 
 import java.util.logging.Logger;
 
-import icp.lib.Task;
-
 /**
  * A same-as permission points to an object. The check methods for the same-as
  * permission will be forwarded to the permission of the object pointer to.
@@ -20,22 +18,9 @@ final class SameAsPermission implements Permission
   private final Object obj;
 
   // private constructor
-  private SameAsPermission(Object obj)
+  public SameAsPermission(Object obj)
   {
     this.obj = obj;
-  }
-
-  /** Create a same-as permission.
-   *
-   *  @param obj the object's whose permission
-   *  @param second second permission to be chained together.
-   *
-   *  @return returns the new chained permission.
-   *
-   */
-  static SameAsPermission newInstance(Object obj)
-  {
-    return new SameAsPermission(obj);
   }
 
   /** Validate permission for calling task to make a call.
@@ -43,10 +28,9 @@ final class SameAsPermission implements Permission
    *  @throws IntentError if the access is not allowed.
    *
    */
-  @Override
-  public void checkCall()
+  public void checkCall(Object target)
   {
-    PermissionSupport.getPermission(obj).checkCall();
+    PermissionSupport.getPermission(obj).checkCall(target);
   }
 
   /** Validate permission for calling task to get a field.
@@ -54,10 +38,9 @@ final class SameAsPermission implements Permission
    *  @throws IntentError if the access is not allowed.
    *
    */
-  @Override
-  public void checkGet()
+  public void checkGet(Object target)
   {
-    PermissionSupport.getPermission(obj).checkGet();
+    PermissionSupport.getPermission(obj).checkGet(target);
   }
 
   /** Validate permission for calling task to put a field.
@@ -65,10 +48,9 @@ final class SameAsPermission implements Permission
    *  @throws IntentError if the access is not allowed.
    *
    */
-  @Override
-  public void checkPut()
+  public void checkPut(Object target)
   {
-    PermissionSupport.getPermission(obj).checkPut();
+    PermissionSupport.getPermission(obj).checkPut(target);
   }
 
   /** Validate permission for calling task to reset the permission.
@@ -76,9 +58,8 @@ final class SameAsPermission implements Permission
    *  @throws IntentError if the reset is not allowed.
    *
    */
-  @Override
-  public void checkResetPermission()
+  public void checkResetPermission(Object target)
   {
-    throw new IntentError("cannot reset a same-as permission");
+    throw new IntentError(String.format("cannot reset a same-as permission on '%s'", target));
   }
 }

@@ -1,41 +1,78 @@
-package core;// $Id$
+// $Id$
+package core;
 
-import icp.core.AlwaysFailsPermission;
-import icp.core.FrozenPermission;
-import icp.core.ICP;
-import icp.core.IntentError;
+import icp.core.*;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import util.ICPTest;
 
-import static core.Utils.executeInNewThread;
-import static org.testng.Assert.assertNull;
+import java.util.Arrays;
 
-public class TestPermission {
+import static org.testng.Assert.assertEquals;
+import static util.Misc.executeInNewICPThreads;
+
+@DoNotEdit
+public class TestPermission extends ICPTest {
 
   @Test(
-      description = "no access permission (cannot call/read)",
+      description = "no access permission (cannot call)",
       expectedExceptions = IntentError.class
   )
   public void testNoAccess1() throws Exception {
-    TestClass t = new TestClass(42);
-    ICP.setPermission(t, AlwaysFailsPermission.newInstance());
-    t.y = t.getX();
+    TestClass t = new TestClass();
+    ICP.setPermission(t, Permissions.getNoAccessPermission());
+    t.justCall();
+  }
+
+  @Test(
+      description = "no access permission (cannot read)",
+      expectedExceptions = IntentError.class
+  )
+  public void testNoAccess2() throws Exception {
+    TestClass t = new TestClass();
+    // read cannot be in this class, which is not edited
+    Runnable read = new Runnable() { // cannot use lambdas
+      public void run() {
+        System.out.println(t.x);
+      }
+    };
+    ICP.setPermission(t, Permissions.getNoAccessPermission());
+    ICP.setPermission(read, Permissions.getFrozenPermission());
+    read.run();
+  }
+
+  @Test(
+      description = "no access permission (cannot write)",
+      expectedExceptions = IntentError.class
+  )
+  public void testNoAccess3() throws Exception {
+    TestClass t = new TestClass();
+    // write cannot be in this class, which is not edited
+    Runnable write = new Runnable() { // cannot use lambdas
+      public void run() {
+        t.x = 42;
+      }
+    };
+    ICP.setPermission(t, Permissions.getNoAccessPermission());
+    ICP.setPermission(write, Permissions.getFrozenPermission());
+    write.run();
   }
 
   @Test(
       description = "no access permission (cannot set permission)",
       expectedExceptions = IntentError.class
   )
-  public void testNoAccess2() throws Exception {
-    TestClass t = new TestClass(42);
-    ICP.setPermission(t, AlwaysFailsPermission.newInstance());
-    ICP.setPermission(t, AlwaysFailsPermission.newInstance());
+  public void testNoAccess4() throws Exception {
+    TestClass t = new TestClass();
+    ICP.setPermission(t, Permissions.getNoAccessPermission());
+    ICP.setPermission(t, Permissions.getNoAccessPermission());
   }
 
-  @Test(description = "frozen permission (cannot call/read)")
+  @Test(description = "frozen permission (can call/read)")
   public void testFrozen1() throws Exception {
-    TestClass t = new TestClass(42);
-    ICP.setPermission(t, FrozenPermission.newInstance());
-    t.getX();
+    TestClass t = new TestClass();
+    ICP.setPermission(t, Permissions.getFrozenPermission());
+    t.callAndRead();
   }
 
   @Test(
@@ -43,26 +80,56 @@ public class TestPermission {
       expectedExceptions = IntentError.class
   )
   public void testFrozen2() throws Exception {
-    TestClass t = new TestClass(42);
-    ICP.setPermission(t, FrozenPermission.newInstance());
-    t.y = 0;
+    TestClass t = new TestClass();
+    // write cannot be in this class, which is not edited
+    Runnable write = new Runnable() { // cannot use lambdas
+      public void run() {
+        t.x = 42;
+      }
+    };
+    ICP.setPermission(t, Permissions.getFrozenPermission());
+    ICP.setPermission(write, Permissions.getFrozenPermission());
+    write.run();
   }
 
   @Test(description = "samePermissionAs does not copy")
   public void testSetPermissionAs1() throws Exception {
-    TestClass t1 = new TestClass(42);
-    TestClass t2 = new TestClass(42);
+    TestClass t1 = new TestClass();
+    TestClass t2 = new TestClass();
     ICP.samePermissionAs(t2, t1);
-    ICP.setPermission(t1, FrozenPermission.newInstance());
-    assertNull(executeInNewThread(t2::getX));
+    ICP.setPermission(t1, Permissions.getFrozenPermission());
+    Task task = Task.fromThreadSafeRunnable(t2::callAndRead);
+    task.run();
   }
 
-  @Test(description = "samePermissionAs cannot reset", expectedExceptions = IntentError.class)
+  @Test(
+      description = "samePermissionAs cannot reset",
+      expectedExceptions = IntentError.class
+  )
   public void testSetPermissionAs2() throws Exception {
-    TestClass t1 = new TestClass(42);
-    ICP.setPermission(t1, FrozenPermission.newInstance());
-    TestClass t2 = new TestClass(42);
+    TestClass t1 = new TestClass();
+    ICP.setPermission(t1, Permissions.getFrozenPermission());
+    TestClass t2 = new TestClass();
     ICP.samePermissionAs(t2, t1);
-    ICP.setPermission(t2, AlwaysFailsPermission.newInstance());
+    ICP.setPermission(t2, Permissions.getNoAccessPermission());
+  }
+
+  @DataProvider
+  static Object[][] testTransferSafeData() {
+    return new Object[][]{
+        {10},
+        {100},
+        {1000}
+    };
+  }
+
+  @Test(description = "transfer permission is thread-safe", dataProvider = "testTransferSafeData")
+  public void testTransferSafe(int nbThreads) throws Exception {
+    TestClass shared = new TestClass();
+    ICP.setPermission(shared, Permissions.getTransferPermission());
+    Runnable r = shared::justCall;
+    Runnable[] tasks = new Runnable[nbThreads];
+    Arrays.fill(tasks, r);
+    assertEquals(executeInNewICPThreads(tasks), nbThreads - 1);
   }
 }

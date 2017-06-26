@@ -4,30 +4,33 @@ package icp.core;
 
 import javassist.*;
 
-;
-;
-
 /**
- *  ICP's Javassist class loader.
+ * ICP's Javassist class loader.
  */
 public class ICPLoader extends Loader {
 
   /**
-   *  Construct the ICP class loader, which will include a bytecode editor.
-   *  This constructor is called automatically at system startup by passing
-   *  -Djava.system.class.loader=icp.core.ICPLoader to the java command.
+   * Construct the ICP class loader, which will include a bytecode editor.
+   * This constructor is called automatically at system startup by passing
+   * -Djava.system.class.loader=icp.core.ICPLoader to the java command.
    *
-   *  @param parent the parent (default) class loader
+   * @param parent the parent (default) class loader
    */
-  public ICPLoader(ClassLoader parent)
-  {
+  public ICPLoader(ClassLoader parent) {
     // apparently critical to use this constructor in order to avoid
     // recursive invocation of java.lang.ClassLoader constructor
     super(parent, null);
 
-    // keeping sbt and testng out
+    // do not want to edit any of the javassist classes
+    delegateLoadingOf("javassist.");
+
+    // need to avoid infinite recursion, so do not edit the classes in icp.core
+    delegateLoadingOf("icp.core.");
+
+    // keeping intelliJ, sbt and TestNG out; should use a list as a property
     delegateLoadingOf("sbt.");
     delegateLoadingOf("org.testng.");
+    delegateLoadingOf("com.intellij.rt.");
 
     // need to attach bytecode editor to the loader
     Translator t = new BytecodeTranslator();
@@ -35,11 +38,7 @@ public class ICPLoader extends Loader {
     try {
       this.addTranslator(pool, t);
     } catch (NotFoundException | CannotCompileException e) {
-      // seems unlikely that I can call this method because my class loader
-      // is not fully constructed?
-      System.err.println(
-        "internal error in icp.core.Main (addTranslator call):" +e);
-      System.exit(-1);
+      throw new ICPInternalError("cannot create ICP loader", e);
     }
   }
 }

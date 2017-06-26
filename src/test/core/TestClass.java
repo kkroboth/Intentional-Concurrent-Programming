@@ -1,23 +1,18 @@
-package core;// $Id$
-//
-// simple test for javassist bytecode editing
-//
+// $Id$
+package core;
 
-public class TestClass
-{
-  private int x;
-  public int y;
-  public int z = -1;
+public class TestClass {
+  public int x;
 
-  public TestClass(int x)
-  {
-    this.x = x;
-    this.y = 0;
+  public void justCall() {
   }
 
-  public int getX()
-  {
+  public int callAndRead() {
     return x;
+  }
+
+  public void callAndWrite(int x) {
+    this.x = x;
   }
 }
 
