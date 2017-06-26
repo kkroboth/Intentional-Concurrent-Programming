@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 /**
  * This permission allows get and call, but not put or reset.  It is permanently thread-safe, like
- * all permissions.
+ * all core permissions.
  */
 class FrozenPermission implements Permission {
   // for logging debugging info
