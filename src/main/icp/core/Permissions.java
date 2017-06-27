@@ -53,6 +53,7 @@ public class Permissions {
   /**
    * A permission that allows calls, reads and writes (e.g., "thread-safe").  Can be reset.
    */
+  // Do we want this one?  It can be used to snatch rights from other tasks...
   public static Permission getThreadSafePermission() {
     return THREAD_SAFE;
   }
