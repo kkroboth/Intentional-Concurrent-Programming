@@ -23,9 +23,9 @@ class TransferPermission extends SingleCheckPermission {
   }
 
   protected boolean singleCheck() {
-    Task current = Task.currentTask();
+    Task caller = Task.currentTask();
     Task owner = this.owner.get();
-    return owner == current
-        || owner == null && this.owner.compareAndSet(null, current);
+    return caller == owner
+        || owner == null && this.owner.compareAndSet(null, caller);
   }
 }

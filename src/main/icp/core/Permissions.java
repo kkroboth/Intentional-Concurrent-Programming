@@ -95,6 +95,20 @@ public class Permissions {
   }
 
   /**
+   * A permission that temporarily transfers ownership to the first task that runs a check. Can be
+   * reset, but only by its original owner, which then reacquires the permission.
+   *
+   * The permission returned by this method is in its initial state and can be acquired by any task.
+   * One acquired by a different task, it enter an intermediate state in which it can be reacquired
+   * by the original owner.  Once reacquired, it behaves like a private permission.  If the task
+   * that acquires is the original owner, the intermediate state is skipped.
+   */
+  // Do we want this one?  It can be used to snatch rights from other tasks...
+  public static Permission getLoanPermission() {
+    return new LoanPermission();
+  }
+
+  /**
    * A permission that mimics the permission of a leader object. Cannot be reset.
    */
   public static Permission getSamePermissionAs(Object leader) {

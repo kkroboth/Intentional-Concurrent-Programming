@@ -4,6 +4,8 @@ import icp.core.*;
 import org.testng.annotations.Test;
 import util.ICPTest;
 
+import static org.testng.Assert.assertThrows;
+
 @DoNotEdit
 public class TestPrivate extends ICPTest {
 
@@ -15,20 +17,14 @@ public class TestPrivate extends ICPTest {
     ICP.setPermission(t, Permissions.getNoAccessPermission());
   }
 
-  @Test(
-      description = "non creator cannot call",
-      expectedExceptions = IntentError.class
-  )
+  @Test(description = "non creator cannot call")
   public void testPrivate2() throws Exception {
     TestClass t = new TestClass();
     Task task = Task.fromThreadSafeRunnable(t::justCall);
-    task.run();
+    assertThrows(IntentError.class, task::run);
   }
 
-  @Test(
-      description = "non creator cannot write",
-      expectedExceptions = IntentError.class
-  )
+  @Test(description = "non creator cannot write")
   public void testPrivate3() throws Exception {
     TestClass t = new TestClass();
     // write cannot be in this class, which is not edited
@@ -38,14 +34,11 @@ public class TestPrivate extends ICPTest {
       }
     };
     Task task = Task.fromPrivateRunnable(write);
-    task.run();
+    assertThrows(IntentError.class, task::run);
   }
 
   // Note: this test fails if field field is final.  Is it OK?
-  @Test(
-      description = "non creator cannot read",
-      expectedExceptions = IntentError.class
-  )
+  @Test(description = "non creator cannot read")
   public void testPrivate4() throws Exception {
     TestClass t = new TestClass();
     // read cannot be in this class, which is not edited
@@ -55,6 +48,6 @@ public class TestPrivate extends ICPTest {
       }
     };
     Task task = Task.fromPrivateRunnable(read);
-    task.run();
+    assertThrows(IntentError.class, task::run);
   }
 }

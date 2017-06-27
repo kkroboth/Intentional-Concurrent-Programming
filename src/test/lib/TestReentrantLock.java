@@ -11,7 +11,7 @@ import util.ICPTest;
 
 import java.util.Arrays;
 
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.*;
 import static util.Misc.executeInNewICPThread;
 import static util.Misc.executeInNewICPThreads;
 
@@ -31,39 +31,32 @@ public class TestReentrantLock extends ICPTest {
     }
   }
 
-  @Test(
-      description = "creator thread cannot access without lock",
-      expectedExceptions = IntentError.class
-  )
+  @Test(description = "creator thread cannot access without lock")
   public void cannotAccessWithoutLock() throws Exception {
     Target target = new Target();
     SimpleReentrantLock lock = new SimpleReentrantLock();
     ICP.setPermission(target, lock.getLockedPermission());
-    target.call();
+    assertThrows(IntentError.class, target::call);
   }
 
-  @Test(
-      description = "creator thread cannot reset permission",
-      expectedExceptions = IntentError.class
-  )
+  @Test(description = "creator thread cannot reset permission")
   public void cannotResetPermission1() throws Exception {
     Target target = new Target();
     SimpleReentrantLock lock = new SimpleReentrantLock();
     ICP.setPermission(target, lock.getLockedPermission());
-    ICP.setPermission(target, Permissions.getFrozenPermission());
+    assertThrows(IntentError.class, () ->
+        ICP.setPermission(target, Permissions.getFrozenPermission()));
   }
 
-  @Test(
-      description = "creator thread cannot reset permission, even with lock",
-      expectedExceptions = IntentError.class
-  )
+  @Test(description = "creator thread cannot reset permission, even with lock")
   public void cannotResetPermission2() throws Exception {
     Target target = new Target();
     SimpleReentrantLock lock = new SimpleReentrantLock();
     ICP.setPermission(target, lock.getLockedPermission());
     try {
       lock.lock();
-      ICP.setPermission(target, Permissions.getFrozenPermission());
+      assertThrows(IntentError.class, () ->
+          ICP.setPermission(target, Permissions.getFrozenPermission()));
     } finally {
       lock.unlock();
     }
@@ -109,13 +102,13 @@ public class TestReentrantLock extends ICPTest {
     }
   }
 
-  @Test(description = "tasks own, not threads", expectedExceptions = IntentError.class)
+  @Test(description = "tasks own, not threads")
   public void testThreadsDontOwn() throws Exception {
     SimpleReentrantLock lock = new SimpleReentrantLock();
     Task t1 = Task.fromThreadSafeRunnable(lock::lock);
     Task t2 = Task.fromThreadSafeRunnable(lock::unlock);
     t1.run();
-    t2.run();
+    assertThrows(IntentError.class, t2::run);
   }
 
   @Test(description = "tasks own across threads")
@@ -138,6 +131,6 @@ public class TestReentrantLock extends ICPTest {
     Thread.sleep(1000);
     // does not throw IntentError because the task does own the lock
     // throws IllegalMonitorStateException instead because the thread does not own the lock
-    assert (executeInNewICPThread(t) instanceof IllegalMonitorStateException);
+    assertTrue(executeInNewICPThread(t) instanceof IllegalMonitorStateException);
   }
 }

@@ -87,7 +87,7 @@ public abstract class SingleCheckPermission implements Permission {
     doCheck(singleCheck(), target, "cannot write fields");
   }
 
-  public final void checkResetPermission(Object target) {
+  public void checkResetPermission(Object target) {
     logger.fine(String.format("task '%s' checking reset permission on '%s'",
         Task.currentTask(), this));
     doCheck(resettable && singleCheck(), target, "cannot reset permission");
