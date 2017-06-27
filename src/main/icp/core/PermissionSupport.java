@@ -26,7 +26,30 @@ public final class PermissionSupport
   }
 
   // obscured name to be used for the field added to hold the permission
-  private static String AddedPermissionFieldName = "icp$42$permissionField";
+  private static final String AddedPermissionFieldName = "icp$42$permissionField";
+
+  public static Permission makePrivatePermissionFor(Object unused) {
+    return Permissions.getPrivatePermission();
+  }
+
+  private static final CtClass PERMISSION_TYPE;
+  private static final CtField.Initializer PRIVATE_INITIALZER;
+
+  static {
+    try {
+      ClassPool pool = ClassPool.getDefault();
+      // what is the meaning of this comment:
+      //   get the CtClass for the type of the field, which is Object
+      //   it is actually Wrapper, but I can only manipulate it via reflection
+      //   as an Object
+      PERMISSION_TYPE = pool.get("icp.core.Permission");
+      CtClass thisClass = pool.get(PermissionSupport.class.getName());
+      PRIVATE_INITIALZER = CtField.Initializer.byCall(thisClass, "makePrivatePermissionFor");
+
+    } catch (NotFoundException e) {
+      throw new ExceptionInInitializerError("class not found: " + e.getMessage());
+    }
+  }
 
   /** Add the field for the permission
    *
@@ -35,19 +58,6 @@ public final class PermissionSupport
   public static void addPermissionField(CtClass clss)
   {
     logger.fine("entering addPermissionField");
-
-    // get the CtClass for the type of the field, which is Object
-    // it is actually Wrapper, but I can only manipulate it via reflection
-    // as an Object
-    ClassPool pool = ClassPool.getDefault();
-    CtClass permissionFieldType;
-    try {
-      permissionFieldType = pool.get("java.lang.Object");
-    }
-    catch (NotFoundException e)
-    {
-      throw new ICPInternalError("NotFoundException in addPermissionField", e);
-    }
 
     // see if the field already exists in the class
     // if so, it was inherited from a superclass
@@ -71,7 +81,7 @@ public final class PermissionSupport
       {
         throw new ICPInternalError("NotFoundException in addPermissionField (getType)", e);
       }
-      assert t.equals(permissionFieldType);
+      assert t.equals(PERMISSION_TYPE);
 
       // field should not already exist in this class
       // it should be inherited from a superclass
@@ -85,19 +95,19 @@ public final class PermissionSupport
     // add the field
     CtField f;
     try {
-      f = new CtField(permissionFieldType, AddedPermissionFieldName, clss);
+      f = new CtField(PERMISSION_TYPE, AddedPermissionFieldName, clss);
     }
     catch (CannotCompileException e)
     {
       throw new ICPInternalError("CannotCompileException in addPermissionField", e);
     }
     try {
-      clss.addField(f);
+      clss.addField(f, PRIVATE_INITIALZER);
     }
     catch (CannotCompileException e)
     {
-      throw new ICPInternalError(String.format("Cannot add field %s: already exists?",
-          AddedPermissionFieldName), e);
+      throw new ICPInternalError(String.format("Cannot add field %s: %s",
+          AddedPermissionFieldName, e.getMessage()), e);
     }
   }
 
@@ -197,6 +207,7 @@ public final class PermissionSupport
    *
    *  @throws NullPointerException if <code>obj</code> is null.
    */
+/*
   public static void initialize(Object obj)
   {
     // it's our internal error if it is null
@@ -218,6 +229,7 @@ public final class PermissionSupport
     // set up the initial permission
     initPermissionFieldValue(obj);
   }
+*/
 
   //
   // static package-private methods to manipulate permissions on objects

@@ -3,7 +3,6 @@
 package icp.core;
 
 import javassist.*;
-import javassist.expr.ConstructorCall;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 
@@ -28,6 +27,7 @@ final class ClassEditor {
    * @param className name of class to be edited
    */
   static void edit(CtClass cc, String className) {
+/*
     // grab all the constructors declared in the class
     // and iterate through and edit the constructor calls in each
     CtConstructor[] constructors = cc.getDeclaredConstructors();
@@ -58,6 +58,7 @@ final class ClassEditor {
         throw new ICPInternalError("cannot compile edit of constructor", ex);
       }
     }
+*/
 
     // now grab all the methods declared in this class
     // and add the check at the beginning of the method body
