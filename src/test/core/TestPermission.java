@@ -65,21 +65,22 @@ public class TestPermission extends ICPTest {
     t.callAndRead();
   }
 
-  @Test(
-      description = "frozen permission (cannot write)",
-      expectedExceptions = IntentError.class
-  )
+  // test fails; should be fixed
+  @Test(description = "frozen permission (cannot write)")
   public void testFrozen2() throws Exception {
     TestClass t = new TestClass();
     // write cannot be in this class, which is not edited
+/*
     Runnable write = new Runnable() { // cannot use lambdas
       public void run() {
         t.x = 42;
       }
     };
+*/
+    Runnable write = () -> t.x = 42;
     ICP.setPermission(t, Permissions.getFrozenPermission());
-    ICP.setPermission(write, Permissions.getFrozenPermission());
-    write.run();
+    //ICP.setPermission(write, Permissions.getFrozenPermission());
+    assertThrows(IntentError.class, write::run);
   }
 
   @Test(description = "samePermissionAs does not copy")
