@@ -12,6 +12,11 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertThrows;
 import static util.Misc.executeInNewICPThreads;
 
+// NOTE: cannot use lambdas in the tests in this class
+// because the lambdas are implemented as methods inserted
+// into this class, and this class is not edited due to the
+// @DoNotEdit annotation.
+
 @DoNotEdit
 public class TestPermission extends ICPTest {
 
@@ -70,16 +75,13 @@ public class TestPermission extends ICPTest {
   public void testFrozen2() throws Exception {
     TestClass t = new TestClass();
     // write cannot be in this class, which is not edited
-/*
     Runnable write = new Runnable() { // cannot use lambdas
       public void run() {
         t.x = 42;
       }
     };
-*/
-    Runnable write = () -> t.x = 42;
     ICP.setPermission(t, Permissions.getFrozenPermission());
-    //ICP.setPermission(write, Permissions.getFrozenPermission());
+    ICP.setPermission(write, Permissions.getFrozenPermission());
     assertThrows(IntentError.class, write::run);
   }
 

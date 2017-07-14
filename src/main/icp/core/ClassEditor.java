@@ -27,40 +27,8 @@ final class ClassEditor {
    * @param className name of class to be edited
    */
   static void edit(CtClass cc, String className) {
-/*
-    // grab all the constructors declared in the class
-    // and iterate through and edit the constructor calls in each
-    CtConstructor[] constructors = cc.getDeclaredConstructors();
-    for (CtConstructor constructor : constructors) {
-      // getLongName displays the constructor's class and the parameter types
-      String longName = constructor.getLongName();
-      logger.finer(String.format("processing constructor: long name is %s;", longName));
 
-      try {
-        // edit its constructor calls
-        constructor.instrument(
-            new ExprEditor() {
-              public void edit(ConstructorCall c) throws CannotCompileException {
-                // only interested in calls to super
-                if (c.isSuper()) {
-                  logger.fine("edit call on super");
-                  c.replace("{ $proceed($$); " +
-                      " icp.core.PermissionSupport#initialize($0); }");
-                } else {
-                  // just leave the constructor call alone
-                  // apparently must call replace even though no edit is needed
-                  c.replace(" $proceed($$);");
-                }
-              }
-            });
-      } catch (CannotCompileException ex) {
-        logger.severe("cannot compile edit of constructor");
-        throw new ICPInternalError("cannot compile edit of constructor", ex);
-      }
-    }
-*/
-
-    // now grab all the methods declared in this class
+    // grab all the methods declared in this class
     // and add the check at the beginning of the method body
     CtMethod[] methods = cc.getDeclaredMethods();
     for (CtMethod method : methods) {
@@ -108,11 +76,17 @@ final class ClassEditor {
               public void edit(FieldAccess fa) throws CannotCompileException {
                 String name = fa.getFieldName();
 
+                boolean skip = false;
+
                 // skip fields inserted for captured variables
                 // also skip fields that capture outer "this" values
                 // THIS IS A HACK dependent on running with javac
                 if (name.startsWith("val$") || name.startsWith("this$")) {
                   logger.fine("skip field edit for " + name);
+                  skip = true;
+                }
+
+                if (skip) {
                   if (fa.isReader()) {
                     fa.replace("{ $_ = $proceed(); }");
                   } else if (fa.isWriter()) {

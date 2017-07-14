@@ -8,6 +8,7 @@ tests:
       - core.TestPermission
       - core.TestInit
       - core.TestLanguage
+      - core.TestLambda
 
   - name: Lib
     classes:
