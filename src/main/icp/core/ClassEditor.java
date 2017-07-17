@@ -82,7 +82,30 @@ final class ClassEditor {
                 // also skip fields that capture outer "this" values
                 // THIS IS A HACK dependent on running with javac
                 if (name.startsWith("val$") || name.startsWith("this$")) {
-                  logger.fine("skip field edit for " + name);
+                  logger.fine("skip field edit for " + name + "(captured)");
+                  skip = true;
+                }
+
+                // skip final fields
+                // because we want final field accesses to be treated
+                // consistently and final fields that contain unambiguous
+                // constant values become constants in the bytecode, meaning
+                // there is no getField operation, and therefore no check
+                // if the executing thread has access to the object containing
+                // the final field.
+                // since final fields are immutable we will always allow
+                // access to them
+                CtField field = null;
+                try {
+                  field = fa.getField();
+                }
+                catch (NotFoundException nfe)
+                {
+                  throw new ICPInternalError("cannot find field: ", nfe);
+                }
+                int modifiers = field.getModifiers();
+                if (Modifier.isFinal(modifiers)) {
+                  logger.fine("skip field edit for " + name + " (final)");
                   skip = true;
                 }
 

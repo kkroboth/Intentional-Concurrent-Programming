@@ -37,7 +37,6 @@ public class TestPermission extends ICPTest {
       }
     };
     ICP.setPermission(t, Permissions.getNoAccessPermission());
-    ICP.setPermission(read, Permissions.getFrozenPermission());
     assertThrows(IntentError.class, read::run);
   }
 
@@ -51,7 +50,6 @@ public class TestPermission extends ICPTest {
       }
     };
     ICP.setPermission(t, Permissions.getNoAccessPermission());
-    ICP.setPermission(write, Permissions.getFrozenPermission());
     assertThrows(IntentError.class, write::run);
   }
 
@@ -70,7 +68,6 @@ public class TestPermission extends ICPTest {
     t.callAndRead();
   }
 
-  // test fails; should be fixed
   @Test(description = "frozen permission (cannot write)")
   public void testFrozen2() throws Exception {
     TestClass t = new TestClass();
@@ -81,7 +78,6 @@ public class TestPermission extends ICPTest {
       }
     };
     ICP.setPermission(t, Permissions.getFrozenPermission());
-    ICP.setPermission(write, Permissions.getFrozenPermission());
     assertThrows(IntentError.class, write::run);
   }
 

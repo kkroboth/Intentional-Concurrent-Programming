@@ -59,11 +59,11 @@ final class BytecodeTranslator implements Translator {
   private static Boolean mustEdit(CtClass cc) throws NotFoundException {
     logger.fine(String.format("checking class '%s' for possible editing", cc.getName()));
     // skip interfaces
-    if (cc.isInterface())
-      return false;
+    //if (cc.isInterface())
+    //  return false;
     // skip abstract classes (why?)
-    if (javassist.Modifier.isAbstract(cc.getModifiers()))
-      return false;
+    //if (javassist.Modifier.isAbstract(cc.getModifiers()))
+    //  return false;
     // skip DoNotEdit classes
     try {
       if (cc.getAnnotation(DoNotEdit.class) != null)
