@@ -51,19 +51,17 @@ final class BytecodeTranslator implements Translator {
 
     CtClass cc = pool.get(classname);
     if (mustEdit(cc)) {
-      PermissionSupport.addPermissionField(cc);
+      // do not add try to add a field to an interface
+      if (!cc.isInterface())
+      {
+        PermissionSupport.addPermissionField(cc);
+      }
       ClassEditor.edit(cc, classname);
     }
   }
 
   private static Boolean mustEdit(CtClass cc) throws NotFoundException {
     logger.fine(String.format("checking class '%s' for possible editing", cc.getName()));
-    // skip interfaces
-    //if (cc.isInterface())
-    //  return false;
-    // skip abstract classes (why?)
-    //if (javassist.Modifier.isAbstract(cc.getModifiers()))
-    //  return false;
     // skip DoNotEdit classes
     try {
       if (cc.getAnnotation(DoNotEdit.class) != null)

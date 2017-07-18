@@ -90,9 +90,9 @@ final class ClassEditor {
                 // because we want final field accesses to be treated
                 // consistently and final fields that contain unambiguous
                 // constant values become constants in the bytecode, meaning
-                // there is no getField operation, and therefore no check
-                // if the executing thread has access to the object containing
-                // the final field.
+                // there is no getField operation, and therefore no check to
+                // see if the executing thread has access to the object 
+                // containing the final field.
                 // since final fields are immutable we will always allow
                 // access to them
                 CtField field = null;
