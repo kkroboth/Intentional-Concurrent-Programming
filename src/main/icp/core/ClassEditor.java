@@ -78,14 +78,6 @@ final class ClassEditor {
 
                 boolean skip = false;
 
-                // skip fields inserted for captured variables
-                // also skip fields that capture outer "this" values
-                // THIS IS A HACK dependent on running with javac
-                if (name.startsWith("val$") || name.startsWith("this$")) {
-                  logger.fine("skip field edit for " + name + "(captured)");
-                  skip = true;
-                }
-
                 // skip final fields
                 // because we want final field accesses to be treated
                 // consistently and final fields that contain unambiguous
@@ -95,6 +87,9 @@ final class ClassEditor {
                 // containing the final field.
                 // since final fields are immutable we will always allow
                 // access to them
+                // also: final fields named val$... and this$... are created
+                // by javac when implementing anonymous and nested classes
+                // we don't want these fields checked either
                 CtField field = null;
                 try {
                   field = fa.getField();

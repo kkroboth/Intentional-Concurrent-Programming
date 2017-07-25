@@ -10,6 +10,7 @@ import util.ICPTest;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertThrows;
 import static util.Misc.executeInNewICPThread;
 
@@ -217,4 +218,67 @@ public class TestLanguage extends ICPTest {
     assertThrows(IntentError.class, a::meth3);
   }
   
+  @Test(description = "anonymous class captures a variable")
+  public void testAnonymous() throws Exception {
+    final TestClass a = new TestClass();
+    a.callAndWrite(1066);
+    ICP.setPermission(a, Permissions.getFrozenPermission());
+    Runnable r = new Runnable() {
+      public void run() {
+        assertEquals(a.callAndRead(), 1066);
+      }
+    };
+    ICP.setPermission(r, Permissions.getFrozenPermission());
+    assertNull(executeInNewICPThread(r));
+  }
+  
+  @Test(description = "nested classes")
+  public void testNested() throws Exception {
+
+    // create a thread-safe object with shared inner objects
+    final NestedClasses a = new NestedClasses(1066);
+    ICP.setPermission(a, Permissions.getPermanentlyThreadSafePermission());
+    assertEquals(a.getX(), 1066);
+    assertEquals(a.getY(), 2066);
+    assertEquals(a.testLocal(), 1066 + 2066);
+
+    // expose an instance to the inner class
+    final Object b = a.exposeX();
+    final Object c = a.exposeY();
+
+    // expose instance of a local class
+    final Object d = a.testLocal2(null);
+    // should be able to use it again since this thread created it
+    Object e = a.testLocal2(d);
+
+    // now access the object via another thread
+    Runnable r = new Runnable() {
+      public void run() {
+        // these will access both the outer and inner classes
+        assertEquals(a.getX(), 1066);
+        assertEquals(a.getY(), 2066);
+        assertEquals(a.testLocal(), (1066 + 2066));
+        a.incX();
+        a.incY();
+        assertEquals(a.getX(), 1067);
+        assertEquals(a.getY(), 2067);
+        assertEquals(a.grabX(), 1067);
+        assertEquals(a.grabY(), 2067);
+
+        // try to use local private object created by another thread
+        boolean threwIt = false;
+        try {
+          a.testLocal2(d);
+        }
+        catch (IntentError ie)
+        {
+          threwIt = true;
+        }
+        assertTrue(threwIt);
+      }
+    };
+    ICP.setPermission(r, Permissions.getFrozenPermission());
+    assertNull(executeInNewICPThread(r));
+  }
+
 }
