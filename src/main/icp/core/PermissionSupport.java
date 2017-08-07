@@ -199,37 +199,18 @@ public final class PermissionSupport
     permission.checkPut(obj);
   }
 
-  /** Initialize the permission for a newly created object. The object is
-   *  given a private permission, allowing only the creating task to access
-   *  the object.
+  /**
+   *  EXPERIMENTAL CODE: Hook called at end of the execution of a static
+   *  initializer for a class. We might decide to use this hook to set
+   *  a permission on the class object, to allow intents to be expressed
+   *  for static fields and methods.
    *
-   *  @param obj the newly created object
-   *
-   *  @throws NullPointerException if <code>obj</code> is null.
+   *  @param clss the Class object for the class being initialized.
    */
-/*
-  public static void initialize(Object obj)
+  public static void setPermissionOnClass(Class<?> clss)
   {
-    // it's our internal error if it is null
-    if (obj == null)
-    {
-      throw new NullPointerException();
-    }
-
-    logger.fine(String.format("[%s] permission initialize called for %s",
-      Thread.currentThread(), obj.toString()));
-
-    // is the permission field already initialized?
-    // then do nothing, as this is a redundant call to initialize
-    if (getPermissionFieldValue(obj) != null)
-    {
-      return;
-    }
-
-    // set up the initial permission
-    initPermissionFieldValue(obj);
+    //System.err.println("setPermissionOnClass called for "+ clss);
   }
-*/
 
   //
   // static package-private methods to manipulate permissions on objects

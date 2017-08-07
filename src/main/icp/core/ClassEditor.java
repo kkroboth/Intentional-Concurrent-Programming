@@ -28,6 +28,30 @@ final class ClassEditor {
    */
   static void edit(CtClass cc, String className) {
 
+    // EXPERIMENTAL CODE
+    // get the static initializer for this class and edit it to
+    // insert a call to an ICP core routine at the end of the initializer
+    // note that makeClassInitializer returns an empty static initializer
+    // if there is not one already in the class
+    CtConstructor staticInit = null;
+    try {
+      staticInit = cc.makeClassInitializer();
+    } catch (CannotCompileException cce) {
+      logger.severe("makeClassInitializer() failed");
+      throw new ICPInternalError(
+        "makeClassInitializer() failed: ", cce);
+    }
+    logger.fine("editing static initializer");
+    try {
+      staticInit.insertAfter(
+          "icp.core.PermissionSupport#setPermissionOnClass($class);");
+    } catch (CannotCompileException cce) {
+      logger.severe("cannot compile insertion of method setPermissionOnClass");
+      throw new ICPInternalError(
+        "cannot compile insertion of method setPermissionOnClasscheckCall: ",
+        cce);
+    }
+
     // grab all the methods declared in this class
     // and add the check at the beginning of the method body
     CtMethod[] methods = cc.getDeclaredMethods();
@@ -59,7 +83,8 @@ final class ClassEditor {
             "icp.core.PermissionSupport#checkCall($0);");
       } catch (CannotCompileException cce) {
         logger.severe("cannot compile insertion of method checkCall");
-        throw new ICPInternalError("cannot compile insertion of method checkCall", cce);
+        throw new ICPInternalError(
+          "cannot compile insertion of method checkCall: ", cce);
       }
     }
 

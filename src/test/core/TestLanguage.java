@@ -281,4 +281,40 @@ public class TestLanguage extends ICPTest {
     assertNull(executeInNewICPThread(r));
   }
 
+  // test that instance initializers are edited by Javassist
+  @Test(description = "instance initializer")
+  public void testInstanceInitializer() throws Exception {
+    class A {
+      public int i = 1066;
+    };
+    A x = new A();
+    ICP.setPermission(x, Permissions.getNoAccessPermission());
+    class B {
+      B() { i = i + 13; };
+      public int i = x.i + 37;
+    };
+    boolean threwIt = false;
+    try {
+      B b = new B();
+    }
+    catch (IntentError ie)
+    {
+      threwIt = true;
+    }
+    assertTrue(threwIt);
+    class C {
+      C() { i = i + 13; };
+      public int i;
+      { i = x.i + 377; }
+    };
+    threwIt = false;
+    try {
+      C c = new C();
+    }
+    catch (IntentError ie)
+    {
+      threwIt = true;
+    }
+    assertTrue(threwIt);
+  }
 }
