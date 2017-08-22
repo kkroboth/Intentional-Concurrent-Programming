@@ -12,12 +12,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertThrows;
 import static util.Misc.executeInNewICPThreads;
 
-// NOTE: cannot use lambdas in the tests in this class
-// because the lambdas are implemented as methods inserted
-// into this class, and this class is not edited due to the
-// @DoNotEdit annotation.
-
-@DoNotEdit
+@External
 public class TestPermission extends ICPTest {
 
   @Test(description = "no access permission (cannot call)")
@@ -30,27 +25,15 @@ public class TestPermission extends ICPTest {
   @Test(description = "no access permission (cannot read)")
   public void testNoAccess2() throws Exception {
     TestClass t = new TestClass();
-    // read cannot be in this class, which is not edited
-    Runnable read = new Runnable() { // cannot use lambdas
-      public void run() {
-        System.out.println(t.x);
-      }
-    };
     ICP.setPermission(t, Permissions.getNoAccessPermission());
-    assertThrows(IntentError.class, read::run);
+    assertThrows(IntentError.class, () -> System.out.println(t.x));
   }
 
   @Test(description = "no access permission (cannot write)")
   public void testNoAccess3() throws Exception {
     TestClass t = new TestClass();
-    // write cannot be in this class, which is not edited
-    Runnable write = new Runnable() { // cannot use lambdas
-      public void run() {
-        t.x = 42;
-      }
-    };
     ICP.setPermission(t, Permissions.getNoAccessPermission());
-    assertThrows(IntentError.class, write::run);
+    assertThrows(IntentError.class, () -> t.x = 42);
   }
 
   @Test(description = "no access permission (cannot set permission)")
@@ -71,14 +54,8 @@ public class TestPermission extends ICPTest {
   @Test(description = "frozen permission (cannot write)")
   public void testFrozen2() throws Exception {
     TestClass t = new TestClass();
-    // write cannot be in this class, which is not edited
-    Runnable write = new Runnable() { // cannot use lambdas
-      public void run() {
-        t.x = 42;
-      }
-    };
     ICP.setPermission(t, Permissions.getFrozenPermission());
-    assertThrows(IntentError.class, write::run);
+    assertThrows(IntentError.class, () -> t.x = 42);
   }
 
   @Test(description = "samePermissionAs does not copy")

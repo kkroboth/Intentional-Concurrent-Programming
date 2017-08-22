@@ -12,7 +12,6 @@ import java.util.logging.Logger;
  * The editing of a class is done by <code>ClassEditor.edit</code> static method.
  *
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
- *
  */
 final class BytecodeTranslator implements Translator {
 
@@ -23,54 +22,35 @@ final class BytecodeTranslator implements Translator {
   /**
    * Start the translation process. We have nothing to do at this time.
    *
-   * @throws NotFoundException actually never thrown
+   * @throws NotFoundException      actually never thrown
    * @throws CannotCompileException actually never thrown
    */
   @Override
-  public void start(ClassPool pool) throws NotFoundException, CannotCompileException
-  {
+  public void start(ClassPool pool) throws NotFoundException, CannotCompileException {
     // cannot use logging here, for mysterious reasons
     // cannot do much here that requires loading of new classes, even with the default loader
   }
 
   /**
-   * Process a class when it is loaded.  Interfaces, abstract classes and classes annotated with
-   * {@code DoNotEdit} are not edited.
+   * Process a class when it is loaded.  A permission field is also added. Furthermore, code is
+   * edited to check method calls (on the receiver site) and reads and writes to fields (and the
+   * calling site). No permission field is added to interfaces, classes that already inherit such a
+   * field, and classes annotated with {@code External}.  However, these are still edited for method
+   * calls and read/write of fields.
    *
-   * @see DoNotEdit
-   *
-   * @throws NotFoundException actually never thrown
+   * @throws NotFoundException      actually never thrown
    * @throws CannotCompileException actually never thrown
+   * @see External
    */
   @Override
   public void onLoad(ClassPool pool, String classname)
-    throws NotFoundException, CannotCompileException
-  {
+      throws NotFoundException, CannotCompileException {
     logger.fine(String.format("thread '%s' loading class '%s'",
         Thread.currentThread().getName(), classname));
 
     CtClass cc = pool.get(classname);
-    if (mustEdit(cc)) {
-      // do not add try to add a field to an interface
-      if (!cc.isInterface())
-      {
-        PermissionSupport.addPermissionField(cc);
-      }
-      ClassEditor.edit(cc, classname);
-    }
-  }
-
-  private static Boolean mustEdit(CtClass cc) throws NotFoundException {
-    logger.fine(String.format("checking class '%s' for possible editing", cc.getName()));
-    // skip DoNotEdit classes
-    try {
-      if (cc.getAnnotation(DoNotEdit.class) != null)
-        return false;
-    } catch (ClassNotFoundException e) {
-      throw new NotFoundException("class not found", e);
-    }
-    logger.fine(String.format("class '%s' ready to edit", cc.getName()));
-    return true;
+    PermissionSupport.addPermissionField(cc);
+    ClassEditor.edit(cc, classname);
   }
 }
 

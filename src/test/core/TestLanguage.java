@@ -1,20 +1,17 @@
 // $Id: DemoSuite.java 17 2017-06-19 16:59:12Z charpov $
 package core;
 
-import icp.core.DoNotEdit;
-import icp.core.IntentError;
+import icp.core.External;
 import icp.core.ICP;
+import icp.core.IntentError;
 import icp.core.Permissions;
 import org.testng.annotations.Test;
 import util.ICPTest;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.assertThrows;
+import static org.testng.Assert.*;
 import static util.Misc.executeInNewICPThread;
 
-@DoNotEdit
+@External
 public class TestLanguage extends ICPTest {
 
   @Test(description = "inheritance from abstract class, abstract method")
@@ -138,19 +135,9 @@ public class TestLanguage extends ICPTest {
     B obj = new B();
     ICP.setPermission(obj, Permissions.getNoAccessPermission());
     // read of non-final field should fail
-    Runnable read = new Runnable() { // cannot use lambdas
-      public void run() {
-        System.out.println(obj.nf.i);
-      }
-    };
-    assertThrows(IntentError.class, read::run);
+    assertThrows(IntentError.class, () -> System.out.println(obj.nf.i));
     // read of final field should execute
-    read = new Runnable() { // cannot use lambdas
-      public void run() {
-        assertEquals(obj.f.i, 13);
-      }
-    };
-    read.run();
+    assertEquals(obj.f.i, 13);
   }
 
   @Test(description = "concrete methods and constructors in abstract classes")
@@ -162,43 +149,50 @@ public class TestLanguage extends ICPTest {
         // getfield should be checked
         System.out.println(t.x);
       }
+
       A(int i) {
         TestClass t = new TestClass();
         ICP.setPermission(t, Permissions.getNoAccessPermission());
         // putfield should be checked
         t.x = 42;
       }
+
       A(int i, int j) {
         // this constructor will not fail
       }
+
       void meth1() {
         TestClass t = new TestClass();
         ICP.setPermission(t, Permissions.getNoAccessPermission());
         // field references should be checked in this method
         System.out.println(t.x);
       }
+
       void meth2() {
         TestClass t = new TestClass();
         ICP.setPermission(t, Permissions.getNoAccessPermission());
         // field references should be checked in this method
         t.x = 42;
       }
+
       void meth3() {
       }
     }
     class B extends A {
       B() {
       }
+
       B(int i) {
-       super(i);
+        super(i);
       }
+
       B(int i, int j) {
-       super(i, j);
+        super(i, j);
       }
     }
     assertThrows(IntentError.class, () -> new B());
     assertThrows(IntentError.class, () -> new B(1));
-    B b = new B(1,2);
+    B b = new B(1, 2);
     assertThrows(IntentError.class, b::meth1);
     assertThrows(IntentError.class, b::meth2);
     ICP.setPermission(b, Permissions.getNoAccessPermission());
@@ -217,7 +211,7 @@ public class TestLanguage extends ICPTest {
     // should be check at the beginning of the method
     assertThrows(IntentError.class, a::meth3);
   }
-  
+
   @Test(description = "anonymous class captures a variable")
   public void testAnonymous() throws Exception {
     final TestClass a = new TestClass();
@@ -231,7 +225,7 @@ public class TestLanguage extends ICPTest {
     ICP.setPermission(r, Permissions.getFrozenPermission());
     assertNull(executeInNewICPThread(r));
   }
-  
+
   @Test(description = "nested classes")
   public void testNested() throws Exception {
 
@@ -269,9 +263,7 @@ public class TestLanguage extends ICPTest {
         boolean threwIt = false;
         try {
           a.testLocal2(d);
-        }
-        catch (IntentError ie)
-        {
+        } catch (IntentError ie) {
           threwIt = true;
         }
         assertTrue(threwIt);
@@ -286,33 +278,43 @@ public class TestLanguage extends ICPTest {
   public void testInstanceInitializer() throws Exception {
     class A {
       public int i = 1066;
-    };
+    }
+    ;
     A x = new A();
     ICP.setPermission(x, Permissions.getNoAccessPermission());
     class B {
-      B() { i = i + 13; };
+      B() {
+        i = i + 13;
+      }
+
+      ;
       public int i = x.i + 37;
-    };
+    }
+    ;
     boolean threwIt = false;
     try {
       B b = new B();
-    }
-    catch (IntentError ie)
-    {
+    } catch (IntentError ie) {
       threwIt = true;
     }
     assertTrue(threwIt);
     class C {
-      C() { i = i + 13; };
+      C() {
+        i = i + 13;
+      }
+
+      ;
       public int i;
-      { i = x.i + 377; }
-    };
+
+      {
+        i = x.i + 377;
+      }
+    }
+    ;
     threwIt = false;
     try {
       C c = new C();
-    }
-    catch (IntentError ie)
-    {
+    } catch (IntentError ie) {
       threwIt = true;
     }
     assertTrue(threwIt);

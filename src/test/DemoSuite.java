@@ -1,6 +1,6 @@
 // $Id$
 
-import icp.core.DoNotEdit;
+import icp.core.External;
 import icp.core.Task;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -17,7 +17,7 @@ import static org.testng.Assert.assertNotNull;
  * will not be checked.   Checks on method calls and reset are not an issue since they are not
  * added to the calling side.
  */
-@DoNotEdit
+@External
 public class DemoSuite extends ICPTest {
 
   static {

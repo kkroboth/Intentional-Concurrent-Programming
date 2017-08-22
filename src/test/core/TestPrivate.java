@@ -6,7 +6,7 @@ import util.ICPTest;
 
 import static org.testng.Assert.assertThrows;
 
-@DoNotEdit
+@External
 public class TestPrivate extends ICPTest {
 
   @Test(description = "creator has all accesses")
@@ -27,13 +27,7 @@ public class TestPrivate extends ICPTest {
   @Test(description = "non creator cannot write")
   public void testPrivate3() throws Exception {
     TestClass t = new TestClass();
-    // write cannot be in this class, which is not edited
-    Runnable write = new Runnable() { // cannot use lambdas
-      public void run() {
-        t.x = 42;
-      }
-    };
-    Task task = Task.fromPrivateRunnable(write);
+    Task task = Task.fromThreadSafeRunnable(() -> t.x = 41);
     assertThrows(IntentError.class, task::run);
   }
 
@@ -41,13 +35,7 @@ public class TestPrivate extends ICPTest {
   @Test(description = "non creator cannot read")
   public void testPrivate4() throws Exception {
     TestClass t = new TestClass();
-    // read cannot be in this class, which is not edited
-    Runnable read = new Runnable() { // cannot use lambdas
-      public void run() {
-        System.out.println(t.x);
-      }
-    };
-    Task task = Task.fromPrivateRunnable(read);
+    Task task = Task.fromThreadSafeRunnable(() -> System.out.println(t.x));
     assertThrows(IntentError.class, task::run);
   }
 }

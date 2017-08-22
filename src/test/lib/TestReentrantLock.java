@@ -15,7 +15,7 @@ import static org.testng.Assert.*;
 import static util.Misc.executeInNewICPThread;
 import static util.Misc.executeInNewICPThreads;
 
-@DoNotEdit
+@External
 public class TestReentrantLock extends ICPTest {
 
   static class Target {

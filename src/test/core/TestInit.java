@@ -1,7 +1,7 @@
 // $Id: DemoSuite.java 17 2017-06-19 16:59:12Z charpov $
 package core;
 
-import icp.core.DoNotEdit;
+import icp.core.External;
 import icp.core.IntentError;
 import icp.core.Task;
 import org.testng.annotations.Test;
@@ -10,7 +10,7 @@ import util.ICPTest;
 import static org.testng.Assert.*;
 import static util.Misc.executeInNewJavaThread;
 
-@DoNotEdit
+@External
 public class TestInit extends ICPTest {
 
   @Test(description = "the running thread is given an implicit task")

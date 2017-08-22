@@ -55,9 +55,25 @@ public final class PermissionSupport
    *
    *  @param clss CtClass object for the class to which the field should be added.
    */
-  public static void addPermissionField(CtClass clss)
+  public static void addPermissionField(CtClass clss) throws NotFoundException
   {
     logger.fine("entering addPermissionField");
+
+    // skip interfaces
+    if (clss.isInterface()) {
+      logger.fine(clss.getName() + " is interface; no permission added");
+      return;
+    }
+
+    // skip classes called by external frameworks
+    try {
+      if (clss.getAnnotation(External.class) != null) {
+        logger.fine(clss.getName() + " is external; no permission added");
+        return;
+      }
+    } catch (ClassNotFoundException e) {
+      throw new NotFoundException("class not found", e);
+    }
 
     // see if the field already exists in the class
     // if so, it was inherited from a superclass
