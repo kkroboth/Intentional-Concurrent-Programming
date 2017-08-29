@@ -7,7 +7,9 @@ import icp.core.Task;
 import org.testng.annotations.Test;
 import util.ICPTest;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertSame;
+import static org.testng.Assert.assertTrue;
 import static util.Misc.executeInNewJavaThread;
 
 @External

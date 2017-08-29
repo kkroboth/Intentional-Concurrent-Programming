@@ -2,15 +2,19 @@
 
 package icp.core;
 
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.NotFoundException;
+import javassist.Translator;
 
 import java.util.logging.Logger;
 
 /**
  * Bytecode translator to be called by the Javassist classloader when each class is loaded.
- *
+ * <p>
  * The editing of a class is done by <code>ClassEditor.edit</code> static method.
- *
+ * <p>
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
 final class BytecodeTranslator implements Translator {
@@ -44,9 +48,9 @@ final class BytecodeTranslator implements Translator {
    */
   @Override
   public void onLoad(ClassPool pool, String classname)
-      throws NotFoundException, CannotCompileException {
+    throws NotFoundException, CannotCompileException {
     logger.fine(String.format("thread '%s' loading class '%s'",
-        Thread.currentThread().getName(), classname));
+      Thread.currentThread().getName(), classname));
 
     CtClass cc = pool.get(classname);
     PermissionSupport.addPermissionField(cc);

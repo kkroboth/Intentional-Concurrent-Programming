@@ -2,17 +2,22 @@
 
 package icp.lib;
 
-import icp.core.*;
+import icp.core.ICP;
+import icp.core.IntentError;
+import icp.core.Permission;
+import icp.core.Permissions;
+import icp.core.SingleCheckPermission;
+import icp.core.Task;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Simple reentrant lock, meaning it has only lock and unlock methods.
- *
+ * <p>
  * Includes a method to export its underlying permission.
- *
+ * <p>
  * It wraps a java.util.concurrent.locks.ReentrantLock.
- *
+ * <p>
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
 public class SimpleReentrantLock {
@@ -55,6 +60,7 @@ public class SimpleReentrantLock {
 
   /**
    * Unlock the lock.
+   *
    * @throws IntentError if the lock is not held
    */
   public void unlock() {

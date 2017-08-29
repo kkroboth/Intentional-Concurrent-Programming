@@ -64,32 +64,32 @@ public abstract class SingleCheckPermission implements Permission {
   private void doCheck(boolean checked, Object target, String message) {
     if (!checked)
       throw new IntentError(String.format("task '%s' %s on '%s'%s",
-          Task.currentTask(), message, target, cause));
+        Task.currentTask(), message, target, cause));
 
   }
 
   public final void checkCall(Object target) {
     logger.fine(String.format("task '%s' checking call permission on '%s'",
-        Task.currentTask(), this));
+      Task.currentTask(), this));
 
     doCheck(singleCheck(), target, "cannot call methods");
   }
 
   public final void checkGet(Object target) {
     logger.fine(String.format("task '%s' checking read permission on '%s'",
-        Task.currentTask(), this));
+      Task.currentTask(), this));
     doCheck(singleCheck(), target, "cannot read fields");
   }
 
   public final void checkPut(Object target) {
     logger.fine(String.format("task '%s' checking write permission on '%s'",
-        Task.currentTask(), this));
+      Task.currentTask(), this));
     doCheck(singleCheck(), target, "cannot write fields");
   }
 
   public void checkResetPermission(Object target) {
     logger.fine(String.format("task '%s' checking reset permission on '%s'",
-        Task.currentTask(), this));
+      Task.currentTask(), this));
     doCheck(resettable && singleCheck(), target, "cannot reset permission");
   }
 }

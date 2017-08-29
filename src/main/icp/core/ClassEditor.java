@@ -2,7 +2,14 @@
 
 package icp.core;
 
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 
@@ -44,7 +51,7 @@ final class ClassEditor {
     logger.fine("editing static initializer");
     try {
       staticInit.insertAfter(
-          "icp.core.PermissionSupport#setPermissionOnClass($class);");
+        "icp.core.PermissionSupport#setPermissionOnClass($class);");
     } catch (CannotCompileException cce) {
       logger.severe("cannot compile insertion of method setPermissionOnClass");
       throw new ICPInternalError(
@@ -80,7 +87,7 @@ final class ClassEditor {
       logger.fine("editing method " + method);
       try {
         method.insertBefore(
-            "icp.core.PermissionSupport#checkCall($0);");
+          "icp.core.PermissionSupport#checkCall($0);");
       } catch (CannotCompileException cce) {
         logger.severe("cannot compile insertion of method checkCall");
         throw new ICPInternalError(
@@ -97,73 +104,71 @@ final class ClassEditor {
       try {
         // edit its field accesses
         behavior.instrument(
-            new ExprEditor() {
-              public void edit(FieldAccess fa) throws CannotCompileException {
-                String name = fa.getFieldName();
+          new ExprEditor() {
+            public void edit(FieldAccess fa) throws CannotCompileException {
+              String name = fa.getFieldName();
 
-                boolean skip = false;
+              boolean skip = false;
 
-                // skip final fields
-                // because we want final field accesses to be treated
-                // consistently and final fields that contain unambiguous
-                // constant values become constants in the bytecode, meaning
-                // there is no getField operation, and therefore no check to
-                // see if the executing thread has access to the object 
-                // containing the final field.
-                // since final fields are immutable we will always allow
-                // access to them
-                // also: final fields named val$... and this$... are created
-                // by javac when implementing anonymous and nested classes
-                // we don't want these fields checked either
-                CtField field = null;
-                try {
-                  field = fa.getField();
-                }
-                catch (NotFoundException nfe)
-                {
-                  throw new ICPInternalError("cannot find field: ", nfe);
-                }
-                int modifiers = field.getModifiers();
-                if (Modifier.isFinal(modifiers)) {
-                  logger.fine("skip field edit for " + name + " (final)");
-                  skip = true;
-                }
-
-                if (skip) {
-                  if (fa.isReader()) {
-                    fa.replace("{ $_ = $proceed(); }");
-                  } else if (fa.isWriter()) {
-                    fa.replace("{ $proceed($$); }");
-                  } else {
-                    // should not reach
-                    throw new AssertionError("unreachable");
-                  }
-                  return;
-                }
-
-                // otherwise go ahead and add a check
-                if (fa.isReader()) {
-                  logger.fine(String.format("edit getField for field %s in class %s",
-                      name, cc.getName()));
-                  fa.replace("{ " +
-                      "icp.core.PermissionSupport#checkGetField($0);" +
-                      " $_ = $proceed(); " +
-                      "}");
-                  return;
-                }
-                if (fa.isWriter()) {
-                  logger.fine(String.format("edit putField for field %s in class %s",
-                      name, cc.getName()));
-                  fa.replace("{ " +
-                      "icp.core.PermissionSupport#checkPutField($0);" +
-                      " $proceed($$); " +
-                      "}");
-                  return;
-                }
-                // should not reach
-                throw new AssertionError("unreachable");
+              // skip final fields
+              // because we want final field accesses to be treated
+              // consistently and final fields that contain unambiguous
+              // constant values become constants in the bytecode, meaning
+              // there is no getField operation, and therefore no check to
+              // see if the executing thread has access to the object
+              // containing the final field.
+              // since final fields are immutable we will always allow
+              // access to them
+              // also: final fields named val$... and this$... are created
+              // by javac when implementing anonymous and nested classes
+              // we don't want these fields checked either
+              CtField field = null;
+              try {
+                field = fa.getField();
+              } catch (NotFoundException nfe) {
+                throw new ICPInternalError("cannot find field: ", nfe);
               }
-            });
+              int modifiers = field.getModifiers();
+              if (Modifier.isFinal(modifiers)) {
+                logger.fine("skip field edit for " + name + " (final)");
+                skip = true;
+              }
+
+              if (skip) {
+                if (fa.isReader()) {
+                  fa.replace("{ $_ = $proceed(); }");
+                } else if (fa.isWriter()) {
+                  fa.replace("{ $proceed($$); }");
+                } else {
+                  // should not reach
+                  throw new AssertionError("unreachable");
+                }
+                return;
+              }
+
+              // otherwise go ahead and add a check
+              if (fa.isReader()) {
+                logger.fine(String.format("edit getField for field %s in class %s",
+                  name, cc.getName()));
+                fa.replace("{ " +
+                  "icp.core.PermissionSupport#checkGetField($0);" +
+                  " $_ = $proceed(); " +
+                  "}");
+                return;
+              }
+              if (fa.isWriter()) {
+                logger.fine(String.format("edit putField for field %s in class %s",
+                  name, cc.getName()));
+                fa.replace("{ " +
+                  "icp.core.PermissionSupport#checkPutField($0);" +
+                  " $proceed($$); " +
+                  "}");
+                return;
+              }
+              // should not reach
+              throw new AssertionError("unreachable");
+            }
+          });
       } catch (CannotCompileException cce) {
         logger.severe("cannot compile insertion of field check");
         throw new ICPInternalError("cannot compile insertion of field check", cce);

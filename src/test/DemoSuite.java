@@ -44,9 +44,9 @@ public class DemoSuite extends ICPTest {
   @DataProvider
   static Object[][] data() {
     return new Object[][]{
-        {"foo", 3},
-        {"bar", 3},
-        {"foobar", 6}
+      {"foo", 3},
+      {"bar", 3},
+      {"foobar", 6}
     };
   }
 

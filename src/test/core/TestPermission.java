@@ -1,7 +1,11 @@
 // $Id$
 package core;
 
-import icp.core.*;
+import icp.core.External;
+import icp.core.ICP;
+import icp.core.IntentError;
+import icp.core.Permissions;
+import icp.core.Task;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import util.ICPTest;
@@ -41,7 +45,7 @@ public class TestPermission extends ICPTest {
     TestClass t = new TestClass();
     ICP.setPermission(t, Permissions.getNoAccessPermission());
     assertThrows(IntentError.class, () ->
-        ICP.setPermission(t, Permissions.getNoAccessPermission()));
+      ICP.setPermission(t, Permissions.getNoAccessPermission()));
   }
 
   @Test(description = "frozen permission (can call/read)")
@@ -75,15 +79,15 @@ public class TestPermission extends ICPTest {
     TestClass t2 = new TestClass();
     ICP.samePermissionAs(t2, t1);
     assertThrows(IntentError.class, () ->
-        ICP.setPermission(t2, Permissions.getNoAccessPermission()));
+      ICP.setPermission(t2, Permissions.getNoAccessPermission()));
   }
 
   @DataProvider
   static Object[][] testTransferSafeData() {
     return new Object[][]{
-        {10},
-        {100},
-        {1000}
+      {10},
+      {100},
+      {1000}
     };
   }
 
@@ -145,7 +149,7 @@ public class TestPermission extends ICPTest {
     TestClass shared = new TestClass();
     ICP.setPermission(shared, Permissions.getLoanPermission());
     Task task = Task.fromThreadSafeRunnable(() ->
-        ICP.setPermission(shared, Permissions.getPrivatePermission()));
+      ICP.setPermission(shared, Permissions.getPrivatePermission()));
     assertThrows(IntentError.class, task::run);
   }
 }

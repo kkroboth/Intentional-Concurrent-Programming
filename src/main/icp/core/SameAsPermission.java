@@ -9,8 +9,7 @@ import java.util.logging.Logger;
  * permission will be forwarded to the permission of the object pointer to.
  * However, a same-as permission cannot be reset.
  */
-final class SameAsPermission implements Permission
-{
+final class SameAsPermission implements Permission {
   // for logging debugging info
   private static final Logger logger = Logger.getLogger("icp.core");
 
@@ -18,48 +17,43 @@ final class SameAsPermission implements Permission
   private final Object obj;
 
   // private constructor
-  public SameAsPermission(Object obj)
-  {
+  public SameAsPermission(Object obj) {
     this.obj = obj;
   }
 
-  /** Validate permission for calling task to make a call.
+  /**
+   * Validate permission for calling task to make a call.
    *
-   *  @throws IntentError if the access is not allowed.
-   *
+   * @throws IntentError if the access is not allowed.
    */
-  public void checkCall(Object target)
-  {
+  public void checkCall(Object target) {
     PermissionSupport.getPermission(obj).checkCall(target);
   }
 
-  /** Validate permission for calling task to get a field.
+  /**
+   * Validate permission for calling task to get a field.
    *
-   *  @throws IntentError if the access is not allowed.
-   *
+   * @throws IntentError if the access is not allowed.
    */
-  public void checkGet(Object target)
-  {
+  public void checkGet(Object target) {
     PermissionSupport.getPermission(obj).checkGet(target);
   }
 
-  /** Validate permission for calling task to put a field.
+  /**
+   * Validate permission for calling task to put a field.
    *
-   *  @throws IntentError if the access is not allowed.
-   *
+   * @throws IntentError if the access is not allowed.
    */
-  public void checkPut(Object target)
-  {
+  public void checkPut(Object target) {
     PermissionSupport.getPermission(obj).checkPut(target);
   }
 
-  /** Validate permission for calling task to reset the permission.
+  /**
+   * Validate permission for calling task to reset the permission.
    *
-   *  @throws IntentError if the reset is not allowed.
-   *
+   * @throws IntentError if the reset is not allowed.
    */
-  public void checkResetPermission(Object target)
-  {
+  public void checkResetPermission(Object target) {
     throw new IntentError(String.format("cannot reset a same-as permission on '%s'", target));
   }
 }

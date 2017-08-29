@@ -6,15 +6,15 @@ import java.util.logging.Logger;
 
 /**
  * Main class for ICP, a Java-based intentional concurrent programming system.
- *
+ * <p>
  * Intents are enforced by permissions attached to objects.
- *
+ * <p>
  * Javassist is used to edit the user bytecode to insert a permission check
  * prior to each method call, get of a field, or put of a field. The bytecode
  * is edited as the classes are loaded. The bytecode is also edited to
  * potentially insert code after every call to a superclass constructor, in
  * order to generate the initial permission for a new object.
- *
+ * <p>
  * This class cannot be instantiated.
  */
 final public class ICP {
@@ -30,7 +30,7 @@ final public class ICP {
    * another object. (Checks for the same-as permission are forwarded to the
    * permission of the second object.) The existing permission on the first
    * object must allow the permission to be reset.
-   *
+   * <p>
    * This is equivalent to:
    * {@code setPermission(follower, Permissions.getSamePermissionAs(leader)}
    *
@@ -39,7 +39,7 @@ final public class ICP {
    */
   public static void samePermissionAs(Object follower, Object leader) {
     PermissionSupport.setPermission(follower,
-        Permissions.getSamePermissionAs(leader));
+      Permissions.getSamePermissionAs(leader));
   }
 
   /**

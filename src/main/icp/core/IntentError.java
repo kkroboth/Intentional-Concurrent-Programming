@@ -4,7 +4,7 @@ package icp.core;
 
 /**
  * Exception thrown when a permission violation occurs.
- *
+ * <p>
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
 final public class IntentError extends RuntimeException {

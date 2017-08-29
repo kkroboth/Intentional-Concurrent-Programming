@@ -2,7 +2,11 @@
 
 package lib;
 
-import icp.core.*;
+import icp.core.External;
+import icp.core.ICP;
+import icp.core.IntentError;
+import icp.core.Permissions;
+import icp.core.Task;
 import icp.core.Thread;
 import icp.lib.SimpleReentrantLock;
 import org.testng.annotations.DataProvider;
@@ -11,7 +15,9 @@ import util.ICPTest;
 
 import java.util.Arrays;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertThrows;
+import static org.testng.Assert.assertTrue;
 import static util.Misc.executeInNewICPThread;
 import static util.Misc.executeInNewICPThreads;
 
@@ -45,7 +51,7 @@ public class TestReentrantLock extends ICPTest {
     SimpleReentrantLock lock = new SimpleReentrantLock();
     ICP.setPermission(target, lock.getLockedPermission());
     assertThrows(IntentError.class, () ->
-        ICP.setPermission(target, Permissions.getFrozenPermission()));
+      ICP.setPermission(target, Permissions.getFrozenPermission()));
   }
 
   @Test(description = "creator thread cannot reset permission, even with lock")
@@ -56,7 +62,7 @@ public class TestReentrantLock extends ICPTest {
     try {
       lock.lock();
       assertThrows(IntentError.class, () ->
-          ICP.setPermission(target, Permissions.getFrozenPermission()));
+        ICP.setPermission(target, Permissions.getFrozenPermission()));
     } finally {
       lock.unlock();
     }
@@ -65,15 +71,15 @@ public class TestReentrantLock extends ICPTest {
   @DataProvider
   static Object[][] canAccessWithLockData() {
     return new Object[][]{
-        {5, 10},
-        {10, 100},
-        {100, 1000}
+      {5, 10},
+      {10, 100},
+      {100, 1000}
     };
   }
 
   @Test(
-      description = "any thread can access with lock; lock works as a lock",
-      dataProvider = "canAccessWithLockData"
+    description = "any thread can access with lock; lock works as a lock",
+    dataProvider = "canAccessWithLockData"
   )
   public void canAccessWithLock(int nbThreads, int nbLoops) throws Exception {
     Target target = new Target();

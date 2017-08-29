@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 
 /**
  * Thread class that extends java.lang.Thread.
- *
+ * <p>
  * Gives limited access to constructors. Only constructors that take task are allowed.
- *
+ * <p>
  * <em>Permissions:</em> instances of this class are private to the caller
  *
  * @see Task

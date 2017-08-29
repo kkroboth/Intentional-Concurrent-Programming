@@ -5,9 +5,9 @@ package icp.core;
 /**
  * Core permissions.  This class can be used to create basic permissions.  Other permissions can
  * be obtained from library components (e.g., synchronizers).
- *
+ * <p>
  * All the permissions produced by this class are permanently thread-safe.
- *
+ * <p>
  * This class cannot be instantiated.
  */
 public class Permissions {
@@ -70,7 +70,7 @@ public class Permissions {
    * A permission private to the calling task. The task that calls this method gets a permission
    * that grants all accesses (including reset) to  <em>this task</em>.  Other tasks have no access.
    * Can be reset.
-   *
+   * <p>
    * This is the default permission that is set on all new objects, unless stated otherwise.
    */
   public static Permission getPrivatePermission() {
@@ -85,7 +85,7 @@ public class Permissions {
 
   /**
    * A permission that transfers ownership to the first task that runs a check. Can be reset.
-   *
+   * <p>
    * The permission returned by this method is in its initial state and can be acquired by any task.
    * One acquired, it enter its final state and behaves like a private permission for the acquiring
    * task.
@@ -97,7 +97,7 @@ public class Permissions {
   /**
    * A permission that temporarily transfers ownership to the first task that runs a check. Can be
    * reset, but only by its original owner, which then reacquires the permission.
-   *
+   * <p>
    * The permission returned by this method is in its initial state and can be acquired by any task.
    * One acquired by a different task, it enter an intermediate state in which it can be reacquired
    * by the original owner.  Once reacquired, it behaves like a private permission.  If the task

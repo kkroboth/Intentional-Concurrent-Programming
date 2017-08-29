@@ -1,6 +1,10 @@
 package core;// $Id: DemoSuite.java 17 2017-06-19 16:59:12Z charpov $
 
-import icp.core.*;
+import icp.core.External;
+import icp.core.ICP;
+import icp.core.IntentError;
+import icp.core.Permissions;
+import icp.core.Task;
 import org.testng.annotations.Test;
 import util.ICPTest;
 

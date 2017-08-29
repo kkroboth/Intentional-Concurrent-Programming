@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Loan permission.  It is temporarily acquired by the first task that performs a check.  It can
  * be reacquired at any time by its original owner.  It is only resettable by the original owner,
  * after it has been reacquired.
- *
+ * <p>
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
 class LoanPermission extends SingleCheckPermission {
@@ -36,7 +36,7 @@ class LoanPermission extends SingleCheckPermission {
     }
     // case: another task
     return caller == borrower
-        || borrower == null && this.borrower.compareAndSet(null, caller);
+      || borrower == null && this.borrower.compareAndSet(null, caller);
   }
 
   @Override
@@ -44,7 +44,7 @@ class LoanPermission extends SingleCheckPermission {
     Task caller = Task.currentTask();
     if (caller != owner)
       throw new IntentError(String.format("task '%s' cannot reset permission on '%s' (not owner)",
-          caller, target));
+        caller, target));
     // may do an unnecessary call to set, but shouldn't happen much (the permission is likely
     // being replaced)
     this.borrower.set(owner);

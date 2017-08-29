@@ -11,18 +11,15 @@ import icp.core.Thread;
 import icp.lib.SimpleReentrantLock;
 
 // this class will be loaded by the normal class loader
-public class Pi1
-{
+public class Pi1 {
 
   private static class Pi1SharedValue {
     public int i;
     public double d;
   }
 
-  public static void main(String[] args) throws Throwable
-  {
-    if (args.length == 0)
-    {
+  public static void main(String[] args) throws Throwable {
+    if (args.length == 0) {
       throw new RuntimeException("usage: Pi1 numberOfTasks");
     }
 
@@ -30,9 +27,7 @@ public class Pi1
     final int n;
     try {
       n = Integer.parseInt(args[0]);
-    }
-    catch (NumberFormatException nfe)
-    {
+    } catch (NumberFormatException nfe) {
       throw new RuntimeException("usage: Pi numberOfTasks");
     }
 
@@ -41,8 +36,7 @@ public class Pi1
     final double width = 1.0 / INTERVALS;
     int ch = INTERVALS / n;
     int sp = INTERVALS % n;
-    if (sp == 0)
-    {
+    if (sp == 0) {
       sp = n;
       ch -= 1;
     }
@@ -59,9 +53,8 @@ public class Pi1
     // permission to it
     ICP.setPermission(sum, lock.getLockedPermission());
 
-     // create and start a set of tasks to do the pi computation
-    for (int i = 0; i < n; i++)
-    {
+    // create and start a set of tasks to do the pi computation
+    for (int i = 0; i < n; i++) {
       final int id = i;
 
       // create the task
@@ -89,7 +82,7 @@ public class Pi1
         sum.d += localSum;
         if (sum.i == n) // last task will check answer
         {
-          assert(String.format("%14.12f",
+          assert (String.format("%14.12f",
             sum.d * width).startsWith("3.141592653"));
         }
         lock.unlock();

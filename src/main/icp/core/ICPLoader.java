@@ -2,7 +2,11 @@
 
 package icp.core;
 
-import javassist.*;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.Loader;
+import javassist.NotFoundException;
+import javassist.Translator;
 
 /**
  * ICP's Javassist class loader.
