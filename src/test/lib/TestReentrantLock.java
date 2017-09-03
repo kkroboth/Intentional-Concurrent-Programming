@@ -7,7 +7,6 @@ import icp.core.ICP;
 import icp.core.IntentError;
 import icp.core.Permissions;
 import icp.core.Task;
-import icp.core.Thread;
 import icp.lib.SimpleReentrantLock;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -18,8 +17,8 @@ import java.util.Arrays;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
-import static util.Misc.executeInNewICPThread;
-import static util.Misc.executeInNewICPThreads;
+import static util.Misc.executeInNewICPTaskThread;
+import static util.Misc.executeInNewICPTaskThreads;
 
 @External
 public class TestReentrantLock extends ICPTest {
@@ -99,7 +98,7 @@ public class TestReentrantLock extends ICPTest {
 
     Runnable[] tasks = new Runnable[nbThreads];
     Arrays.fill(tasks, r);
-    assertEquals(executeInNewICPThreads(tasks), 0);
+    assertEquals(executeInNewICPTaskThreads(tasks), 0);
     lock.lock();
     try {
       assertEquals(target.getCallCount(), nbThreads * nbLoops);
@@ -132,11 +131,11 @@ public class TestReentrantLock extends ICPTest {
         }
       }
     });
-    // don't use executeInNewICPThread in first run to avoid memory barriers
+    // don't use executeInNewICPTaskThread in first run to avoid memory barriers
     new Thread(t).start(); // ICP thread, but Java thread would work too
     Thread.sleep(1000);
     // does not throw IntentError because the task does own the lock
     // throws IllegalMonitorStateException instead because the thread does not own the lock
-    assertTrue(executeInNewICPThread(t) instanceof IllegalMonitorStateException);
+    assertTrue(executeInNewICPTaskThread(t) instanceof IllegalMonitorStateException);
   }
 }

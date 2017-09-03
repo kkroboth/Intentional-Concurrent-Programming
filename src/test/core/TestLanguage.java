@@ -12,7 +12,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertThrows;
 import static org.testng.Assert.assertTrue;
-import static util.Misc.executeInNewICPThread;
+import static util.Misc.executeInNewICPTaskThread;
 
 @External
 public class TestLanguage extends ICPTest {
@@ -31,7 +31,7 @@ public class TestLanguage extends ICPTest {
 
     Runnable r = () -> new C().call();
 
-    assertNull(executeInNewICPThread(r));
+    assertNull(executeInNewICPTaskThread(r));
   }
 
   @Test(description = "inheritance from abstract class, concrete method")
@@ -47,7 +47,7 @@ public class TestLanguage extends ICPTest {
 
     Runnable r = () -> new C().call();
 
-    assertNull(executeInNewICPThread(r));
+    assertNull(executeInNewICPTaskThread(r));
   }
 
   @Test(description = "inheritance from abstract class, concrete method, overridden")
@@ -67,7 +67,7 @@ public class TestLanguage extends ICPTest {
 
     Runnable r = () -> new C().call();
 
-    assertNull(executeInNewICPThread(r));
+    assertNull(executeInNewICPTaskThread(r));
   }
 
   @Test(description = "inheritance from concrete class, no override")
@@ -83,7 +83,7 @@ public class TestLanguage extends ICPTest {
 
     Runnable r = () -> new C().call();
 
-    assertNull(executeInNewICPThread(r));
+    assertNull(executeInNewICPTaskThread(r));
   }
 
   @Test(description = "inheritance from concrete class, overridden")
@@ -103,7 +103,7 @@ public class TestLanguage extends ICPTest {
 
     Runnable r = () -> new C().call();
 
-    assertNull(executeInNewICPThread(r));
+    assertNull(executeInNewICPTaskThread(r));
   }
 
   @Test(description = "inherited class loaded first")
@@ -226,7 +226,7 @@ public class TestLanguage extends ICPTest {
       }
     };
     ICP.setPermission(r, Permissions.getFrozenPermission());
-    assertNull(executeInNewICPThread(r));
+    assertNull(executeInNewICPTaskThread(r));
   }
 
   @Test(description = "nested classes")
@@ -273,7 +273,7 @@ public class TestLanguage extends ICPTest {
       }
     };
     ICP.setPermission(r, Permissions.getFrozenPermission());
-    assertNull(executeInNewICPThread(r));
+    assertNull(executeInNewICPTaskThread(r));
   }
 
   // test that instance initializers are edited by Javassist

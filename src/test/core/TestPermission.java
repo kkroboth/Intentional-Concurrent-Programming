@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertThrows;
-import static util.Misc.executeInNewICPThreads;
+import static util.Misc.executeInNewICPTaskThreads;
 
 @External
 public class TestPermission extends ICPTest {
@@ -98,7 +98,7 @@ public class TestPermission extends ICPTest {
     Runnable r = shared::justCall;
     Runnable[] tasks = new Runnable[nbThreads];
     Arrays.fill(tasks, r);
-    assertEquals(executeInNewICPThreads(tasks), nbThreads - 1);
+    assertEquals(executeInNewICPTaskThreads(tasks), nbThreads - 1);
   }
 
   @Test(description = "transfer permission can be reset")

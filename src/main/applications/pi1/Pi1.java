@@ -7,7 +7,6 @@ package applications.pi1;
 
 import icp.core.ICP;
 import icp.core.Task;
-import icp.core.Thread;
 import icp.lib.SimpleReentrantLock;
 
 // this class will be loaded by the normal class loader
