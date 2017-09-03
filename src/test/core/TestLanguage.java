@@ -282,7 +282,6 @@ public class TestLanguage extends ICPTest {
     class A {
       public int i = 1066;
     }
-    ;
     A x = new A();
     ICP.setPermission(x, Permissions.getNoAccessPermission());
     class B {
@@ -290,10 +289,8 @@ public class TestLanguage extends ICPTest {
         i = i + 13;
       }
 
-      ;
       public int i = x.i + 37;
     }
-    ;
     boolean threwIt = false;
     try {
       B b = new B();
@@ -306,14 +303,12 @@ public class TestLanguage extends ICPTest {
         i = i + 13;
       }
 
-      ;
       public int i;
 
       {
         i = x.i + 377;
       }
     }
-    ;
     threwIt = false;
     try {
       C c = new C();

@@ -24,14 +24,14 @@ public class TestPrivate extends ICPTest {
   @Test(description = "non creator cannot call")
   public void testPrivate2() throws Exception {
     TestClass t = new TestClass();
-    Task task = Task.fromThreadSafeRunnable(t::justCall);
+    Task task = new Task(t::justCall);
     assertThrows(IntentError.class, task::run);
   }
 
   @Test(description = "non creator cannot write")
   public void testPrivate3() throws Exception {
     TestClass t = new TestClass();
-    Task task = Task.fromThreadSafeRunnable(() -> t.x = 41);
+    Task task = new Task(() -> t.x = 41);
     assertThrows(IntentError.class, task::run);
   }
 
@@ -39,7 +39,7 @@ public class TestPrivate extends ICPTest {
   @Test(description = "non creator cannot read")
   public void testPrivate4() throws Exception {
     TestClass t = new TestClass();
-    Task task = Task.fromThreadSafeRunnable(() -> System.out.println(t.x));
+    Task task = new Task(() -> System.out.println(t.x));
     assertThrows(IntentError.class, task::run);
   }
 }

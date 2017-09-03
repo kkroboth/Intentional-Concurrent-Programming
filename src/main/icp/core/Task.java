@@ -31,10 +31,11 @@ public class Task implements Runnable {
   }
 
   /**
-   * default access constructor to only allow classes inside
-   * icp.lib to inherit from Task.
+   * Create new ICP Task with given Runnable.
+   *
+   * @param task Runnable which will be ran by {@link #run()}
    */
-  private Task(Runnable task) {
+  public Task(Runnable task) {
     if (task == null)
       throw new NullPointerException();
     theTask = task;
@@ -42,12 +43,25 @@ public class Task implements Runnable {
     icp$42$permissionField = Permissions.getTransferPermission();
   }
 
+  /**
+   * Creates new thread safe Task from given runnable and sets same-as permissions on task from
+   * the runnable
+   *
+   * @param r Runnable for task and same-as permission
+   * @return New created task from runnable
+   */
   public static Task fromPrivateRunnable(Runnable r) {
+    // Currently keeping factory method for these cases
+    // TODO: Should this be removed and make the user set permissions directly?
     Task task = new Task(r);
     PermissionSupport.setPermission(r, Permissions.getSamePermissionAs(task));
     return task;
   }
 
+  /**
+   * @deprecated Use public constructor
+   */
+  @Deprecated
   public static Task fromThreadSafeRunnable(Runnable r) {
     return new Task(r);
   }

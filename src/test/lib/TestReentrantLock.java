@@ -110,8 +110,8 @@ public class TestReentrantLock extends ICPTest {
   @Test(description = "tasks own, not threads")
   public void testThreadsDontOwn() throws Exception {
     SimpleReentrantLock lock = new SimpleReentrantLock();
-    Task t1 = Task.fromThreadSafeRunnable(lock::lock);
-    Task t2 = Task.fromThreadSafeRunnable(lock::unlock);
+    Task t1 = new Task(lock::lock);
+    Task t2 = new Task(lock::unlock);
     t1.run();
     assertThrows(IntentError.class, t2::run);
   }
