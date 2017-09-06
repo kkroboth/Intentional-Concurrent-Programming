@@ -33,7 +33,7 @@ public class Task implements Runnable {
   /**
    * Create new ICP Task with given Runnable.
    *
-   * @param task Runnable which will be ran by {@link #run()}
+   * @param task Runnable which will be run by {@link #run()}
    */
   public Task(Runnable task) {
     if (task == null)
@@ -41,29 +41,6 @@ public class Task implements Runnable {
     theTask = task;
     running = new AtomicBoolean();
     icp$42$permissionField = Permissions.getTransferPermission();
-  }
-
-  /**
-   * Creates new thread safe Task from given runnable and sets same-as permissions on task from
-   * the runnable
-   *
-   * @param r Runnable for task and same-as permission
-   * @return New created task from runnable
-   */
-  public static Task fromPrivateRunnable(Runnable r) {
-    // Currently keeping factory method for these cases
-    // TODO: Should this be removed and make the user set permissions directly?
-    Task task = new Task(r);
-    PermissionSupport.setPermission(r, Permissions.getSamePermissionAs(task));
-    return task;
-  }
-
-  /**
-   * @deprecated Use public constructor
-   */
-  @Deprecated
-  public static Task fromThreadSafeRunnable(Runnable r) {
-    return new Task(r);
   }
 
   /**

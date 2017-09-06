@@ -2,11 +2,7 @@
 
 package lib;
 
-import icp.core.External;
-import icp.core.ICP;
-import icp.core.IntentError;
-import icp.core.Permissions;
-import icp.core.Task;
+import icp.core.*;
 import icp.lib.SimpleReentrantLock;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -14,9 +10,7 @@ import util.ICPTest;
 
 import java.util.Arrays;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertThrows;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 import static util.Misc.executeInNewICPTaskThread;
 import static util.Misc.executeInNewICPTaskThreads;
 
@@ -119,7 +113,7 @@ public class TestReentrantLock extends ICPTest {
   @Test(description = "tasks own across threads")
   public void testTasksOwn() throws Exception {
     SimpleReentrantLock lock = new SimpleReentrantLock();
-    Task t = Task.fromPrivateRunnable(new Runnable() {
+    Runnable r = new Runnable() {
       boolean first = true;
 
       public void run() {
@@ -130,7 +124,9 @@ public class TestReentrantLock extends ICPTest {
           lock.unlock();
         }
       }
-    });
+    };
+    Task t = new Task(r);
+    ICP.samePermissionAs(r, t);
     // don't use executeInNewICPTaskThread in first run to avoid memory barriers
     new Thread(t).start(); // ICP thread, but Java thread would work too
     Thread.sleep(1000);
