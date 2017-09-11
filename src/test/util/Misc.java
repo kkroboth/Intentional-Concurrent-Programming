@@ -4,6 +4,8 @@ package util;
 import icp.core.IntentError;
 import icp.core.Task;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -89,5 +91,40 @@ public class Misc {
     for (Thread t : runners)
       t.join();
     return exceptions.get();
+  }
+
+  public static Future<Integer> executeInNewICPTaskThreadsFuture(Runnable[] tasks) throws InterruptedException {
+    int n = tasks.length;
+    Thread[] runners = new Thread[n];
+    AtomicInteger exceptions = new AtomicInteger();
+
+    for (int i = 0; i < n; i++) {
+      int id = i;
+      Thread runner = new Thread(new Task(() -> {
+        try {
+          tasks[id].run();
+        } catch (IntentError e) {
+          e.printStackTrace();
+          exceptions.incrementAndGet();
+        }
+      }), "runner-" + i);
+      runners[i] = runner;
+      runner.start();
+    }
+
+    // Wait for all runners in another thread to return future
+    CompletableFuture<Integer> errorsFuture = new CompletableFuture<>();
+    new Thread(() -> {
+      for (Thread t : runners)
+        try {
+          t.join();
+        } catch (InterruptedException e) {
+          errorsFuture.completeExceptionally(e);
+        }
+
+      errorsFuture.complete(exceptions.get());
+    }).start();
+
+    return errorsFuture;
   }
 }
