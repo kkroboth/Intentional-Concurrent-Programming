@@ -68,7 +68,7 @@ public class ThreadStart {
       thread.join();
     }
 
-    // TODO: Since ICP ignores static methods, operation.getCount() will always succeed.
+    // TODO: Can never getCount() because permission was not reset
     if (operation.getCount() != nbThreads) {
       throw new RuntimeException("Computations did not add up");
     }

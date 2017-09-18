@@ -2,7 +2,6 @@ package lib;
 
 import icp.core.IntentError;
 import icp.lib.OneTimeLatch;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import util.ICPTest;
@@ -21,9 +20,6 @@ import static util.Misc.executeInNewICPTaskThread;
 import static util.Misc.executeInNewICPTaskThreadsFuture;
 
 public class TestOneTimeLatch extends ICPTest {
-  private Target target;
-  private OneTimeLatch latch;
-
   static class Target {
     final AtomicInteger count = new AtomicInteger();
 
@@ -40,12 +36,6 @@ public class TestOneTimeLatch extends ICPTest {
     }
   }
 
-  @BeforeMethod
-  public void setup() {
-    this.target = new Target();
-    this.latch = new OneTimeLatch();
-  }
-
   @Test(description = "cannot call open() more than once")
   public void cannotCallOpenMoreThanOnce() throws InterruptedException {
     OneTimeLatch latch = new OneTimeLatch();
@@ -57,19 +47,20 @@ public class TestOneTimeLatch extends ICPTest {
 
   @Test(description = "same task cannot call await after open")
   public void cannotCallAwaitAfterOpen() {
-    this.latch.open();
-    assertThrows(IntentError.class, this.latch::await);
+    OneTimeLatch latch = new OneTimeLatch();
+    latch.open();
+    assertThrows(IntentError.class, latch::await);
   }
 
   @Test(description = "must register await for isOpen permission")
   public void mustRegisterAwaitForPermission() throws InterruptedException {
-    setPermission(target, this.latch.getIsOpenPermission());
-    this.latch.open(); // Latch is opened, but permission requires registration
+    OneTimeLatch latch = new OneTimeLatch();
+    Target target = new Target();
+    setPermission(target, latch.getIsOpenPermission());
+    latch.open(); // Latch is opened, but permission requires registration
 
-    assertTrue(getCount() == 0);
-    assertTrue(executeInNewICPTaskThread(() -> {
-      this.target.call();
-    }) instanceof IntentError);
+    assertTrue(getCount(latch) == 0);
+    assertTrue(executeInNewICPTaskThread(target::call) instanceof IntentError);
   }
 
   @DataProvider
@@ -79,11 +70,8 @@ public class TestOneTimeLatch extends ICPTest {
     };
   }
 
-  //@Test(description = "successful awaits on latch", dataProvider = "awaitsOnLatchData")
-  @Test(description = "successful awaits on latch")
-  public void awaitsOnLatch() throws InterruptedException, ExecutionException {
-    int nbThreads = 1;
-
+  @Test(description = "successful awaits on latch", dataProvider = "awaitsOnLatchData")
+  public void awaitsOnLatch(int nbThreads) throws InterruptedException, ExecutionException {
     Target target = new Target();
     OneTimeLatch latch = new OneTimeLatch();
 
@@ -104,15 +92,16 @@ public class TestOneTimeLatch extends ICPTest {
     Future<Integer> errors = executeInNewICPTaskThreadsFuture(runnables);
     latch.open();
     assertEquals(errors.get().intValue(), 0);
+    // TODO: Fails -- Permission does not reset
     assertEquals(finalCount, target.getCount());
   }
 
-  private long getCount() {
+  private long getCount(OneTimeLatch latch) {
     try {
       Field field = OneTimeLatch.class.getDeclaredField("latch");
       field.setAccessible(true);
-      java.util.concurrent.CountDownLatch latch = (java.util.concurrent.CountDownLatch) field.get(this.latch);
-      return latch.getCount();
+      java.util.concurrent.CountDownLatch countDownLatch = (java.util.concurrent.CountDownLatch) field.get(latch);
+      return countDownLatch.getCount();
     } catch (NoSuchFieldException | IllegalAccessException e) {
       fail("Could not get internal count", e);
     }

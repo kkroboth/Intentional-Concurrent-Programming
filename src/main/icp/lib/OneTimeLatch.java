@@ -41,8 +41,6 @@ public class OneTimeLatch {
     };
 
     ICP.setPermission(isOpen, Permissions.getFrozenPermission());
-    ICP.setPermission(taskCalledOpen, Permissions.getFrozenPermission());
-    ICP.setPermission(taskRegisteredAwait, Permissions.getFrozenPermission());
     ICP.setPermission(this, Permissions.getPermanentlyThreadSafePermission());
   }
 
@@ -116,9 +114,14 @@ public class OneTimeLatch {
   }
 
   // Set flag to true once a Task calls open. That same task cannot call await.
-  private static final TaskLocal<Boolean> taskCalledOpen = new CalledOpenTaskLocal();
+  final TaskLocal<Boolean> taskCalledOpen = new CalledOpenTaskLocal();
 
   private static class CalledOpenTaskLocal extends TaskLocal<Boolean> {
+
+    CalledOpenTaskLocal() {
+      ICP.setPermission(this, Permissions.getFrozenPermission());
+    }
+
     @Override
     protected Boolean initialValue() {
       return Boolean.FALSE;
@@ -126,9 +129,14 @@ public class OneTimeLatch {
   }
 
   // await task registration
-  private static final TaskLocal<Boolean> taskRegisteredAwait = new RegisterAwaitTaskLocal();
+  final TaskLocal<Boolean> taskRegisteredAwait = new RegisterAwaitTaskLocal();
 
   private static class RegisterAwaitTaskLocal extends TaskLocal<Boolean> {
+
+    RegisterAwaitTaskLocal() {
+      ICP.setPermission(this, Permissions.getFrozenPermission());
+    }
+
     @Override
     protected Boolean initialValue() {
       return Boolean.FALSE;

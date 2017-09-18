@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * TODO: I (Kyle) will fix this mess
+ * TODO: Does not use any permissions at the moment -- only crude setup
  */
-// Implements runnable for each job completed
 public class OneTimeLatchForkJoin implements ForkJoin.ForkJoinProvider<OneTimeLatchForkJoin.TextFile,
   OneTimeLatchForkJoin.WordResults> {
   final ForkJoin.JobPool<TextFile> jobs;
