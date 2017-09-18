@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
 public class OneTimeLatch {
-  private final CountDownLatch latch;
+  final CountDownLatch latch;
   private final Permission isOpen;
   private final AtomicBoolean openCalled; // only one task can open
 
