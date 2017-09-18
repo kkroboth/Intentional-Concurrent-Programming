@@ -30,7 +30,6 @@ public class TestOneTimeLatchRegistraion extends ICPTest {
   public void mustRegisterOpenerBeforeCallingOpen() {
     OneTimeLatchRegistration latch = new OneTimeLatchRegistration();
     assertThrows(IntentError.class, latch::open);
-
   }
 
 }

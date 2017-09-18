@@ -32,7 +32,8 @@ public class OneTimeLatchRegistration extends OneTimeLatch {
       @Override
       protected boolean singleCheck() {
         // TODO: Should we use getCount() on java.util CountDownLatch?
-        return latch.getCount() != 0 && openerTask.get().equals(Task.currentTask());
+        Task openerTask = OneTimeLatchRegistration.this.openerTask.get();
+        return latch.getCount() != 0 && openerTask != null && openerTask.equals(Task.currentTask());
       }
     };
 
@@ -75,7 +76,8 @@ public class OneTimeLatchRegistration extends OneTimeLatch {
    * @throws IntentError task is already been registered as opener or same wait task
    */
   public void registerWaiter() {
-    if (openerTask.get().equals(Task.currentTask())) {
+    Task openerTask = this.openerTask.get();
+    if (openerTask != null && openerTask.equals(Task.currentTask())) {
       throw new IntentError("cannot register task as opener and waiter");
     }
 
@@ -95,7 +97,8 @@ public class OneTimeLatchRegistration extends OneTimeLatch {
    */
   @Override
   public void open() {
-    if (!openerTask.get().equals(Task.currentTask())) {
+    Task openerTask = this.openerTask.get();
+    if (openerTask == null || openerTask.equals(Task.currentTask())) {
       throw new IntentError("Task not registered as opener");
     }
     super.open();
@@ -111,7 +114,7 @@ public class OneTimeLatchRegistration extends OneTimeLatch {
    */
   @Override
   public void await() throws InterruptedException {
-    if (!taskRegisteredAwait.get().equals(Task.currentTask())) {
+    if (!taskRegisteredAwait.get()) {
       throw new IntentError("Task not registered as waiter");
     }
 
