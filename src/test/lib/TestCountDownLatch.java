@@ -1,5 +1,6 @@
 package lib;
 
+import icp.core.External;
 import icp.core.ICP;
 import icp.core.IntentError;
 import icp.lib.CountDownLatch;
