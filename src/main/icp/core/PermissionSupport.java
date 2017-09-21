@@ -77,6 +77,17 @@ public final class PermissionSupport {
       throw new NotFoundException("class not found", e);
     }
 
+    // TODO: Not complete, see variant two of subclassnullpermission.
+    // Fixes Bug: issues.subclassnullpermission.Test
+    // skip classes whose supertype is not java.lang.Object
+    // The superclass will eventually be loaded and then the permission
+    // is added.
+    // This case only applies when a child is loaded before its parent.
+    if (!clss.getSuperclass().equals(ClassPool.getDefault().get("java.lang.Object"))) {
+      logger.fine(clss.getName() + " supertype is not java.lang.Object: no permission added");
+      return;
+    }
+
     // see if the field already exists in the class
     // if so, it was inherited from a superclass
     CtField oldField = null;

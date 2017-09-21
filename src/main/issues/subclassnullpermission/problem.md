@@ -1,3 +1,4 @@
+# Variant 1
 When the child is loaded first, the child object contains
 two permission fields:
 
@@ -20,3 +21,8 @@ What Works:
     1) Same permission field is loaded (from superclass)
     2) Do nothing
 
+# Variant 2 (due to fixing variant 1)
+When using the @External annotation on a parent class, and a normal class
+(without @External), the child continues up super type chain until it 
+reaches `java.lang.Object`. Setting the permission on a null permission field
+results in default permanently-thread-safe and you can never reset those.
