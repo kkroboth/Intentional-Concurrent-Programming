@@ -77,17 +77,6 @@ public final class PermissionSupport {
       throw new NotFoundException("class not found", e);
     }
 
-    // TODO: Not complete, see variant two of subclassnullpermission.
-    // Fixes Bug: issues.subclassnullpermission.Test
-    // skip classes whose supertype is not java.lang.Object
-    // The superclass will eventually be loaded and then the permission
-    // is added.
-    // This case only applies when a child is loaded before its parent.
-    if (!clss.getSuperclass().equals(ClassPool.getDefault().get("java.lang.Object"))) {
-      logger.fine(clss.getName() + " supertype is not java.lang.Object: no permission added");
-      return;
-    }
-
     // see if the field already exists in the class
     // if so, it was inherited from a superclass
     CtField oldField = null;
@@ -283,17 +272,30 @@ public final class PermissionSupport {
 
   private static Field findPermissionField(Object obj) {
     // use standard Java reflection
+    // See bug: issues.subclassnullpermission (fixed)
+    // We will always return the permission field which is closest
+    // up in inheritance chain.
     Class<?> c = obj.getClass();
+    Field basePermissionField = null;
+
+    // TODO: Should we allow @External class's set permissions directly?
+    if(obj.getClass().getAnnotation(External.class) != null) {
+      // Raise exception, log warning, what to do...
+    }
+
     do {
       try {
-        return c.getDeclaredField(AddedPermissionFieldName);
+        basePermissionField = c.getDeclaredField(AddedPermissionFieldName);
       } catch (NoSuchFieldException | SecurityException e) {
-        // not found, looking up the inheritance chain
+        // doesn't exist in current class
+        // no-op
+      } finally {
+        // Must continue up chain until base class's permission is found, or latest non-null
         c = c.getSuperclass();
       }
     } while (c != null);
-    // not found anywhere
-    return null;
+
+    return basePermissionField;
   }
 
   /**
