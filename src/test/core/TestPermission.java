@@ -68,7 +68,7 @@ public class TestPermission extends ICPTest {
     TestClass t2 = new TestClass();
     ICP.samePermissionAs(t2, t1);
     ICP.setPermission(t1, Permissions.getFrozenPermission());
-    Task task = new Task(t2::callAndRead);
+    Task task = Task.fromThreadSafeRunnable(t2::callAndRead);
     task.run();
   }
 
@@ -105,7 +105,7 @@ public class TestPermission extends ICPTest {
   public void testTransferReset() throws Exception {
     TestClass shared = new TestClass();
     ICP.setPermission(shared, Permissions.getTransferPermission());
-    Task task = new Task(() -> {
+    Task task = Task.fromThreadSafeRunnable(() -> {
       ICP.setPermission(shared, Permissions.getFrozenPermission());
       shared.callAndRead();
       assertThrows(IntentError.class, () -> shared.callAndWrite(42));
@@ -119,7 +119,7 @@ public class TestPermission extends ICPTest {
   public void testTransferOwnerLoses() throws Exception {
     TestClass shared = new TestClass();
     ICP.setPermission(shared, Permissions.getTransferPermission());
-    new Task(() -> shared.callAndWrite(42)).run();
+    Task.fromThreadSafeRunnable(() -> shared.callAndWrite(42)).run();
     assertThrows(IntentError.class, shared::justCall);
   }
 
@@ -127,7 +127,7 @@ public class TestPermission extends ICPTest {
   public void testLoanOwnerRetains() throws Exception {
     TestClass shared = new TestClass();
     ICP.setPermission(shared, Permissions.getLoanPermission());
-    Task task = new Task(() -> shared.callAndWrite(42));
+    Task task = Task.fromThreadSafeRunnable(() -> shared.callAndWrite(42));
     task.run(); // OK
     shared.callAndWrite(43); // OK
     assertThrows(IntentError.class, task::run); // fails
@@ -137,7 +137,7 @@ public class TestPermission extends ICPTest {
   public void testOwnerResetLoan() throws Exception {
     TestClass shared = new TestClass();
     ICP.setPermission(shared, Permissions.getLoanPermission());
-    Task task = new Task(() -> shared.callAndWrite(42));
+    Task task = Task.fromThreadSafeRunnable(() -> shared.callAndWrite(42));
     task.run(); // OK
     ICP.setPermission(shared, Permissions.getPrivatePermission());
     shared.callAndWrite(43); // OK
@@ -148,7 +148,7 @@ public class TestPermission extends ICPTest {
   public void testOtherResetLoan() throws Exception {
     TestClass shared = new TestClass();
     ICP.setPermission(shared, Permissions.getLoanPermission());
-    Task task = new Task(() ->
+    Task task = Task.fromThreadSafeRunnable(() ->
       ICP.setPermission(shared, Permissions.getPrivatePermission()));
     assertThrows(IntentError.class, task::run);
   }

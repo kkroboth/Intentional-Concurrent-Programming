@@ -28,7 +28,7 @@ public class Misc {
    */
   public static Exception executeInNewICPTaskThread(Runnable r) throws InterruptedException {
     AtomicReference<Exception> ex = new AtomicReference<>();
-    Thread runner = new Thread(new Task(() -> {
+    Thread runner = new Thread(Task.fromThreadSafeRunnable(() -> {
       try {
         r.run();
       } catch (Exception e) {
@@ -78,7 +78,7 @@ public class Misc {
 
     for (int i = 0; i < n; i++) {
       int id = i;
-      Thread runner = new Thread(new Task(() -> {
+      Thread runner = new Thread(Task.fromThreadSafeRunnable(() -> {
         try {
           tasks[id].run();
         } catch (IntentError e) {
@@ -100,7 +100,7 @@ public class Misc {
 
     for (int i = 0; i < n; i++) {
       int id = i;
-      Thread runner = new Thread(new Task(() -> {
+      Thread runner = new Thread(Task.fromThreadSafeRunnable(() -> {
         try {
           tasks[id].run();
         } catch (IntentError e) {

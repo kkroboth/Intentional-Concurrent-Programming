@@ -35,12 +35,24 @@ public class Task implements Runnable {
    *
    * @param task Runnable which will be run by {@link #run()}
    */
-  public Task(Runnable task) {
+  Task(Runnable task) {
     if (task == null)
       throw new NullPointerException();
     theTask = task;
     running = new AtomicBoolean();
+    // TODO: Take out, TM should modify T before we start it???
+    // TODO: Make thread-safe
     icp$42$permissionField = Permissions.getTransferPermission();
+  }
+
+  /**
+   * Create new task from Thread-Safe Runnable.
+   *
+   * @param task Thread safe runnable
+   * @return New created task
+   */
+  public static Task fromThreadSafeRunnable(Runnable task) {
+    return new Task(task);
   }
 
   /**
@@ -59,12 +71,16 @@ public class Task implements Runnable {
     try {
       assert theTask != null;
       // we are now a task and can check permissions
+      // TODO: Fix bug -- Already on stack
+      // TODO: Remove
       PermissionSupport.checkCall(this);
       theTask.run();
     } finally {
       CURRENT_TASK.set(current);
       running.set(false);
     }
+
+    // todo: Enable Join permission (add join permission)
   }
 
   private static final AtomicBoolean INITIALIZED = new AtomicBoolean();
