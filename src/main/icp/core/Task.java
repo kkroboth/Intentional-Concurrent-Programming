@@ -15,13 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Default access for inheritance and lower level static methods.
  */
 public class Task implements Runnable {
-
-  /**
-   * The permission field.  It is set as <em>private</em> at construction time, like for any other
-   * class, except for {@code InitTask}, where it is left null.
-   */
-  Permission icp$42$permissionField;
-
   private final Runnable theTask;
   private final AtomicBoolean running;
 
@@ -40,18 +33,35 @@ public class Task implements Runnable {
       throw new NullPointerException();
     theTask = task;
     running = new AtomicBoolean();
-    // TODO: Take out, TM should modify T before we start it???
-    // TODO: Make thread-safe
-    icp$42$permissionField = Permissions.getTransferPermission();
   }
 
   /**
    * Create new task from Thread-Safe Runnable.
+   * A task is considered thread-safe iff that task's permission is of
+   * {@link Permissions#getPermanentlyThreadSafePermission()}.
+   * <p>
+   * Lambdas are thread-safe and you should use this factory method when
+   * constructing Tasks out of lambda runnables.
    *
    * @param task Thread safe runnable
    * @return New created task
    */
   public static Task fromThreadSafeRunnable(Runnable task) {
+    return new Task(task);
+  }
+
+
+  /**
+   * Passed in Runnable task is private and will be changed to
+   * PermanentlyThreadSafe permission.
+   *
+   * @param task Private task runnable
+   * @return New created task
+   */
+  public static Task fromPrivateRunnable(Runnable task) {
+    // TODO: Transfer or thread-safe? Are we assuming any Runnable passed in
+    // must be safe.
+    ICP.setPermission(task, Permissions.getPermanentlyThreadSafePermission());
     return new Task(task);
   }
 
@@ -70,17 +80,11 @@ public class Task implements Runnable {
     CURRENT_TASK.set(this);
     try {
       assert theTask != null;
-      // we are now a task and can check permissions
-      // TODO: Fix bug -- Already on stack
-      // TODO: Remove
-      PermissionSupport.checkCall(this);
       theTask.run();
     } finally {
       CURRENT_TASK.set(current);
       running.set(false);
     }
-
-    // todo: Enable Join permission (add join permission)
   }
 
   private static final AtomicBoolean INITIALIZED = new AtomicBoolean();

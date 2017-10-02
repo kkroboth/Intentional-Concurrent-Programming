@@ -266,6 +266,21 @@ public final class PermissionSupport {
     setPermissionFieldValue(obj, permission);
   }
 
+  /**
+   * Same as {@link #setPermission(Object, Permission)} but ignores whether
+   * the old permission is resettable.
+   *
+   * @param obj        the object to set permission for (forced)
+   * @param permission the permission to set in object (forced)
+   */
+  static void forceSetPermission(Object obj, Permission permission) {
+    // This breaks some of our principles -- use caution.
+    // Currently only used for thread joining
+    logger.fine(String.format("[%s] forceSetPermission called for %s with %s",
+      Thread.currentThread(), obj, permission.toString()));
+    setPermissionFieldValue(obj, permission);
+  }
+
   //
   // static private methods to do the dirty work
   //
@@ -279,7 +294,7 @@ public final class PermissionSupport {
     Field basePermissionField = null;
 
     // TODO: Should we allow @External class's set permissions directly?
-    if(obj.getClass().getAnnotation(External.class) != null) {
+    if (obj.getClass().getAnnotation(External.class) != null) {
       // Raise exception, log warning, what to do...
     }
 

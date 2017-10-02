@@ -2,6 +2,8 @@ package applications.latches;
 
 import icp.core.ICP;
 import icp.core.Task;
+import icp.core.TaskThread;
+import icp.core.TaskThreadGroup;
 import icp.lib.OneTimeLatch;
 
 import java.util.concurrent.CountDownLatch;
@@ -21,7 +23,8 @@ public class ThreadStart2 {
   private final int nbThreads;
 
   private final SharedOperation operation;
-  private final Thread[] threads;
+  private final TaskThread[] threads;
+  private final TaskThreadGroup threadGroup;
 
   // Shared between all threads
   private static class SharedOperation {
@@ -44,9 +47,9 @@ public class ThreadStart2 {
     ICP.setPermission(operation, startLatch.getIsOpenPermission());
 
     // Setup threads
-    this.threads = new Thread[nbThreads];
+    this.threads = new TaskThread[nbThreads];
     for (int i = 0; i < threads.length; i++) {
-      threads[i] = new Thread(Task.fromThreadSafeRunnable(() -> {
+      threads[i] = TaskThread.of(Task.fromThreadSafeRunnable(() -> {
         waitLatch.countDown();
 
         // Wait for main thread
@@ -58,18 +61,17 @@ public class ThreadStart2 {
         }
 
       }));
-      threads[i].start();
     }
+
+    threadGroup = new TaskThreadGroup(threads);
+    threadGroup.start(operation);
   }
 
   public int startAndGetCount() throws InterruptedException {
     waitLatch.await(); // Normal countdownlatch (java.util)
     startLatch.open();
-    for (Thread thread : this.threads) {
-      thread.join();
-    }
+    threadGroup.join();
 
-    // TODO: Problem here -- Permission must be reset!
     if (operation.getCount() != nbThreads) {
       throw new RuntimeException("Computations did not add up");
     }

@@ -2,7 +2,6 @@ package application.forkjoin;
 
 import icp.core.ICP;
 import icp.core.Permissions;
-import icp.lib.OneTimeLatch;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,34 +9,23 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * TODO: I (Kyle) will fix this mess
- * TODO: Does not use any permissions at the moment -- only crude setup
- */
-public class OneTimeLatchForkJoin implements ForkJoin.ForkJoinProvider<OneTimeLatchForkJoin.TextFile,
-  OneTimeLatchForkJoin.WordResults> {
-  final ForkJoin.JobPool<TextFile> jobs;
-  final ForkJoin<TextFile, WordResults> executor;
-  final OneTimeLatch completeLatch;
-  final AtomicInteger jobsLeft;
+public abstract class WordCount implements ForkJoinProvider<WordCount.TextFile,
+  WordCount.WordResults> {
 
-  final ConcurrentLinkedQueue<WordResults> results;
+  private final JobPool<TextFile> jobs;
+  private final ForkJoin<TextFile, WordResults> executor;
+  private final ConcurrentLinkedQueue<WordResults> results;
 
-  public OneTimeLatchForkJoin() {
-    jobs = ForkJoin.fixedJobPool(new TextFile("alice.txt", "alice"),
-      new TextFile("usconst.txt", "America"), new TextFile("alice.txt", "the"),
-      new TextFile("usconst.txt", "the"));
+  public WordCount(JobPool<TextFile> jobs) {
+    this.jobs = jobs;
     executor = new ForkJoin<>(this); // 'this' escapes
-    completeLatch = new OneTimeLatch();
-    jobsLeft = new AtomicInteger(4);
     results = new ConcurrentLinkedQueue<>();
     ICP.setPermission(this, Permissions.getFrozenPermission());
   }
 
   public void run(int nbWorkers) throws InterruptedException {
-    ForkJoin.Worker<TextFile, WordResults>[] workers = new ForkJoin.Worker[nbWorkers];
+    Worker<TextFile, WordResults>[] workers = new Worker[nbWorkers];
     for (int i = 0; i < nbWorkers; i++) {
       workers[i] = new ThreadTask();
     }
@@ -45,36 +33,31 @@ public class OneTimeLatchForkJoin implements ForkJoin.ForkJoinProvider<OneTimeLa
     executor.execute(workers);
   }
 
-  public List<WordResults> get() throws InterruptedException {
-    completeLatch.await();
+  public final void addResult(WordResults results) {
+    this.results.add(results);
+  }
+
+  public final List<WordResults> getResults() {
     return new ArrayList<>(results);
   }
 
   @Override
-  public ForkJoin.JobPool<TextFile> getJobPool() {
+  public final JobPool<TextFile> getJobPool() {
     return jobs;
   }
 
-  @Override
-  public void jobCompleted(WordResults job) {
-    results.add(job);
-    int left = jobsLeft.decrementAndGet();
-    if (left == 0) completeLatch.open();
-  }
-
-
   // Text file in resources folder
-  static class TextFile {
+  public static class TextFile {
     final String name;
     final String word;
 
-    TextFile(String name, String word) {
+    public TextFile(String name, String word) {
       this.name = name;
       this.word = word;
       ICP.setPermission(this, Permissions.getFrozenPermission());
     }
 
-    BufferedReader open() {
+    public BufferedReader open() {
       return new BufferedReader(new InputStreamReader(getClass().getClassLoader()
         .getResourceAsStream(name)));
     }
@@ -82,11 +65,11 @@ public class OneTimeLatchForkJoin implements ForkJoin.ForkJoinProvider<OneTimeLa
   }
 
   // Holds results of counted words
-  static class WordResults {
+  public static class WordResults {
     final String word;
     final int count;
 
-    WordResults(String word, int count) {
+    public WordResults(String word, int count) {
       this.word = word;
       this.count = count;
       ICP.setPermission(this, Permissions.getFrozenPermission());
@@ -98,7 +81,7 @@ public class OneTimeLatchForkJoin implements ForkJoin.ForkJoinProvider<OneTimeLa
     }
   }
 
-  static class ThreadTask extends Thread implements ForkJoin.Worker<TextFile, WordResults> {
+  static class ThreadTask extends Thread implements Worker<TextFile, WordResults> {
 
     ThreadTask() {
       ICP.setPermission(this, Permissions.getFrozenPermission());
@@ -123,10 +106,4 @@ public class OneTimeLatchForkJoin implements ForkJoin.ForkJoinProvider<OneTimeLa
     }
   }
 
-  public static void main(String[] args) throws InterruptedException {
-    OneTimeLatchForkJoin forkJoin = new OneTimeLatchForkJoin();
-    forkJoin.run(Runtime.getRuntime().availableProcessors());
-    List<WordResults> results = forkJoin.get();
-    System.out.println(results);
-  }
 }

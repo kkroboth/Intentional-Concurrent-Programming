@@ -1,4 +1,4 @@
-package lib;
+package core;
 
 import icp.core.External;
 import icp.core.IntentError;
@@ -103,7 +103,7 @@ public class TestClassLoading extends ICPTest {
   // Helper to load inner classes from this Test Class
   static void loadClass(String name) {
     try {
-      Class.forName(String.format("lib.TestClassLoading$%s", name));
+      Class.forName(String.format("core.TestClassLoading$%s", name));
     } catch (ClassNotFoundException e) {
       //noinspection ThrowableNotThrown
       fail(e);

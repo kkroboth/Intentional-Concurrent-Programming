@@ -98,7 +98,7 @@ public class OneTimeLatchRegistration extends OneTimeLatch {
   @Override
   public void open() {
     Task openerTask = this.openerTask.get();
-    if (openerTask == null || openerTask.equals(Task.currentTask())) {
+    if (openerTask == null || !openerTask.equals(Task.currentTask())) {
       throw new IntentError("Task not registered as opener");
     }
     super.open();
