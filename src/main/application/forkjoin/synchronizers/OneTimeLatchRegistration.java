@@ -6,7 +6,6 @@ import application.forkjoin.WordCount;
 import application.forkjoin.shared.Consumer;
 import application.forkjoin.shared.Producer;
 import icp.core.ICP;
-import icp.core.Permissions;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,7 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * Uses a Consumer and Producer objects. Only consumer has a
  * isOpenPermission attached.
- *
  * <p>
  * <em>Problems:</em>
  * Can't use IsClosedPermission because you can only have ONE opener,
@@ -40,9 +38,12 @@ public class OneTimeLatchRegistration extends WordCount {
     consumer = new Consumer(this); // 'this' escaped
     producer = new Producer(this);
 
-    ICP.setPermission(producer, Permissions.getPermanentlyThreadSafePermission());
+    //ICP.setPermission(producer, Permissions.getPermanentlyThreadSafePermission());
+    ICP.setPermission(producer, completeLatch.getPermission());
+    ICP.setPermission(consumer, completeLatch.getPermission());
     //ICP.setPermission(producer, completeLatch.getIsClosedPermission());
-    ICP.setPermission(consumer, completeLatch.getIsOpenPermission());
+    // old permission
+    //ICP.setPermission(consumer, completeLatch.getIsOpenPermission());
   }
 
   public List<WordResults> get() throws InterruptedException {
@@ -54,10 +55,10 @@ public class OneTimeLatchRegistration extends WordCount {
 
   @Override
   public void jobCompleted(WordResults job) {
+    completeLatch.registerOpener();
     producer.addResult(job);
     int left = jobsLeft.decrementAndGet();
     if (left == 0) {
-      completeLatch.registerOpener();
       completeLatch.open();
     }
   }

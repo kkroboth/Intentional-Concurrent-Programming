@@ -14,7 +14,7 @@ public final class TaskThreadGroup {
   }
 
   public void start(Object... targets) {
-    // NOTE: TaskThreadGroup modifies targets, not the
+    // NOTE: TaskThreadGroup modifies the targets, not the
     // individual task threads.
     for (int i = 0; i < taskThreads.length; i++) {
       taskThreads[i].start(EMPTY_TARGETS);

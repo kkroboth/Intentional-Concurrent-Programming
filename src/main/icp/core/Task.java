@@ -6,6 +6,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MonitorInfo;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -17,6 +18,35 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Task implements Runnable {
   private final Runnable theTask;
   private final AtomicBoolean running;
+  private CountDownLatch joinLatch;
+
+  // Join permission
+  private final Permission joinPermission;
+  private final TaskLocal<Boolean> joiners;
+
+
+  {
+    // Can't use Utils.newBooleanTaskLocal as it will
+    // set instance to frozen permission before an Init Task
+    // exist.
+    // joiners = Utils.newBooleanTaskLocal(false);
+    joiners = new TaskLocal<Boolean>() {
+      @Override
+      protected Boolean initialValue() {
+        return false;
+      }
+    };
+
+    joinPermission = new SingleCheckPermission("task not joined") {
+      @Override
+      protected boolean singleCheck() {
+        Task curTask = Task.currentTask();
+        // Just check if join latch is opened
+        // AND task called join
+        return joinLatch.getCount() == 0 && joiners.get();
+      }
+    };
+  }
 
   Task() {
     theTask = null;
@@ -80,11 +110,37 @@ public class Task implements Runnable {
     CURRENT_TASK.set(this);
     try {
       assert theTask != null;
+      joinLatch = new CountDownLatch(1); // JMM safe?
       theTask.run();
     } finally {
       CURRENT_TASK.set(current);
       running.set(false);
+      joinLatch.countDown(); // JMM safe?
     }
+  }
+
+  /**
+   * Same semantics of a Thread.join() but for tasks.
+   * A call to run() happens-before a thread returning from join().
+   */
+  public void join() throws InterruptedException {
+    joiners.set(true);
+    joinLatch.await();
+  }
+
+  /**
+   * Get the join permission associated with task.
+   * <p>
+   * <em>Violations:</em>
+   * <ul>
+   * <li>Task did not call <em>join</em></li>
+   * <li>Joining task has not joined</li>
+   * </ul>
+   *
+   * @return the join permission
+   */
+  public Permission getJoinPermission() {
+    return joinPermission;
   }
 
   private static final AtomicBoolean INITIALIZED = new AtomicBoolean();
