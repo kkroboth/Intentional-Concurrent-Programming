@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Task implements Runnable {
   private final Runnable theTask;
   private final AtomicBoolean running;
-  private CountDownLatch joinLatch;
+  private volatile CountDownLatch joinLatch;
 
   // Join permission
   private final Permission joinPermission;
@@ -110,12 +110,12 @@ public class Task implements Runnable {
     CURRENT_TASK.set(this);
     try {
       assert theTask != null;
-      joinLatch = new CountDownLatch(1); // JMM safe?
+      joinLatch = new CountDownLatch(1);
       theTask.run();
     } finally {
       CURRENT_TASK.set(current);
       running.set(false);
-      joinLatch.countDown(); // JMM safe?
+      joinLatch.countDown();
     }
   }
 
