@@ -1,57 +1,19 @@
 package application.joins;
 
 import icp.core.ICP;
-import icp.core.Permissions;
+import icp.core.IntentError;
 import icp.core.Task;
 
 public class OneWorkerOneShared {
-
-
   // Shared operation (thread safe)
   static class Data {
     int counter = 0;
-
-    Data() {
-      ICP.setPermission(this, Permissions.getPermanentlyThreadSafePermission());
-    }
-  }
-
-  // Worker accesses (thread safe)
-  static class Provider {
-    final Data data;
-
-    Provider(Data data) {
-      this.data = data;
-    }
-
-    void setData(int counter) {
-      this.data.counter = counter;
-    }
-  }
-
-  // Accessor (is open permission)
-  static class Accessor {
-    final Data data;
-
-    Accessor(Data data) {
-      this.data = data;
-    }
-
-    int getCounter() {
-      return data.counter;
-    }
   }
 
   final Data data;
-  final Provider provider;
-  final Accessor accessor;
 
   OneWorkerOneShared() {
     data = new Data();
-    provider = new Provider(data);
-    accessor = new Accessor(data);
-    ICP.setPermission(provider, Permissions.getPermanentlyThreadSafePermission());
-    ICP.setPermission(this, Permissions.getPermanentlyThreadSafePermission());
   }
 
 
@@ -63,18 +25,24 @@ public class OneWorkerOneShared {
         e.printStackTrace();
       }
 
-      provider.setData(1);
+      data.counter = 1;
     });
+    // set join permission on data
+    ICP.setPermission(data, task.getJoinPermission());
+
+    // Test join permission (bad)
+    try {
+      System.out.println(data.counter);
+      throw new AssertionError("Main task accessed data before join");
+    } catch (IntentError good) {
+    }
 
     // throw away access to thread -- use task.join()
     new Thread(task).start();
 
-    // set join permission on data
-    ICP.setPermission(accessor, task.getJoinPermission());
-
     // join and get access to data
     task.join();
-    assert accessor.getCounter() == 1;
+    assert data.counter == 1;
   }
 
   public static void main(String[] args) throws InterruptedException {

@@ -37,13 +37,19 @@ public class Task implements Runnable {
       }
     };
 
+    joinLatch = new CountDownLatch(1);
+
     joinPermission = new SingleCheckPermission("task not joined") {
       @Override
       protected boolean singleCheck() {
         Task curTask = Task.currentTask();
-        // Just check if join latch is opened
-        // AND task called join
-        return joinLatch.getCount() == 0 && joiners.get();
+        // Either the task is still running (not joined) and
+        // current task is *this* task.
+        // Or, *this* task registered to join and *this*
+        // task has joined.
+
+        return (curTask.equals(Task.this) && (joinLatch.getCount() == 1))
+          || (joiners.get() && joinLatch.getCount() == 0);
       }
     };
   }
@@ -110,7 +116,6 @@ public class Task implements Runnable {
     CURRENT_TASK.set(this);
     try {
       assert theTask != null;
-      joinLatch = new CountDownLatch(1);
       theTask.run();
     } finally {
       CURRENT_TASK.set(current);

@@ -14,6 +14,7 @@ public class SimpleFuture {
         e.printStackTrace();
       }
 
+      // TODO: Strings work because tehy are not checked
       return "Hello World";
     });
 
