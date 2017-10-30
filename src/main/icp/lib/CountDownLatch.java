@@ -1,6 +1,5 @@
 package icp.lib;
 
-import icp.core.External;
 import icp.core.ICP;
 import icp.core.IntentError;
 import icp.core.Permission;
@@ -9,17 +8,23 @@ import icp.core.SingleCheckPermission;
 import icp.core.TaskLocal;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
  * General CountDownLatch with a positive number.
  */
-public class CountDownLatch {
-  private final Sync sync;
-  private final AtomicInteger remainingCountDowners;
+public final class CountDownLatch {
+  private final java.util.concurrent.CountDownLatch latch;
+
+  // Instead of dealing with AQS, CAS our count and if not zero then we can countdown the latch.
+  // If zero, that's a violation. j.u.c CountDownLatch allows calling countdown below zero, we don't!
+  private final AtomicInteger latchCount;
+
+  private final AtomicInteger remainingCountDowners; // can't register more countdowners than count
   private final Permission permission;
+
   private final TaskLocal<Boolean> countDowners;
   private final TaskLocal<Boolean> waiters;
+  private final TaskLocal<Boolean> calledCountDown;
 
 
   /**
@@ -29,22 +34,24 @@ public class CountDownLatch {
    *              latch is opened.
    */
   public CountDownLatch(int count) {
-    if (count <= 0) throw new IllegalArgumentException("Count must be a positive number");
+    latch = new java.util.concurrent.CountDownLatch(count);
+    latchCount = new AtomicInteger(count);
     remainingCountDowners = new AtomicInteger(count);
-    sync = new Sync(count);
+
     countDowners = Utils.newBooleanTaskLocal(false);
     waiters = Utils.newBooleanTaskLocal(false);
+    calledCountDown = Utils.newBooleanTaskLocal(false);
 
     permission = new SingleCheckPermission("TODO: Failed") {
       @Override
       protected boolean singleCheck() {
         // Task is countdowner
         if (countDowners.get()) {
-          return !sync.calledCountDown();
+          return !calledCountDown.get();
         }
         // Task has to be a waiter
         else
-          return waiters.get() && sync.getCount() == 0;
+          return waiters.get() && latch.getCount() == 0;
       }
     };
 
@@ -80,7 +87,17 @@ public class CountDownLatch {
   public void countDown() {
     if (!countDowners.get())
       throw new IntentError("Task is not a countdowner");
-    sync.releaseShared(1);
+    if (calledCountDown.get())
+      throw new IntentError("Countdowner task already called countDown()");
+
+    int count;
+    do {
+      count = latchCount.get();
+      if (count == 0) throw new IntentError("Latch already opened");
+    } while (!latchCount.compareAndSet(count, count - 1));
+
+    latch.countDown();
+    calledCountDown.set(true);
   }
 
   public void registerWaiter() {
@@ -100,60 +117,12 @@ public class CountDownLatch {
    * </ul>
    */
   public void await() throws InterruptedException {
-    sync.acquireSharedInterruptibly(1);
+    if (calledCountDown.get())
+      throw new IntentError("Same task cannot call countDown() then await()");
+    latch.await();
   }
 
   public Permission getPermission() {
     return permission;
   }
-
-  // AQS for countdown latch
-  @External
-  private static final class Sync extends AbstractQueuedSynchronizer {
-
-    private final TaskLocal<Boolean> calledCountDown;
-
-    Sync(int count) {
-      assert count > 0;
-      calledCountDown = Utils.newBooleanTaskLocal(false);
-      setState(count);
-    }
-
-    /**
-     * Outside access of state.
-     */
-    int getCount() {
-      return getState();
-    }
-
-    boolean calledCountDown() {
-      return calledCountDown.get();
-    }
-
-    @Override
-    protected int tryAcquireShared(int arg) {
-      // Await:
-      if (calledCountDown.get()) throw new IntentError("Same task cannot call countDown() then await()");
-      return getState() == 0 ? 1 : -1;
-    }
-
-    @Override
-    protected boolean tryReleaseShared(int arg) {
-      // CountDown:
-      if (calledCountDown.get())
-        throw new IntentError("Countdowner task already called countDown()");
-      int count;
-      boolean nowOpen = false;
-      do {
-        count = getState();
-        if (count == 0)
-          throw new IntentError("CountdownLatch already opened");
-        else if (count - 1 == 0) nowOpen = true;
-      } while (!compareAndSetState(count, count - 1));
-
-      calledCountDown.set(true);
-      return nowOpen;
-    }
-  }
-
 }

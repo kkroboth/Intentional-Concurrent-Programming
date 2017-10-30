@@ -35,7 +35,8 @@ public class TestOneTimeLatch extends ICPTest {
     }
   }
 
-  @Test(description = "cannot call open() more than once")
+  // This is now allowed
+  @Test(enabled = false, description = "cannot call open() more than once")
   public void cannotCallOpenMoreThanOnce() throws InterruptedException {
     OneTimeLatch latch = new OneTimeLatch();
     latch.open();

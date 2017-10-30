@@ -1,10 +1,9 @@
-package application.forkjoin.synchronizers;
+package applications.forkjoin.synchronizers;
 
-import application.forkjoin.ForkJoin;
-import application.forkjoin.JobPool;
-import application.forkjoin.WordCount;
-import application.forkjoin.shared.Consumer;
-import application.forkjoin.shared.Producer;
+import applications.forkjoin.ForkJoin;
+import applications.forkjoin.JobPool;
+import applications.forkjoin.WordCount;
+import applications.forkjoin.shared.SharedOperation;
 import icp.core.ICP;
 
 import java.util.List;
@@ -14,49 +13,36 @@ import java.util.concurrent.atomic.AtomicInteger;
  * This example uses two synchronizers, an AtomicInteger to keep track of
  * remaining jobs and OneTimeLatch to open results to master Task.
  * <p>
- * Uses a Consumer and Producer objects. Only consumer has a
- * isOpenPermission attached.
+ * Uses a single Data object with task-bases permissions.
  * <p>
- * <em>Problems:</em>
- * Can't use IsClosedPermission because you can only have ONE opener,
- * and there are multiple tasks producing results where any one of them
- * could be the opener. One to the CountDownLatch...
  */
 public class OneTimeLatchRegistration extends WordCount {
   private final icp.lib.OneTimeLatchRegistration completeLatch;
   private final AtomicInteger jobsLeft;
 
   // Shared operations
-  private final Consumer consumer;
-  private final Producer producer;
+  private final SharedOperation shared;
 
   public OneTimeLatchRegistration(JobPool<TextFile> jobs, int count) {
     super(jobs);
     completeLatch = new icp.lib.OneTimeLatchRegistration();
     jobsLeft = new AtomicInteger(count);
 
-    consumer = new Consumer(this); // 'this' escaped
-    producer = new Producer(this);
-
-    //ICP.setPermission(producer, Permissions.getPermanentlyThreadSafePermission());
-    ICP.setPermission(producer, completeLatch.getPermission());
-    ICP.setPermission(consumer, completeLatch.getPermission());
-    //ICP.setPermission(producer, completeLatch.getIsClosedPermission());
-    // old permission
-    //ICP.setPermission(consumer, completeLatch.getIsOpenPermission());
+    shared = new SharedOperation(this);
+    ICP.setPermission(shared, completeLatch.getPermission());
   }
 
   public List<WordResults> get() throws InterruptedException {
     completeLatch.registerWaiter();
     completeLatch.await();
-    return consumer.getAllResults();
+    return shared.getAllResults();
   }
 
 
   @Override
   public void jobCompleted(WordResults job) {
     completeLatch.registerOpener();
-    producer.addResult(job);
+    shared.addResult(job);
     int left = jobsLeft.decrementAndGet();
     if (left == 0) {
       completeLatch.open();

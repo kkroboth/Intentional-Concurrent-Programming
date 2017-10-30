@@ -20,7 +20,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
-public class SimpleReentrantLock {
+public final class SimpleReentrantLock {
 
   private final ReentrantLock lock;
   private final Permission locked;

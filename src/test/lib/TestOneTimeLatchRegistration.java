@@ -66,7 +66,8 @@ public class TestOneTimeLatchRegistration extends ICPTest {
     assertThrows(IntentError.class, latch::open);
   }
 
-  @Test(description = "Cannot open twice")
+  // Note: This is now allowed
+  @Test(enabled = false, description = "Cannot open twice")
   public void cannotOpenTwice() {
     OneTimeLatchRegistration latch = new OneTimeLatchRegistration();
     latch.registerOpener();

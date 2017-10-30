@@ -1,4 +1,4 @@
-package application.forkjoin;
+package applications.forkjoin;
 
 import icp.core.ICP;
 import icp.core.Permissions;

@@ -1,4 +1,4 @@
-package application.joins;
+package applications.joins;
 
 import icp.core.ICP;
 import icp.core.Permissions;

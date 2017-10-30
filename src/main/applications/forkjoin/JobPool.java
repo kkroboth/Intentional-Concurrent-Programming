@@ -1,4 +1,4 @@
-package application.forkjoin;
+package applications.forkjoin;
 
 public interface JobPool<T> {
 

@@ -1,6 +1,6 @@
-package application.forkjoin.shared;
+package applications.forkjoin.shared;
 
-import application.forkjoin.WordCount;
+import applications.forkjoin.WordCount;
 
 import java.util.List;
 

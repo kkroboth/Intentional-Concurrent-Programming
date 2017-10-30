@@ -5,13 +5,9 @@ import icp.core.IntentError;
 import icp.core.Permission;
 import icp.core.Permissions;
 import icp.core.SingleCheckPermission;
-import icp.core.Task;
 import icp.core.TaskLocal;
 
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Same as {@link OneTimeLatch} with count initialized to 1 has an additional
@@ -23,40 +19,41 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>
  * <em>Permissions:</em> instances of this class are permanently thread-safe.
  */
-public class OneTimeLatchRegistration {
+public final class OneTimeLatchRegistration {
   private final CountDownLatch latch;
   private final Permission permission;
 
-  private final AtomicReference<Task> openerTask;
+  // Allow multiple openers
+  private final TaskLocal<Boolean> openers;
   private final TaskLocal<Boolean> waiters;
   private final TaskLocal<Boolean> calledAwait;
-  private final AtomicBoolean openCalled; // only one task can open
 
   /**
    * Initiate a one-time latch with countdown of 1.
    */
   public OneTimeLatchRegistration() {
     latch = new CountDownLatch(1);
-    openerTask = new AtomicReference<>(null);
-    openCalled = new AtomicBoolean();
 
     // TODO: Change to normal permission for more detailed
     // messages
     permission = new SingleCheckPermission("TODO: Add message why failed") {
       @Override
       protected boolean singleCheck() {
-        // Used for close and open states
-        Task curTask = Task.currentTask();
+        // Valid cases:
+        // 1) Waiter and latch is open
+        // 2) Opener and latch is closed
 
         boolean isOpen = latch.getCount() == 0;
-        if (Objects.equals(openerTask.get(), curTask))
+
+        if (openers.get())
           return !isOpen;
         else
           return waiters.get() && isOpen;
       }
     };
 
-
+    // Tasks who are registered as openers
+    openers = Utils.newBooleanTaskLocal(false);
     // Tasks who are registered as waiters
     waiters = Utils.newBooleanTaskLocal(false);
     // Tasks who called await
@@ -72,20 +69,21 @@ public class OneTimeLatchRegistration {
    * <p>
    * <em>Violations:</em>
    * <ul>
-   * <li>Task has already been set as opener (includes same task)</li>
    * <li>Task registered as waiter</li>
    * </ul>
    *
-   * @throws IntentError Opener task already set or same task
+   * @throws IntentError Opener task is already an opener
    */
   public void registerOpener() {
     if (waiters.get()) {
       throw new IntentError("Cannot register tasks as opener and waiter");
     }
 
-    if (!this.openerTask.compareAndSet(null, Task.currentTask())) {
-      throw new IntentError("Opener task has already been set");
+    if (openers.get()) {
+      throw new IntentError("Already registered as opener");
     }
+
+    openers.set(true);
   }
 
   /**
@@ -102,8 +100,7 @@ public class OneTimeLatchRegistration {
    * @throws IntentError task is already been registered as opener or same wait task
    */
   public void registerWaiter() {
-    Task openerTask = this.openerTask.get();
-    if (openerTask != null && openerTask.equals(Task.currentTask())) {
+    if (openers.get()) {
       throw new IntentError("cannot register task as opener and waiter");
     }
 
@@ -122,17 +119,12 @@ public class OneTimeLatchRegistration {
    * </ul>
    */
   public void open() {
-    // No one can call open again (violation)
-    if (!openCalled.compareAndSet(false, true)) {
-      throw new IntentError("open() has been called)");
-    }
-
-    Task openerTask = this.openerTask.get();
-    if (openerTask == null || !openerTask.equals(Task.currentTask())) {
+    if (!openers.get()) {
       throw new IntentError("Task not registered as opener");
     }
 
-    openCalled.set(true);
+    // With multiple openers, j.u.c.CountDownLatch.countDown() does nothing
+    // for counts already at zero
     latch.countDown();
   }
 
