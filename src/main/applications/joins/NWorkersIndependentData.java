@@ -9,7 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * There are "n" workers calculating data (word counts in files)
  * independently from all other tasks. The master waits (joins)
- * on all workers and iterates over to retrieve each result.
+ * on all workers and iterates over to retrieve each data.
  */
 public class NWorkersIndependentData {
 
@@ -44,7 +44,7 @@ public class NWorkersIndependentData {
       result = new Data();
       accessor = new Accessor(result);
 
-      task = Task.fromThreadSafeRunnable(() -> {
+      task = Task.ofThreadSafe(() -> {
         try {
           Thread.sleep(ThreadLocalRandom.current().nextInt(1, 50));
         } catch (InterruptedException e) {

@@ -57,7 +57,7 @@ public class Pi1 {
       final int id = i;
 
       // create the task
-      Task task = Task.fromThreadSafeRunnable(() -> {
+      Task task = Task.ofThreadSafe(() -> {
         int low;
         int high;
         if (id < split) {

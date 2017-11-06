@@ -35,7 +35,7 @@ public class Lazy {
 
   void start() {
     for (int i = 0; i < 10; i++) {
-      new Thread(Task.fromThreadSafeRunnable(() -> {
+      new Thread(Task.ofThreadSafe(() -> {
         try {
           assert d1.get().number == 42;
           assert d2.get().number == 1;
@@ -66,7 +66,7 @@ public class Lazy {
       Future<T> f;
       synchronized (this) {
         if (future == null) {
-          future = ForkJoinPool.commonPool().submit(CallableTask.fromThreadSafeCallable(this::calc));
+          future = ForkJoinPool.commonPool().submit(CallableTask.ofThreadSafe(this::calc));
         }
         f = future;
       }

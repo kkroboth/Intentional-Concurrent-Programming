@@ -42,7 +42,7 @@ public class OneWorkerOneSharedReg {
     } catch (IntentError good) {
     }
 
-    new Thread(Task.fromThreadSafeRunnable(() -> {
+    new Thread(Task.ofThreadSafe(() -> {
       latch.registerOpener();
 
       try {

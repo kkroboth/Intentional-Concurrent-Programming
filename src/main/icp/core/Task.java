@@ -24,12 +24,35 @@ public class Task implements Runnable {
   private final Permission joinPermission;
   private final TaskLocal<Boolean> joiners;
 
+  /*
+   * Overview:
+   *
+   * Permissions are asserted by Tasks and not Threads. This allows a single thread
+   * which may inaccessible to the user in thread pools, to run independent runnables
+   * wrapped inside Tasks.
+   *
+   * A such scenario that can be caught by Tasks and not Threads is forgetting to unlock
+   * a j.u.c.locks.Lock between multiple submitted jobs in an executor. If a single worker
+   * executor thread has two jobs and job1 acquires the lock, without releasing it, job2
+   * will be thrown an IntentError when trying to acquire. Depending on what type of executor,
+   * an error may not be caught without ICP.
+   *
+   * Although Task is-a runnable, it does have thread-like methods including join. A better
+   * name would be await() to not confuse with Thread.join(). Ideally it would be nice to
+   * set a join permission on java.lang.Thread. Instead the join permission is here in Task.
+   *
+   * When extending this class, the default constructor is mainly for InitTask, and in most
+   * cases the Task(Runnable) should be used. A complication implementing FutureTask happened
+   * that required passing in a RunnableFuture to super(), but also storing the field. super()
+   * must be the first statement. For now, a dummy static runnable is passed in and never used.
+   * The package-private method doRun() can be overridden for custom execution. By default it
+   * executes the task passed in constructor.
+   */
+
 
   {
     // Can't use Utils.newBooleanTaskLocal as it will
-    // set instance to frozen permission before an Init Task
-    // exist.
-    // joiners = Utils.newBooleanTaskLocal(false);
+    // set instance to frozen permission before an Init Task exists.
     joiners = new TaskLocal<Boolean>() {
       @Override
       protected Boolean initialValue() {
@@ -54,6 +77,10 @@ public class Task implements Runnable {
     };
   }
 
+  /**
+   * Constructor should only be used in InitTask as it is bootstrapped.
+   * Never will call run() method.
+   */
   Task() {
     theTask = null;
     running = null;
@@ -82,7 +109,7 @@ public class Task implements Runnable {
    * @param task Thread safe runnable
    * @return New created task
    */
-  public static Task fromThreadSafeRunnable(Runnable task) {
+  public static Task ofThreadSafe(Runnable task) {
     return new Task(task);
   }
 
@@ -94,7 +121,7 @@ public class Task implements Runnable {
    * @param task Private task runnable
    * @return New created task
    */
-  public static Task fromPrivateRunnable(Runnable task) {
+  public static Task ofPrivate(Runnable task) {
     // TODO: Transfer or thread-safe? Are we assuming any Runnable passed in
     // must be safe.
     ICP.setPermission(task, Permissions.getPermanentlyThreadSafePermission());
@@ -107,6 +134,9 @@ public class Task implements Runnable {
    * threads to run a task concurrently.  Note that this enable tasks to have the same property
    * that threads have (i.e., they can see their own writes), even across multiple (but not
    * concurrent) executions by different threads.
+   * <p>
+   * {@link #doRun()} should be overridden if custom functionality is required. This method delegates
+   * running <em>theTask</em> passed in constructor to <em>doRun</em>.
    */
   public void run() {
     assert running != null; // only null in init task, which is not run
@@ -115,8 +145,8 @@ public class Task implements Runnable {
     Task current = CURRENT_TASK.get();
     CURRENT_TASK.set(this);
     try {
-      assert theTask != null;
-      theTask.run();
+      // optional overridden method
+      doRun();
     } finally {
       CURRENT_TASK.set(current);
       running.set(false);
@@ -125,9 +155,22 @@ public class Task implements Runnable {
   }
 
   /**
+   * Override for custom task run behavior.
+   * Default implementation runs the passed in Runnable from constructor.
+   * <p>
+   * One example is FutureTask does not pass in a Runnable, but calls its
+   * underlying future run method.
+   */
+  void doRun() {
+    assert theTask != null;
+    theTask.run();
+  }
+
+  /**
    * Same semantics of a Thread.join() but for tasks.
    * A call to run() happens-before a thread returning from join().
    */
+  // TODO: Consider calling this method await() to not confuse with Thread.join()
   public void join() throws InterruptedException {
     joiners.set(true);
     joinLatch.await();

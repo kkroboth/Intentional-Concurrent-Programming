@@ -5,10 +5,9 @@ import icp.core.ICP;
 import icp.core.Permissions;
 
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 
-public class SimpleFuture {
+public class SimpleFuture extends Suite {
 
   static class Result {
     int value;
@@ -20,7 +19,7 @@ public class SimpleFuture {
 
 
   void start() throws ExecutionException, InterruptedException {
-    Future<Result> future = ForkJoinPool.commonPool().submit(CallableTask.fromThreadSafeCallable(() -> {
+    Future<Result> future = executorService.submit(CallableTask.ofThreadSafe(() -> {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {

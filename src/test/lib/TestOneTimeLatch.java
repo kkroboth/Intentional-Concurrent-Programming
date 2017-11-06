@@ -80,7 +80,7 @@ public class TestOneTimeLatch extends ICPTest {
     final int finalCount = nbThreads;
     Task[] runnables = new Task[nbThreads];
     for (int i = 0; i < runnables.length; i++) {
-      runnables[i] = Task.fromThreadSafeRunnable(() -> {
+      runnables[i] = Task.ofThreadSafe(() -> {
         try {
           latch.await();
           target.increment();

@@ -32,7 +32,7 @@ public class SimpleCountDown {
 
     // Worker
     for (int i = 0; i < count; i++) {
-      new Thread(Task.fromThreadSafeRunnable(() -> {
+      new Thread(Task.ofThreadSafe(() -> {
         latch.registerCountDowner();
         try {
           Thread.sleep(10);

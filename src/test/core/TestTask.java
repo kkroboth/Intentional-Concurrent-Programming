@@ -41,11 +41,11 @@ public class TestTask extends ICPTest {
     Target o = new Target();
     ICP.setPermission(o, Permissions.getThreadSafePermission());
 
-    Task task = Task.fromThreadSafeRunnable(() -> {
+    Task task = Task.ofThreadSafe(() -> {
       o.call();
     });
 
-    Task task2 = Task.fromPrivateRunnable(new Runnable() {
+    Task task2 = Task.ofPrivate(new Runnable() {
 
       @Override
       public void run() {
@@ -75,7 +75,7 @@ public class TestTask extends ICPTest {
     }
 
     // Create task
-    Task task = Task.fromThreadSafeRunnable(() -> {
+    Task task = Task.ofThreadSafe(() -> {
       for (int i = 0; i < nbTargets; i++) {
         targets[i].call();
       }
@@ -97,7 +97,7 @@ public class TestTask extends ICPTest {
     SafeTarget target = new SafeTarget();
     ICP.setPermission(target, Permissions.getTransferPermission());
 
-    Task task = Task.fromThreadSafeRunnable(target::call);
+    Task task = Task.ofThreadSafe(target::call);
     Thread thread = new Thread(task);
     TaskThread taskThread = new TaskThread(thread, task);
 

@@ -104,8 +104,8 @@ public class TestReentrantLock extends ICPTest {
   @Test(description = "tasks own, not threads")
   public void testThreadsDontOwn() throws Exception {
     SimpleReentrantLock lock = new SimpleReentrantLock();
-    Task t1 = Task.fromThreadSafeRunnable(lock::lock);
-    Task t2 = Task.fromThreadSafeRunnable(lock::unlock);
+    Task t1 = Task.ofThreadSafe(lock::lock);
+    Task t2 = Task.ofThreadSafe(lock::unlock);
     t1.run();
     assertThrows(IntentError.class, t2::run);
   }
@@ -125,7 +125,7 @@ public class TestReentrantLock extends ICPTest {
         }
       }
     };
-    Task t = Task.fromThreadSafeRunnable(r);
+    Task t = Task.ofThreadSafe(r);
     ICP.samePermissionAs(r, t);
     // don't use executeInNewICPTaskThread in first run to avoid memory barriers
     new Thread(t).start(); // ICP thread, but Java thread would work too

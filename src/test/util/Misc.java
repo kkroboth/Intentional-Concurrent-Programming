@@ -19,7 +19,7 @@ public class Misc {
   }
 
   /**
-   * Wraps given Runnable inside a Task using {@link Task#fromThreadSafeRunnable(Runnable)}
+   * Wraps given Runnable inside a Task using {@link Task#ofThreadSafe(Runnable)}
    * in a Java Thread. Will wait until thread joins before returning.
    *
    * @param r Runnable to wrap in Task
@@ -28,7 +28,7 @@ public class Misc {
    */
   public static Exception executeInNewICPTaskThread(Runnable r) throws InterruptedException {
     AtomicReference<Exception> ex = new AtomicReference<>();
-    Thread runner = new Thread(Task.fromThreadSafeRunnable(() -> {
+    Thread runner = new Thread(Task.ofThreadSafe(() -> {
       try {
         r.run();
       } catch (Exception e) {
@@ -78,7 +78,7 @@ public class Misc {
 
     for (int i = 0; i < n; i++) {
       int id = i;
-      Thread runner = new Thread(Task.fromThreadSafeRunnable(() -> {
+      Thread runner = new Thread(Task.ofThreadSafe(() -> {
         try {
           tasks[id].run();
         } catch (IntentError e) {
@@ -100,7 +100,7 @@ public class Misc {
 
     for (int i = 0; i < n; i++) {
       int id = i;
-      Thread runner = new Thread(Task.fromThreadSafeRunnable(() -> {
+      Thread runner = new Thread(Task.ofThreadSafe(() -> {
         try {
           tasks[id].run();
         } catch (IntentError e) {

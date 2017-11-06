@@ -49,7 +49,7 @@ public class ThreadStart2 {
     // Setup threads
     this.threads = new TaskThread[nbThreads];
     for (int i = 0; i < threads.length; i++) {
-      threads[i] = TaskThread.of(Task.fromThreadSafeRunnable(() -> {
+      threads[i] = TaskThread.of(Task.ofThreadSafe(() -> {
         waitLatch.countDown();
 
         // Wait for main thread

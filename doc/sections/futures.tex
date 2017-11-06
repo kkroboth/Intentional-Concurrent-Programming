@@ -1,0 +1,432 @@
+%%
+%% Author: kyle
+%% 10/31/17
+%%
+
+\section{Futures}
+Multiple implementations of Futures (FutureTask in \gls{juc}) are in consideration as there is no
+general Future that can catch all common \gls{user} errors, handle permissions, and easy for the user to
+use.
+
+% TODO:
+\textcolor{blue}{TODO:}
+Note, there is some confusing of the work \textit{task}. Must clarify when refering to
+ICP Task, FutureTask, or the common word task used for runnable/callable passed in executor.
+
+\subsection{Ideal Properties}
+Note, not all properties may be used at once and some contradict each other.
+\begin{enumerate}[label=Property \arabic*., itemindent=*, leftmargin=0pt, ref=\arabic*]
+    \item \label{lst:futures:prop:1} Keep using \gls{juc} FutureTask without custom ICP implementation
+    \item \label{lst:futures:prop:2} Implicit Task creation when passed a Runnable or Callable interface
+    \item \label{lst:futures:prop:3} Explicit Task creation using factory methods defined in Task and CallableTask.
+    \item \label{lst:futures:prop:4} Useful intent errors when using Futures incorrectly. Requires custom synchronizer.
+    \item \label{lst:futures:prop:5} Explicit transfer of private object created in future before returned.
+    \item \label{lst:futures:prop:6} Implicit transfer of project object using multiple if-statements to check whether
+    permission may be changed, and if, change it to transfer.
+\end{enumerate}
+
+\subsection{Uses of Futures}
+\begin{enumerate}[label=Use \arabic*., itemindent=*, leftmargin=0pt, ref=\arabic*]
+    \item \label{lst:futures:use:1} Task who creates the Future is the only task that may retrieve the result (Private to task)
+    \item \label{lst:futures:use:2} Use Future as a "joinable"\footnote{Wait for runnable to finish.} task. A custom synchronizer
+    could have a \lstinline{join()}\footnote{Make \lstinline{ICPFuture extend Task}}
+    method that returns void. Could it be the case where multiple tasks call join(), but only one
+    calls get()? Impossible in current ICP version as permissions are object based.
+    \item \label{lst:futures:use:3} A Future that allows multiple tasks retrieving a thread-safe or immutable object from
+    \lstinline{get()}.\footnote{Emulate Scala's Lazy val. See \lstinline{applications.futures.Lazy}}
+\end{enumerate}
+
+\subsection{Common code used in examples and implementations}
+
+% @formatter:off
+    \begin{lstlisting}
+// Return object from Callable
+class Result {
+    // Neither final or volatile to express memory semantics of Futures
+    int value;
+
+    Result(int value) {
+        this.value = value;
+    }
+}
+
+class ImmutableResult {
+    final int value;
+
+    ImmutableResult(int value) {
+        this.value = value;
+        ICP.setPermission(this, Permissions.getFrozenPermission());
+    }
+}
+    \end{lstlisting}
+    % @formatter:on
+
+\subsection{Implementation A: CallableTask Wrapper} \label{sec:futures:sub:implementation:1}
+Create a \lstinline{CallableTask} class which implements \lstinline{Callable} and pass the wrapped
+user callable to \gls{juc} Executors. No special treatment of transfering the callable's return object's
+permission is done. This is left up to the user.
+
+\subsubsection*{How to Use}
+% @formatter:off
+    \begin{lstlisting}[caption=Wraping callable in CallableTask]
+Future<Result> future = executorService.submit(CallableTask.ofThreadSafe(() -> {
+    Result result = new Result(42);
+    ICP.setPermission(result, Permissions.getTransferPermission());
+    return result;
+}));
+assert future.get().value == 42;
+    \end{lstlisting}
+    \begin{lstlisting}[caption=Wrapping runnable in Task]
+executorService.submit(Task.ofThreadSafe(() -> {
+    Result result = new ImmutableResult(42);
+    sharedCollection.add(result);
+}));
+    \end{lstlisting}
+    % @formatter:on
+
+Both examples rely on wrapping the Runnable and Callable interfaces in ICP compliant Tasks.
+The benefit is the user may still use their own Executors and the wrapping of interfaces is not
+hidden.
+
+\subsubsection*{What problems may occur if used incorrectly}
+Downsides are not being able to assert \gls{icptask}s or \gls{icpcallable}s sent into the Executor.
+If a user forgets to wrap their interface, undefined behavior is possible.
+
+\paragraph*{User does not set correct permission}~\\
+The transfer permission allows any task to acquire rights to the object by accessing. If multiple
+tasks try to access it by calling \lstinline{future.get()}, one will win, and the others will fail.
+This is a error on the user's part since they are allowing a \textit{private} object to be shared
+among multiple tasks. This is asserted by the transfer permission.
+
+Either the data is transferable and private to only one task, or made immutable or thread-safe for
+multiple tasks.
+
+\paragraph*{Uses normal runnable instead of Task}~ \\
+See \lstinine{applications.futures.Bad1}. User may forget to wrap their Runnable in a Task ready
+runnable (\lstinline{Task.ofThreadSafe}).
+
+\textcolor{red}{icp.core.IntentError: thread 'ForkJoinPool.commonPool-worker-1' is not a task}
+
+\paragraph*{Uses normal callable instead of CallableTask}~\\
+See \lstinline{applications.futures.Bad2}. User may forget to wrap their Callable in a
+CallableTask ready callable.
+\textcolor{red}{icp.core.IntentError: thread 'ForkJoinPool.commonPool-worker-1' is not a task}
+
+\subsubsection*{Forcing a Callable to be Task}
+
+\begin{tikzpicture}
+    % User callable
+    \umlemptyclass{UserCallable}
+    \umlsimpleinterface[y=-2, alias=c1]{Callable}
+    \umlimpl{UserCallable}{c1}
+
+    % CallableTask
+    \umlclass[x=5, template=V]{CallableTask}{
+    - task : Task \\
+    - box : AtomicReference
+    }{
+    + call() : V
+    }
+    \umlimpl{CallableTask}{c1}
+
+    % Task
+    \umlemptyclass[x=5, y=-3]{Task}
+    \umlsimpleinterface[x=5, y=-5]{Runnable}
+    \umlimpl{Task}{Runnable}
+    \umlcompo[stereo=creates, pos stereo=0.5]{CallableTask}{Task}
+
+    % Note for Task
+    \umlnote[x=8, y=-4, geometry=|-|]{Task}{Task that runs the UserCallable and stores result}
+
+    % FutureTask
+    \umlclass[x=10, template=V]{FutureTask}{}{}
+    \umlsimpleinterface[x=10, y=-2, alias=rf]{RunnableFuture}
+    \umlimpl{FutureTask}{rf}
+
+    % Associations
+    \umluniassoc{CallableTask}{UserCallable}
+    \umluniassoc{FutureTask}{CallableTask}
+\end{tikzpicture}
+
+The Callable interface used for submitted jobs in the Executor must be run by a \gls{icptask}. \gls{icptask}s
+are not of Callable type and therefore a custom \gls{icpcallable} middle-man must handle the result.
+
+The ICPCallable does not extend Task, but encapsulates it because the callable should not be join-able and the
+"has-a" relationship on Runnable doesn't exist. The CallableTask implements Callable interface,
+but the factory methods export the interface only.\footnote{Should it export
+CallableTask? User could cast it unless made package-private. There is no other operations besides \lstinline{call}}
+
+The implementation of ICPCallable uses a Task-runnable and AtomicReference as a "box" to pass from runnable to
+data of call method. Creation through factory methods supports thread-safe and private callables
+interfaces. When passing data to and from the "box", no permissions are set. It is up to the user
+to set explicit permissions in their call method.
+
+It should be noted that FutureTask when passed a Callable \textit{does not} wrap it in another layer to handle
+returning the result. This is only done when passed a Runnable.
+
+\subsubsection*{Trade-offs}
+\begin{itemize}
+    \item Doesn't require list of if branches checking the current permission\footnote{Not possible in current system}
+    and seeing if it needs to be set to \textit{Transfer} before future returns.
+    \item By forcing the user to set permission on data, they know by looking at the code how to use
+    the future's data.
+    \item There is no good way of warning the user they should set a permission before "exporting" data.
+    This can lead to confusing IntentErrors.
+    \item Allows users to keep using \gls{juc}'s FutureTasks.
+\end{itemize}
+
+\subsubsection*{Summary}
+Allows user to keep using \gls{juc} Executor and FutureTask (Property \ref{lst:futures:prop:1}). Explicit
+Task creation and permission setting (Properties \ref{lst:futures:prop:3} and \ref{lst:futures:prop:5}).
+
+If future's result is used in multiple tasks and result is private, the IntentError would not be caught until
+task touched result (Issues with Use case \ref{lst:futures:use:1}).
+
+\subsection{Implementation B: Wrapping RunnableFuture in Task} \label{sec:futures:sub:implementation:2}
+The Java Executor interface has one method \lstinline{execute(Runnable)} and all the other task execution
+methods (callables, runnables, runnables with result) delegate to it. The original problem was not having the user's
+callables run in a Task environment. A Task wraps a \gls{juc} FutureTask.
+
+\subsubsection*{How to use}
+% @formatter:off
+\begin{lstlisting}[caption=Wrap RunnableFuture in Task]
+RunnableFuture<Result> future = new FutureTask<>(() -> {
+  Result result = new Result(42);
+  ICP.setPermission(result, Permissions.getTransferPermission());
+  return result;
+});
+
+executorService.execute(Task.ofThreadSafe(future));
+assert future.get().getValue() == 42;
+    \end{lstlisting}
+    % @formatter:on
+
+By still using \gls{juc} Executors, the user must not use the submit methods which take a Callable,
+but build a FutureTask instead.
+For normal runnables, \lstinline{executorService.execute(Task.ofThreadSafe(userRunnable))} is enough.
+
+
+\subsubsection*{What problems may occur if used incorrectly}
+All of the same problems "\nameref{sec:futures:sub:implementation:1}" may happen.
+
+\subsubsection*{Wrapping classes}
+
+\begin{tikzpicture}
+    % User callable
+    \umlemptyclass{UserCallable}
+    \umlsimpleinterface[y=-2, alias=c1]{Callable}
+    \umlimpl{UserCallable}{c1}
+
+    % RunnableFuture
+    \umlclass[x=4, template=V]{FutureTask}{}{}
+    \umlinterface[x=4, y=-3]{RunnableFuture}{}{}
+    \umlimpl{FutureTask}{RunnableFuture}
+
+    % Task
+    \umlemptyclass[x=8]{Task}
+    \umlsimpleinterface[x=8, y=-2]{Runnable}
+    \umlimpl{Task}{Runnable}
+
+    % Associations
+    \umluniassoc{FutureTask}{UserCallable}
+    \umluniassoc{Task}{RunnableFuture}
+\end{tikzpicture}
+
+Only one level of wrapping of RunnableFuture inside a Task is required.
+
+\subsubsection*{Trade-offs}
+\begin{itemize}
+    \item No checking of permissions as the user must set it.
+    \item Know how the returning object must be used (Explicit permission set)
+    \item Still no good way of warning users if incorrect Runnables or Callables are sent in executors
+    \item \lstinline{execute(Runnable)} in Executor interface is the only method that may be used.
+\end{itemize}
+
+\subsubsection*{Summary}
+Has the same properties and uses as "\nameref{sec:futures:sub:implementation:1}". This implementation is
+the simplest from ICP perspective, but most troubling to the user as they may forget to wrap FutureTasks.
+
+\subsection{Implementation C: ICPFutureTask}
+Implement a ICPFutureTask that allows permission to be set on it and handles wrapping Callables and Runnables.
+Having permissions on a Future allows futures to be private to the task who created it. Once again, this allows
+using the same executors in \gls{juc}, but the user \textit{must} use the \lstinline{execute(Runnable)} passing
+the RunnableFuture.
+
+\subsubsection*{Actual Implementation}
+The actual implementation of \lstinline{core.FutureTask} extends \lstinline{Task}. This allows not only using Task
+methods join(), but the passed in callable or runnable does not have to be wrapped. Even if the user
+does happen to wrap a runnable in a Task before sending it future, it still works. Same as wrapping the entire
+RunnableFuture in Task before sending to execute method.
+
+The constructors of Task allow a null task and atomic running boolean set to null internally for InitTask only
+\footnote{Only for InitTask?}
+or a constructor that takes a runnable. Since our FutureTask delegates to a \gls{juc} FutureTask, it must be created
+before passing the runnable\footenote{RunnableFuture} in super call. For now, a static dummy runnable is always
+passed in and never used.
+
+The passed in runnable is never used due to another method on Task added: \lstinline{doRun()}. This package-private method
+is called in \lstinline{Task.run} and allows overridable task execution. By default, it runs the runnable passed in
+Task constructor.
+
+Another downside is having to call \lstinline{Permissions.checkCall(this);} in the first line of all methods. This
+FutureTask resides in the core package which is ignored.
+
+\subsubsection*{Wrapping classes}
+\begin{tikzpicture}
+    % User callable
+    \umlemptyclass{UserCallable}
+    \umlsimpleinterface[y=-2, alias=c1]{Callable}
+    \umlimpl{UserCallable}{c1}
+
+    % FutureTask
+    \umlclass[x=5, template=V]{FutureTask}{}{}
+    \umlsimpleinterface[x=5, y=-2]{RunnableFuture}{}{}
+    \umlimpl{FutureTask}{RunnableFuture}
+
+    % Task
+    \umlemptyclass[x=9]{Task}
+    \umlinherit{FutureTask}{Task}
+    \umlsimpleinterface[x=9, y=-2]{Runnable}
+    \umlimpl{Task}{Runnable}
+
+    % Associations
+    \umluniassoc{FutureTask}{UserCallable}
+\end{tikzpicture}
+
+No extra wrapping outside of FutureTask wrapping a Callable inteface, which is required.
+
+\paragraph*{Variant checking passed in Runnables} ~\\
+It is still valid to wrap a runnable in a Task before sending it off to the FutureTask, but it only adds an
+extra unneeded layer. Assertions can be added to avoid this in the constructors. It would still be possible
+to wrap the FutureTask in a Task before sending it off to an executor.
+
+\subsection*{Trade-offs}
+\begin{itemize}
+    \item Control over callable or runnable passed in through ICPFutureTask
+    \item Setting permission on ICPFutureTask. Multiple calls to get now fail if private.
+    \item Still explicit result permission required by user.
+    \item \lstinline{execute(Runnable)} in Executor interface is only method that may be used.
+\end{itemize}
+
+\subsubsection*{Summary}
+An improvement over past implementations as there are no extra unnecessary wrapping of Callable's, and allows
+permissions to be set on ICPFutureTask. Properties \ref{lst:futures:prop:2}, \ref{lst:futures:prop:4},
+\ref{lst:futures:prop:5} are satisfied. All Use cases can be used without any trouble.
+
+\subsection{Implementation D: ICPExecutor}
+Until now, executors are still ones from \gls{juc} without a custom ICP executor. This implementation adds
+a new interface \lstinline{ICPExecutorService} that extends \lstinline{ExecutorService}. The interface methods
+are overridden to return ICPFutureTask instead of Future. No new methods are added.
+
+Methods which take a Callable are sent into the ICPFutureTask from "\nameref{Implementation C}" and the same
+code is used. Methods taking a Runnable are either wrapped in a Task or sent
+as is.
+
+% @formatter:off
+\begin{lstlisting}[caption=execute(Runnable)]
+delegate.execute(command instanceof Task
+? (Task) command
+: Task.ofThreadSafe(command));
+\end{lstlisting}
+% @formatter:on
+
+Tasks can still be passed in this method and wrapped if a non-task runnable runs a Task inside its run method. It is
+up to the user to avoid this, but has no effect on the system.
+
+\paragraph*{Variants of execute(Runnable)} ~\\
+Instead of wrapping a non-task runnable, an IntentError can thrown to assert only Tasks are sent in. Another
+option is adding a new execute method that only takes Tasks and the other execute(Runnable) method always throws
+an IntentError.
+
+Automatically wrapping a non-task runnable is a cleaner approach and allows users to use the \lstinline{ExecutorService}
+interface.
+
+\paragraph*{InvokeAll and InvokeAny} ~\\
+These methods are not implemented and go directly to the delegated Executor. May not be trivial
+implementations\footnote{http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8u40-b25/java/util/concurrent/ExecutorService.java}
+
+One idea is to take the \lstinline{Collectoin<? extends Callable>} parameter in \lstinline{invokeAll}
+and \lstinline{invokeAny} methods and wrap them in a CallableTask from "\nameref{sec:futures:sub:implementation:2}
+Collection. This is not implemented and awaiting discussion.
+
+\subsubsection*{How to use}
+% @formatter:off
+\begin{lstlisting}
+// Wrap j.u.c executor in ICP executor.
+ICPExecutorService executor = ICPExecutors.newICPExecutorService(
+    Executors.newCachedThreadPool());
+
+// Callable
+FutureTask<Result> future = executor.submit(() -> {
+  Result result = new Result(42);
+  ICP.setPermission(result, Permissions.getTransferPermission());
+  return result;
+});
+assert future.get().getValue() == 42;
+
+// Runnable
+future = executor.submit(() -> {
+  // ICP permission check in runnable
+  assert immutableResult.getValue() == 43;
+}, new Result(42));
+assert future.get().getValue() == 42;
+
+// Runnable and using Join Permission instead of get.
+Result box = new Result(0);
+FutureTask<?> futureRunnable = new FutureTask<>(() -> {
+  assert immutableResult.getValue() == 43; // permission check
+  box.setValue(43);
+}, null);
+ICP.setPermission(box, futureRunnable.getJoinPermission());
+executor.execute(futureRunnable);
+futureRunnable.join();
+assert box.getValue() == 43;
+\end{lstlisting}
+% @formatter:on
+
+\subsection{Using all implemetations at once}
+There are four implementations of Futures and all \textit{could} be kept in the system and left up
+to the user to decide. However, the goal was to wrap code whether a runnable, callable, or future in
+a task and wrapping multiple tasks inside of each other is still valid.
+
+Consider wrapping a callable inside a ICPCallable, then passing it in the ICPFutureTask, and finally
+wrapping the future in a Task to send to the ICPExecutor.
+
+% @formatter:off
+\begin{lstlisting}[caption=Multiple implemetations simultaneously]
+ICPExecutorService icpexecutor = ICPExecutors.newICPExecutorService(Executors.newCachedThreadPool(
+Utils.logExceptionThreadFactory()
+));
+future = new FutureTask<>(CallableTask.ofThreadSafe(() -> {
+    Result result = new Result(42);
+    ICP.setPermission(result, Permissions.getTransferPermission());
+    return result;
+}));
+
+icpexecutor.execute(Task.ofThreadSafe(future));
+assert future.get().getValue() == 42;
+icpexecutor.shutdown();
+\end{lstlisting}
+% @formatter:on
+
+\subsection{Solution}
+The ICPExecutor and ICPFutureTask implementations are best suited as they allow implicit conversion to Tasks
+and don't introduce any extra wrapping of Callables to Tasks or Futures to Tasks. Since ICPExecutorService
+extends ExecutorService, once the user wraps \gsl{juc} Executor, it can still use the inteface without updating
+their code.
+
+InvokeAll and InvokeAny methods are not supported until further discussion. The CallableTask implementation
+can be used to wrap the collection of Callable's before delegated to underlying \gsl{juc} Executor. However,
+this CallableTask should be package-private and the user will have no idea, as long as it works. Avoiding
+the extra wrapping is not possible.
+
+\subsection{Applications}
+Scenarios using Futures.
+\textcolor{blue}{TODO: Write more applications!}
+
+\subsubsection{Lazy evaluation}
+In Scala, fields can be marked as \lstinline{lazy} and are only computed when accessed for the first time and
+is thread-safe. Lazy evaluation can be implemented in Java by using Futures. See \lstinline{applications.futures.Lazy}
+
+
+

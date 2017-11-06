@@ -46,7 +46,7 @@ public class ThreadStart3  {
     // Threads
     Task[] tasks = new Task[nbThreads];
     for (int i = 0; i < nbThreads; i++) {
-      tasks[i] = Task.fromThreadSafeRunnable(() -> {
+      tasks[i] = Task.ofThreadSafe(() -> {
         waitSetup.countDown();
 
         // Wait for main thread

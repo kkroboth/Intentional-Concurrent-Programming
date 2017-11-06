@@ -49,7 +49,7 @@ public class ThreadStart {
     TaskThreadGroup threadGroup;
     TaskThread[] threads = new TaskThread[nbThreads];
     for (int i = 0; i < threads.length; i++) {
-      threads[i] = TaskThread.of(Task.fromThreadSafeRunnable(() -> {
+      threads[i] = TaskThread.of(Task.ofThreadSafe(() -> {
         waitSetup.countDown();
 
         // Wait for main thread

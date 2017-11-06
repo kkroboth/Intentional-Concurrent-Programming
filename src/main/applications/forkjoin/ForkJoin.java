@@ -23,7 +23,7 @@ public class ForkJoin<T, V> {
     Thread[] threads = new Thread[workers.length];
     for (int i = 0; i < threads.length; i++) {
       int finalI = i;
-      threads[i] = new Thread(Task.fromThreadSafeRunnable(() -> {
+      threads[i] = new Thread(Task.ofThreadSafe(() -> {
         // Continue to grab jobs until none exist
         T job;
         while ((job = pool.nextJob()) != null) {

@@ -18,7 +18,7 @@ public class OneWorkerOneShared {
 
 
   void start() throws InterruptedException {
-    Task task = Task.fromThreadSafeRunnable(() -> {
+    Task task = Task.ofThreadSafe(() -> {
       try {
         Thread.sleep(10);
       } catch (InterruptedException e) {

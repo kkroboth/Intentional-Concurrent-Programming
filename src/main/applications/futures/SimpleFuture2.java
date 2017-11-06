@@ -21,7 +21,7 @@ public class SimpleFuture2 {
   }
 
   void start() throws ExecutionException, InterruptedException {
-    Future<Result> future = ForkJoinPool.commonPool().submit(CallableTask.fromThreadSafeCallable(() -> {
+    Future<Result> future = ForkJoinPool.commonPool().submit(CallableTask.ofThreadSafe(() -> {
       list.add("Hello World");
       Result result = new Result();
       result.data = 42;

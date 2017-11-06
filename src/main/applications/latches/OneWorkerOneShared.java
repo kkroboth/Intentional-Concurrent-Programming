@@ -65,7 +65,7 @@ public class OneWorkerOneShared {
   }
 
   void start() throws InterruptedException {
-    new Thread(Task.fromThreadSafeRunnable(() -> {
+    new Thread(Task.ofThreadSafe(() -> {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {

@@ -4,7 +4,7 @@
 %%
 
 % Preamble
-\documentclass[11pt]{article}
+\documentclass[9pt, twoside, a4paper]{article}
 
 % Packages
 \usepackage{courier}
@@ -14,8 +14,44 @@
 \usepackage[linktoc=all]{hyperref}
 \usepackage{packages/tikz-uml}
 \usepackage{color}
-
 \usepackage[utf8]{inputenc}
+\usepackage{enumitem}
+
+
+% Glossary
+\usepackage[automake, toc]{glossaries}
+\makeglossary
+
+\newglossaryentry{juc}
+{
+name=j.u.c,
+description={The \lstinline{java.util.concurrent} package}
+}
+
+\newglossaryentry{@external}
+{
+name=@External,
+description={Classes annotated with \lstinline{@External} annotation. Does not have permission field.}
+}
+
+\newglossaryentry{user}
+{
+name=User,
+description={The person who uses ICP library to express their intentions on how objects are shared}
+}
+
+\newglossaryentry{icptask} {
+name=ICPTask,
+description={ICP Task class in \lstinline{icp.core.Task}. ICP prefix is used to not confuse reader on common word
+\textit{Task} which may refer to FutureTasks, or a computational task}.
+}
+
+\newglossaryentry{icpcallable} {
+name=ICPCallable,
+description={Task compliant callable inteface.}
+}
+
+% End Glossary
 
 % listings settings
 \lstdefinestyle{default} {
@@ -44,12 +80,15 @@ columns=spaceflexible,
     \author{Kyle Kroboth}
     \maketitle
 
-    \paragraph{Disclaimer}\mbox{} \\
+    \paragraph*{Disclaimer}~\\
     This document is a work in progress and contains notes that may be confusing or incomplete.
 
+    % TOC
+    \setcounter{tocdepth}{4}
+    \setcounter{secnumdepth}{4}
     \tableofcontents
 
-    \section{Notes}
+    \section{General}
 
     \subsection{Constructs skipped during class editing}
     \begin{enumerate}
@@ -64,18 +103,25 @@ columns=spaceflexible,
     \end{enumerate}
 
 
-    \subsection{Lambdas are thread-safe}
-    Anytime a Lambda is used, it will always be thread-safe. By default (TODO...)
-    % TODO: Explain in detail why lambdas are skipped.
+    \subsection{Calls to Lambdas are thread-safe}
+    \lstinline{checkCall} permission checks are not inserted before lambdas. Therefor lambdas
+    are thread-safe. The body of lambdas are edited; field writes and reads.
 
     \subsection{Synchronizers}
-    All synchronizers should be \lstinline{final}. For example, \lstinline{OneTimeLatchRegistration}
-    has similar code in \lstinline{OneTimeLatch}, but should not be a "is-a" relationship.
+    Practices used when creating library synchronizers.
 
+    \paragraph*{Final classes}
+    All synchronizers should be \lstinline{final} or not extendable. For example,
+    \lstinline{OneTimeLatchRegistration} has similar code in \lstinline{OneTimeLatch},
+    but should not be a "is-a" relationship.
+
+    \paragraph*{Registering methods}
     As task-based registration is becoming more relevant, code for registering multiple methods is
     repeated, and multiple Boolean TaskLocal's are used. There should be in the future a abstract
     class which handles method registration or use a single TaskLocal that keeps track of multiple
     method calls.
+
+    \textcolor{blue}{TODO: A utility or common code for checking disjoint registrations is required.}
 
     \section{Ideas and Research}
     Features that are in consideration.
@@ -110,15 +156,15 @@ columns=spaceflexible,
 
     % @formatter:off
     \begin{lstlisting}[language=JVMIS, caption=Bytecode for Listings 1]
-    public synchronized void syncMethod();
-        Code:
-            0: aload_0
-            1: dup
-            2: getfield      #2                  // Field shared:I
-            5: iconst_1
-            6: iadd
-            7: putfield      #2                  // Field shared:I
-            10: return
+public synchronized void syncMethod();
+    Code:
+        0: aload_0
+        1: dup
+        2: getfield      #2                  // Field shared:I
+        5: iconst_1
+        6: iadd
+        7: putfield      #2                  // Field shared:I
+        10: return
     \end{lstlisting}
      % @formatter:on
 
@@ -127,55 +173,66 @@ columns=spaceflexible,
 
     % @formatter:off
     \begin{lstlisting}[language=java]
-    public void syncBlock() {
-        synchronized(this) {
-            shared++;
-        }
+public void syncBlock() {
+    synchronized(this) {
+        shared++;
     }
+}
     \end{lstlisting}
     % @formatter:on
 
     % @formatter:off
     \begin{lstlisting}[language=JVMIS]
-    public void syncBlock();
-        Code:
-           0: aload_0
-           1: dup
-           2: astore_1
-           3: monitorenter
-           4: aload_0
-           5: dup
-           6: getfield      #2                  // Field shared:I
-           9: iconst_1
-          10: iadd
-          11: putfield      #2                  // Field shared:I
-          14: aload_1
-          15: monitorexit
-          16: goto          24
-          19: astore_2
-          20: aload_1
-          21: monitorexit
-          22: aload_2
-          23: athrow
-          24: return
-        Exception table:
-           from    to  target type
-               4    16    19   any
-              19    22    19   any
+public void syncBlock();
+    Code:
+       0: aload_0
+       1: dup
+       2: astore_1
+       3: monitorenter
+       4: aload_0
+       5: dup
+       6: getfield      #2                  // Field shared:I
+       9: iconst_1
+      10: iadd
+      11: putfield      #2                  // Field shared:I
+      14: aload_1
+      15: monitorexit
+      16: goto          24
+      19: astore_2
+      20: aload_1
+      21: monitorexit
+      22: aload_2
+      23: athrow
+      24: return
+    Exception table:
+       from    to  target type
+           4    16    19   any
+          19    22    19   any
     \end{lstlisting}
      % @formatter:on
 
     Explicit monitor enter and exit are used for synchronized blocks.
 
     One strategy for synchronized blocks is replacing a the enter and exit ops with a reentrant lock. Doing so gives
-    ICP full control and allow the user to use permissions associated with object monitors. The problem lies in how
+    ICP full control and allow the \gls{user} to use permissions associated with object monitors. The problem lies in how
     the system finds and replaces the bytecode.
 
-    \subsubsection{Possible solution}
+    \subsubsection*{Possible solution 1}
     Since it may be difficult to know which object's monitor is used, inserting support functions before
     \lstinline{monitorenter} and after \lstinline{aload_0} (in these cases) may be able to get the object.
     Remove the monitor bytecode, insert reentrant lock and unlock on matching \lstinline{monitorexit}. Must use
     exception tables to always unlock lock.
+
+    \paragraph*{Locking scenario}
+    With monitor locks it is impossible\footnote{Possible through bytecode manipulation} to enter a monitor lock
+    and exit in another method. Using the \gls{juc} Locks could allow one Task acquiring the lock, but having
+    another task release it. This is only possible when the Thread runs two different tasks. This is avoided
+    in \lstinline{SimpleReentrantLock} by setting Task owner.
+
+    \subsubsection*{Possible solution 2}
+    This was talked about on 10/30/17 and needs clarification, but instead of modifying the bytecode to replace
+    monitors with ICP locks the \lstinline{Task.holdsLock()} could be used. This method can return false positives.
+    \footnote{No notes why}.
 
     \section{Problems}
 
@@ -202,64 +259,96 @@ columns=spaceflexible,
     Finally, we have no control over how JavaAssist class loader loads classes. At any time, class A, B, or C
     can be loaded.
 
-    \section{Synchronizers with Registrations}
-    Registration refers to tasks saying \textit{I'm going to perform this operation} before calling that operation.
-    For example, for the case of 1-time latches, a Task will inform the synchronizer it is a \textit{opener} before
-    calling \lstinline[]{oneTimeLatch.open()}. This allows a disjoint set of opener and waiter tasks.
+    \textcolor{blue}{TODO: Explain scenarios were @External annotations fail. Not that important right now.}
 
-    As a side-effect of registration, \hyperlink{Task-Based Permissions} are possible. One-time latch permissions
+    \section{Synchronizers with Registrations}
+    Registration refers to tasks saying \textit{I'm going to perform this operation} before calling it.
+    For example, for the case of 1-time latches, a Task will inform the synchronizer it is an \textit{opener} before
+    calling \lstinline{oneTimeLatch.open()}. This allows a disjoint set of opener and waiter tasks.
+
+    As a side-effect of registration, Task-Based Permissions are possible. One-time latch permissions
     may include \textit{IsOpenPermission} and \textit{IsClosedPermission}. To use these permissions, three objects must
     be used: \textit{Data\footnote{Usually thread-safe}}, \textit{Accessor}, and \textit{Provider}. This makes coding
-    awkward.
+    awkward. See \nameref{sec:three-object-idiom} for more information.
 
-    % @formatter:off
-    \begin{lstlisting}[language=java]
-      // Shared operation (thread safe)
-      static class Data {
-        int counter = 0;
-
-        Data() {
-          ICP.setPermission(this, Permissions.getPermanentlyThreadSafePermission());
-        }
-      }
-
-      // Worker accesses (thread safe)
-      static class Provider {
-        final Data data;
-
-        Provider(Data data) {
-          this.data = data;
-          ICP.setPermission(this, Permissions.getPermanentlyThreadSafePermission());
-        }
-
-        void setData(int counter) {
-          this.data.counter = counter;
-        }
-      }
-
-      // Accessor (is open permission)
-      static class Accessor {
-        final Data data;
-
-        Accessor(Data data) {
-          this.data = data;
-        }
-
-        int getCounter() {
-          return data.counter;
-        }
-      }
-    \end{lstlisting}
-    % @formatter:on
-
-    \section{Task-based permissions}
+    \subsection{Task-based permissions}
     The original intent of this project was to tie clear permissions to objects. Typically, only one invariant
     exists per Permission. \textit{IsOpen}, \textit{IsClosed}, \textit{HasLock} and so on.
 
-    The downside is there can only be one permission for a object. A simple workaround is having the user create
+    The downside is there can only be one permission for a single object. A simple workaround is having the \gls{user} create
     three classes: Underlying shared data, Accessor, and Provider. Then each object has a unique permission attached.
     For latches, \textit{IsOpen} goes to Accessor, and \textit{IsClosed} for Provider. This leaves the data object to
     be thread-safe in some cases.
+
+
+    \subsubsection*{Failed Solution: Compound Permissions}
+    To get around multiple permissions on a single object, a \textit{Compound} permission that uses
+    composition of permissions. \lstinline{new JoinPermission(new ClosedPermission());}
+    \footnote{A failed attempt of Task-Joining permission. Ideally, once a worker task joins, the master is able
+    to see any shared objects the worker had (JMM). But, the worker task cannot acesses shared data after opening
+    the latch while it is running.}
+    Too complicated to implement and gets worse after composing more than one permission.
+
+    \subsubsection*{Solution: Registration}
+    By using Boolean TaskLocal's in the synchronizer, it is possible to have one permission \footnote{
+    \textit{The Permission} to rule them all. For example, 1-time latch with registration has only
+    one permission for both IsClosed and IsOpen checks.
+    } tied to one object which has multiple invariants depending on the current task. The common strategy
+    is:
+    \begin{enumerate}
+        \item Task tells synchronizer it will call an operation
+        \item Task then calls operation
+    \end{enumerate}
+
+    Simple, but can be cumbersome for the \gls{user}:
+    % @formatter:off
+    \begin{lstlisting}
+// Worker task doing some work then calling countDown on CountDownLatch
+// ... work
+latch.countDowner(); // Worker says it's a countdowner
+latch.countDown(); // Now worker may call countDown
+    \end{lstlisting}
+    % @formatter:on
+
+    The mistakes being caught are non-countdowners calling countdown operation; Master should not wait
+    and call countdown. Though the example has the two methods right next to each other, it is usually
+    writen as:
+
+    % @formatter:off
+    \begin{lstlisting}
+CountDownLatch latch = new CountDownLatch(10); // ICP countdown latch of 10
+SharedData data = new SharedData();
+ICP.setPermission(data, latch.getPermission());
+
+for(int i = 0; i < 10; i++) {
+    new Thread(Task.newThreadSafeRunnable(() -> {
+        // Worker registers as countdowner in first line of runnable (task)
+        latch.countDowner();
+        // ... more initialization
+
+        // ... calculations
+
+        data.set(i, <worker data>);
+        latch.countDown(); // valid, worker is registered
+    })).start();
+}
+
+latch.await();
+// ... Access data
+    \end{lstlisting}
+    % @formatter:on
+
+    The goal is having the \gls{user} register their worker tasks immediately in task initialization. It would still be
+    valid if \lstinline{latch.countDowner()} was called right before the count down.
+
+    \section{Three Object Idiom} \label{sec:three-object-idiom}
+    Permissions are tied at the Object level and not method.\footnote{Previous ICP revision did method level. (confirm???)}
+    Take a simple Data object that uses a AtomicInteger as its underlying data. \textit{Provider} increments the integer,
+    while \textit{Accessor} retrieves the count. Using a \lstinline{CountDownLatch}, the worker tasks who countdown
+    are \textit{Providers}, and the master task who awaits is the \textit{Accessor}. Ideally, there should be permissions
+    that allow the worker to only call \lstinline{increment} when the latch is closed, and assert the master can only
+    access through \lstinline{retrieve} method once it is open. Unfortunality, this cannot work at the method level and the
+    solution involves breaking the Data up into three parts:
 
     \begin{tikzpicture}
         \umlemptyclass[x=2]{Data}
@@ -270,112 +359,44 @@ columns=spaceflexible,
         \umlHVassoc[name=assoc, attr=data|1, pos=1.9]{Provider}{Data}
     \end{tikzpicture}
 
-    \subsection{Failed Solution: Compound Permissions}
-    To get around multiple permissions on a single object, a \textit{Compound} permission that uses
-    composition of permissions. \lstinline{new JoinPermission(new ClosedPermission());}
-    \footnote{A failed attempt of Task-Joining permission. Ideally, once a worker task joins, the master is able
-    to see any shared objects the worker had (JMM). But, the worker task cannot acesses shared data after opening
-    the latch while it is running.}
-    Too complicated to implement and gets worse after composing more than one permission.
+    % @formatter:off
+    \begin{lstlisting}
+public class Data {
+    final AtomicInteger count = new AtomicInteger();
 
-    \subsection{Solution: Registration}
-    By using Boolean TaskLocal's in the synchronizer, it is possible to have one \footnote{
-    \textit{The Permission} to rule them all. For example, 1-time latch with registration has only
-    one permission for both IsClosed and IsOpen checks.
+    public Data() {
+        ICP.setPermission(this, Permissions.getPermanentlyThreadSafe());
     }
-    permission tied to one object which has multiple invariants depending on the current task. The common strategy
-    is:
-    \begin{enumerate}
-        \item Task tells synchronizer it will call an operation
-        \item Task then calls operation
-    \end{enumerate}
 
-    Simple, but can be cumbersome for the user:
-    \begin{lstlisting}
-        // Worker task doing some work then calling countDown on CountDownLatch
-        // ... work
-        latch.countDowner(); // Worker says it's a countdowner
-        latch.countDown(); // Now worker may call countDown
-    \end{lstlisting}
+}
 
-    The mistakes being caught are non-countdowners calling countdown operation; Master should not wait
-    and call countdown. Though the example has the two methods right next to each other, it is usually
-    writen as:
+public class Accessor {
+    final Data data;
 
-    % @formatter:off
-    \begin{lstlisting}
-        CountDownLatch latch = new CountDownLatch(10); // ICP countdown latch of 10
-        SharedData data = new SharedData();
-        ICP.setPermission(data, latch.getPermission());
+    public Accessor(Data data) {
+        this.data = data;
+    }
 
-        for(int i = 0; i < 10; i++) {
-            new Thread(Task.newThreadSafeRunnable(() -> {
-                // Worker registers as countdowner in first line of runnable (task)
-                latch.countDowner();
-                // ... more initialization
+    public int retrieve() {
+        return data.count.get();
+    }
+}
 
-                // ... calculations
+public class Provider {
+    final Data data;
 
-                data.set(i, <worker data>);
-                latch.countDown(); // valid, worker is registered
-            })).start();
-        }
+    public Provider(Data data) {
+        this.data = data;
+    }
 
-        latch.await();
-        // ... Access data
-    \end{lstlisting}
-    % @formatter:on
+    public void increment() {
+        this.data.count.incrementAndGet();
+    }
+}
 
-    The goal is having the user register their worker tasks immediately in task initialization. It would still be
-    valid if \lstinline{latch.countDowner()} was called right before the count down.
-
-    \section{Three Object Idiom}
-    Permissions are tied at the Object level and not method.\footnote{Previous ICP revision did method level. (confirm???)}
-    Take a simple Data object that uses a AtomicInteger as its underlying data. \textit{Provider} increments the integer,
-    while \textit{Accessor} retrieves the count. Using a \lstinline{CountDownLatch}, the worker tasks who countdown
-    are \textit{Providers}, and the master task who awaits is the \textit{Accessor}. Ideally, there should be permissions
-    that allow the worker to only call \lstinline{increment} when the latch is closed, and assert the master can only
-    access through \lstinline{retrieve} method once it is open. Unfortunality, cannot work at the method level and the
-    solution involves breaking the Data object up into three parts:
-
-    % @formatter:off
-    \begin{lstlisting}
-        public class Data {
-            final AtomicInteger count = new AtomicInteger();
-
-            public Data() {
-                ICP.setPermission(this, Permissions.getPermanentlyThreadSafe());
-            }
-
-        }
-
-        public class Accessor {
-            final Data data;
-
-            public Accessor(Data data) {
-                this.data = data;
-            }
-
-            public int retrieve() {
-                return data.count.get();
-            }
-        }
-
-        public class Provider {
-            final Data data;
-
-            public Provider(Data data) {
-                this.data = data;
-            }
-
-            public void increment() {
-                this.data.count.incrementAndGet();
-            }
-        }
-
-        // ... Somewhere after initialization and setting up synchronizer
-        ICP.setPermission(accessor, <permission-associated-with-master>);
-        ICP.setPermission(provider, <permission-associated-with-worker>);
+// ... Somewhere after initialization and setting up synchronizer
+ICP.setPermission(accessor, <permission-associated-with-master>);
+ICP.setPermission(provider, <permission-associated-with-worker>);
     \end{lstlisting}
     % @formatter:on
 
@@ -391,16 +412,16 @@ columns=spaceflexible,
 
     % @formatter:off
     \begin{lstlisting}[caption=Multiple openers, label=lst:multOpeners]
-    @Override
-    public void jobCompleted(WordResults job) {
-        completeLatch.registerOpener(); // Any task may be an opener
-        shared.addResult(job);
-        int left = jobsLeft.decrementAndGet();
-        if (left == 0) {
-            // But only one task *opens* it
-            completeLatch.open();
-        }
+@Override
+public void jobCompleted(WordResults job) {
+    completeLatch.registerOpener(); // Any task may be an opener
+    shared.addResult(job);
+    int left = jobsLeft.decrementAndGet();
+    if (left == 0) {
+        // But only one task *opens* it
+        completeLatch.open();
     }
+}
     \end{lstlisting}
     % @formatter:on
 
@@ -408,7 +429,7 @@ columns=spaceflexible,
     \footnote{See \lstinline{applications.forkjoin.synchronizers.OneTimeLatchRegistration}}
     would be impossible.
 
-    \subsubsection{Without registration}
+    \subsection{Without registration}
     Only has \textit{IsOpen} permission associated with synchronizer. With now registration, is is possible
     for the worker task who called \lstinline{open()} to continue accessing the shared data.\footnote{IsOpen
     permission checks if latch is open, but does not know whether the current task is a worker or master.}
@@ -417,7 +438,7 @@ columns=spaceflexible,
     The disadvantage is the worker may still work on the shared object after calling \lstinline{open()}. This is
     fixed with the one-time latch using registration.
 
-    \subsubsection{Registration}
+    \subsection{Registration}
     Similar to the non-registration latch, but tasks must explicitly tell the synchronizer they are either a
     \textit{opener} or \textit{waiter}. This is done by calling \lstinline{registerOpener()} and
     \lstinline{registerWaiter()} methods.
@@ -432,7 +453,7 @@ columns=spaceflexible,
     The General CountDownLatch synchronizer with a positive count and operation registration. There is no
     non-registration version because of the problems with 1-time latch (non-registration).\footnote{
     Just for fun, a non-registration CountDownLatch can be implemented, but only to prove registration fixes
-    the problems which workers may still access after calling countdown.
+    the problems that workers may still access after calling countdown.
     }
 
     Tasks must register as a \textit{CountDowner} or \textit{Waiter} using the methods \lstinline{registerCountDowner()}
@@ -441,108 +462,85 @@ columns=spaceflexible,
 
     See \lstinline{applications.latches.SimpleCountDown} for example.
 
-    \section{Futures}
-    Same as j.u.c's futures. Instead of building a synchronizer for Futures, it is up to the user to
-    explicitly set the future's result permission.
+    \input{sections/futures}
 
-    \paragraph{Trade-offs}\mbox{} \\
-    \begin{itemize}
-        \item Doesn't require list of if branches checking the current permission\footnote{Not possible in current system}
-        and seeing if it needs to be set to \textit{Transfer} before future returns.
-        \item By forcing the user to set permission on result, they know by looking at the code how to use
-        the future's result.
-        \item There is no good way of warning the user they should set a permission before "exporting" result.
-        This can lead to confusing IntentErrors.
-        \item Allows users to keep using j.u.c's FutureTasks.
-    \end{itemize}
-
-    \subsubsection{Transfer Permission}
-    \lstinline{applications.futures.SimpleFuture} example submits a FutureTask which creates a Result object,
-    sets that object's permission to Transfer, and returns it. The task who submitted object calls \lstinline{future.get()}
-    and now has accesses to Result by transfer.
+    \section{Joining Tasks}
+    A common practice of fork-join implementations involves spawning multiple worker threads, join on all of them,
+    and access the shared data. ICP works with Tasks, and not Threads which means the following code will not work:
 
     % @formatter:off
     \begin{lstlisting}
-        Future<Result> future = ForkJoinPool.commonPool().submit(() -> {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Result result = new Result(42);
-        ICP.setPermission(result, Permissions.getTransferPermission());
-        return result;
+// Fork
+for(int i = 0; i < 10; i++) {
+    threads[i] = new Thread(() -> {
+        data[i] = new Result(i);
     });
+}
 
-    assert future.get().value == 42;
+// Join
+for(int i = 0; i < 10; i++) {
+    threads[i].join();
+    data[i].getResult(); // worker done with data
+}
     \end{lstlisting}
     % @formatter:on
+    See \lstinline{applications.joins.Bad1} for complete example.
 
-    \subsubsection{Callable interface}
-    The Callable interface used when submitted jobs that return results require Callables to be Tasks.
-    The \lstinline{core.CallableTask} does not extend Task, but encapsulates one because the callable
-    should not be join-able and the "has-a" relationship on Runnable doesn't exist. The CallableTask
-    implements Callable interface, but the factory methods export the interface only.\footnote{Should it export
-    CallableTask? User could cast it unless made package-private. There is no other operations besides \lstinline{call}}
+    There is a happens-before relationship of all the actions in each worker and then calling join() on same
+    worker thread. However, no JMM checks are implemented in ICP so there needs to be a Join permission on result
+    objects.
 
-    The implementation uses a Task-runnable and AtomicReference as a "box" to pass from runnable to
-    result of call method. Creation through factory methods supporting thread-safe and private callables
-    interfaces. When passing result to and from the "box", no permissions are set. It is up to the user
-    to set explicit permissions in their call method.
+    This cannot be checked in the current system and the user must use permissions on objects that may be accessed
+    after a given Task has joined\footnote{Better name is completed, finished, calling await()}. Every task has a
+    \lstinline{join} and \lstinline{getJoinPermission} methods. Task-registration is used implicitly here as the
+    current task running has permission access the object until the task has finished. The master task calls
+    \lstinline{join} which registers itself.
 
-    \subsubsection{Problems}
-    \paragraph{User does not set correct permission}\mbox{} \\
-    The transfer permission allows any task to acquire rights to the object by accessing. If multiple
-    tasks try to access it by calling \lstinline{future.get()}, one will win, and the others will fail.
-    This is a error on the user's part since they are allowing a \textit{private} object to be shared
-    among multiple tasks. This is asserted by the transfer permission.
-
-    Either the result is transferable and private to only one task, or made immutable or thread-safe for
-    multiple tasks.
-
-    \paragraph{Uses normal runnable instead of Task}\mbox{} \\
-    See \lstinine{applications.futures.Bad1}. User may forget to wrap their Runnable in a Task ready
-    runnable (\lstinline{Task.fromThreadSafeRunnable()}).
-
+    \paragraph*{Simple Example}
     % @formatter:off
-    \begin{lstlisting}
-        Future f = ForkJoinPool.commonPool().submit(() -> {
-            try {
-                latch.registerOpener(); // Fails here as Task.currentTask is used
-                data = 42;
-                latch.open();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
+    \begin{lstlisting}[caption=Example of Task.join()]
+Task task = Task.ofThreadSafe(() -> {
+  try {
+    Thread.sleep(10);
+  } catch (InterruptedException e) {
+    e.printStackTrace();
+  }
+
+  data.counter = 1;
+});
+// set join permission on data
+ICP.setPermission(data, task.getJoinPermission());
+
+// throw away access to thread -- use task.join()
+new Thread(task).start();
+
+// join and get access to data
+task.join();
+assert data.counter == 1;
     \end{lstlisting}
     % @formatter:on
 
-    \textcolor{red}{icp.core.IntentError: thread 'ForkJoinPool.commonPool-worker-1' is not a task}
+    \colortext{blue}{TODO: Mention failed TaskThread, TaskThreadGroup, and force setting of permissions which violates
+    Hatcher's principle. Not used anymore.}
 
-    \paragraph{Uses normal callable instead of CallableTask}\mbox{} \\
-    See \lstinline{applications.futures.Bad2}. User may forget to wrap their Callable in a
-    CallableTask ready callable.
+    \section{Semaphores}
+    \paragraph*{Permissions} ~\\
+    Each semaphore keeps a TaskLocal count of acquired permits for each task. The permission will assert
+    that that task has acquired at least one permit.\footnote{Should at least N permits be a different
+    permission or synchronizer?}.
 
-    % @formatter:off
-    \begin{lstlisting}
-        Future<Data> f = ForkJoinPool.commonPool().submit(() -> {
-          try {
-            return new Data(42); // Fails here in <init> of Data object
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
+    \subsection{Disjoint Semaphore}
+    Semaphore were acquriers and releasers tasks are disjoint. A suitable scenario is a \lstinline{Bounded Buffer}.
 
-          throw new AssertionError("Should not reach");
-        });
-    \end{lstlisting}
-    % @formatter:on
+    \subsection{Release Semaphore}
+    Semaphore that requires the same Task who acquires N permits to release N permits.
 
-    \textcolor{red}{icp.core.IntentError: thread 'ForkJoinPool.commonPool-worker-1' is not a task}
+    \paragraph*{Possible Implementation}
+    How restrictive should \textit{the task who acquired N permits must release them} be?
+    Once a calls \lstinline{acquire(N)} or \lstinline{acquire()} it must the same amount of
+    N permits before calling another acquire.
 
-    \subsection{Lazy evaluation}
-    In Scala, fields can be marked as \lstinline{lazy} and are only computed when accessed for the first time and
-    is thread-safe. Lazy evaluation can be implemented in Java by using Futures. See \lstinline{applications.futures.Lazy}
+    \newpage
+    \printglossary
 
 \end{document}

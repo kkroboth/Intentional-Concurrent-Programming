@@ -272,8 +272,12 @@ public final class PermissionSupport {
    *
    * @param obj        the object to set permission for (forced)
    * @param permission the permission to set in object (forced)
+   * @deprecated Do not use, will throw execption
    */
   static void forceSetPermission(Object obj, Permission permission) {
+    if (true)
+      throw new ICPInternalError("Violates Hatcher's Principle!");
+
     // This breaks some of our principles -- use caution.
     // Currently only used for thread joining
     logger.fine(String.format("[%s] forceSetPermission called for %s with %s",
