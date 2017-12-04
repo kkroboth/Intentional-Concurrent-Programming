@@ -1,16 +1,20 @@
 package icp.lib;
 
 import icp.core.FutureTask;
+import icp.core.ICP;
+import icp.core.Permission;
+import icp.core.Permissions;
+import icp.core.SingleCheckPermission;
 import icp.core.Task;
+import icp.core.TaskLocal;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * ICP Executors.
@@ -35,8 +39,12 @@ public final class ICPExecutors {
    * Control what types of jobs can be submitted.
    * Delegates to underlying executor.
    */
-  private static final class Wrapper implements ICPExecutorService {
+  private static final class Wrapper extends AbstractExecutorService implements ICPExecutorService {
     private final ExecutorService delegate;
+
+    // WIP Await permission
+    private final Permission awaitTerminationPermission;
+    private final TaskLocal<Boolean> calledAwaitTermination;
 
     /*
      * Summary:
@@ -44,11 +52,8 @@ public final class ICPExecutors {
      * Builds ICPFutureTasks and executes them in delegated executor.
      * All other methods go directly to executor.
      *
-     * InvokeAll and InvokeAny go directly to underlying executor as it is more
-     * complicated to build a list of future tasks from collection of callables.
-     * http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8u40-b25/java/util/concurrent/AbstractExecutorService.java
-     * A CallableTask implementation COULD be used to wrap the callables before sending off
-     * to executor. This is to be discussed.
+     * InvokeAll and InvokeAny will return a list of FutureTask but be of type
+     * Future because List<Future> cannot be List<FutureTask
      *
      * The execute(Runnable) method can be implemented in two ways:
      * 1) Don't assert the type of runnable passed in and assume it's a Task.
@@ -67,6 +72,29 @@ public final class ICPExecutors {
 
     public Wrapper(ExecutorService executorService) {
       delegate = executorService;
+
+      calledAwaitTermination = Utils.newTaskLocal(false);
+      awaitTerminationPermission = new SingleCheckPermission() {
+        @Override
+        protected boolean singleCheck() {
+          // Task called awaitTermination and executor is terminated
+          return calledAwaitTermination.get() && Wrapper.this.isTerminated();
+        }
+
+        ;
+      };
+
+      ICP.setPermission(this, Permissions.getFrozenPermission());
+    }
+
+    @Override
+    protected <T> RunnableFuture<T> newTaskFor(Runnable runnable, T value) {
+      return new FutureTask<>(runnable, value);
+    }
+
+    @Override
+    protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
+      return new FutureTask<>(callable);
     }
 
     @Override
@@ -98,41 +126,29 @@ public final class ICPExecutors {
 
     @Override
     public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+      calledAwaitTermination.set(true);
       return delegate.awaitTermination(timeout, unit);
     }
 
     @Override
     public <T> FutureTask<T> submit(Runnable task, T result) {
-      FutureTask<T> future = new FutureTask<>(task, result);
+      Objects.requireNonNull(task);
+      FutureTask<T> future = (FutureTask<T>) newTaskFor(task, result);
       delegate.execute(future);
       return future;
     }
 
     @Override
     public FutureTask<?> submit(Runnable task) {
-      FutureTask<Void> future = new FutureTask<>(task, null);
+      Objects.requireNonNull(task);
+      FutureTask<?> future = (FutureTask<?>) newTaskFor(task, null);
       delegate.execute(future);
       return future;
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
-      return delegate.invokeAll(tasks);
-    }
-
-    @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
-      return delegate.invokeAll(tasks, timeout, unit);
-    }
-
-    @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
-      return delegate.invokeAny(tasks);
-    }
-
-    @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-      return delegate.invokeAny(tasks, timeout, unit);
+    public Permission getAwaitTerminationPermission() {
+      return awaitTerminationPermission;
     }
 
     @Override

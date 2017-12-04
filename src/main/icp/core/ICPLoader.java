@@ -25,6 +25,8 @@ public class ICPLoader extends Loader {
     // recursive invocation of java.lang.ClassLoader constructor
     super(parent, null);
 
+
+    // TODO: Move to config file
     // do not want to edit any of the javassist classes
     delegateLoadingOf("javassist.");
 

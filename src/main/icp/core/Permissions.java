@@ -114,4 +114,18 @@ public class Permissions {
   public static Permission getSamePermissionAs(Object leader) {
     return new SameAsPermission(leader);
   }
+
+  /**
+   * A permission that only grants access to tasks that hold the monitor lock on object.
+   *
+   * @param lock The monitor lock that must be held
+   */
+  public static Permission getHoldsLockPermission(Object lock) {
+    return new SingleCheckPermission("Monitor lock not held") {
+      @Override
+      protected boolean singleCheck() {
+        return Thread.holdsLock(lock);
+      }
+    };
+  }
 }

@@ -1,6 +1,6 @@
-package applications.forkjoin.shared;
+package applications._forkjoin.shared;
 
-import applications.forkjoin.WordCount;
+import applications._forkjoin.WordCount;
 
 public final class Producer {
   private final WordCount wordCount;

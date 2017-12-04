@@ -23,4 +23,8 @@ public final class Utils {
 
     };
   }
+
+  public static Thread.UncaughtExceptionHandler logThreadException() {
+    return (t, e) -> e.printStackTrace();
+  }
 }

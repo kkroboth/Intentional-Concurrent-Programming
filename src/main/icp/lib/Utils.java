@@ -1,16 +1,12 @@
 package icp.lib;
 
-import icp.core.External;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.TaskLocal;
 
 /**
  * icp.lib utils.
- * <p>
- * Is @External.
  */
-@External
 public final class Utils {
 
   private Utils() {

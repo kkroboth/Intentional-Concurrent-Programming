@@ -1,6 +1,7 @@
 package icp.lib;
 
 import icp.core.FutureTask;
+import icp.core.Permission;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -18,4 +19,6 @@ public interface ICPExecutorService extends ExecutorService {
 
   @Override
   FutureTask<?> submit(Runnable task);
+
+  Permission getAwaitTerminationPermission();
 }

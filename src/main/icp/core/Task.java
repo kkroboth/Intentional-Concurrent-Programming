@@ -71,6 +71,7 @@ public class Task implements Runnable {
         // Or, *this* task registered to join and *this*
         // task has joined.
 
+        // TODO: Remove checking the count
         return (curTask.equals(Task.this) && (joinLatch.getCount() == 1))
           || (joiners.get() && joinLatch.getCount() == 0);
       }

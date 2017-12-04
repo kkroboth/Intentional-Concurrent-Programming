@@ -1,4 +1,4 @@
-package applications.forkjoin;
+package applications._forkjoin;
 
 public interface Worker<T, V> {
 

@@ -1,10 +1,10 @@
-package applications.forkjoin.synchronizers;
+package applications._forkjoin.synchronizers;
 
-import applications.forkjoin.ForkJoin;
-import applications.forkjoin.JobPool;
-import applications.forkjoin.WordCount;
-import applications.forkjoin.shared.Consumer;
-import applications.forkjoin.shared.Producer;
+import applications._forkjoin.ForkJoin;
+import applications._forkjoin.JobPool;
+import applications._forkjoin.WordCount;
+import applications._forkjoin.shared.Consumer;
+import applications._forkjoin.shared.Producer;
 import icp.core.ICP;
 import icp.core.Permissions;
 

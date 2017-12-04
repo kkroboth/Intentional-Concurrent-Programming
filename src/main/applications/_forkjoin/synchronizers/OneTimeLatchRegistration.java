@@ -1,9 +1,9 @@
-package applications.forkjoin.synchronizers;
+package applications._forkjoin.synchronizers;
 
-import applications.forkjoin.ForkJoin;
-import applications.forkjoin.JobPool;
-import applications.forkjoin.WordCount;
-import applications.forkjoin.shared.SharedOperation;
+import applications._forkjoin.ForkJoin;
+import applications._forkjoin.JobPool;
+import applications._forkjoin.WordCount;
+import applications._forkjoin.shared.SharedOperation;
 import icp.core.ICP;
 
 import java.util.List;
