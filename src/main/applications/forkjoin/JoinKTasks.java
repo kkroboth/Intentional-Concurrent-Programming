@@ -1,7 +1,6 @@
 package applications.forkjoin;
 
 import applications.forkjoin.shared.TextFile;
-import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.Task;
@@ -29,8 +28,7 @@ public class JoinKTasks {
 
       threadTasks[i] = Task.ofThreadSafe(() -> {
         TextFile textFile = textFiles[finalI];
-        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
-          textFile.word));
+        textFile.run();
       });
 
       // Add the join permission on each array element

@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 // Text file in resources folder
-public class TextFile {
+public class TextFile implements Runnable {
   public final String name;
   public final String word;
 
@@ -32,5 +32,9 @@ public class TextFile {
     this.count = count;
   }
 
+  @Override
+  public void run() {
+    setCount(WordCount.countWordsInFile(open(), word));
+  }
 }
 

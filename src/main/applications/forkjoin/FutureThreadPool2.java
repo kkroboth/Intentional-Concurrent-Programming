@@ -1,7 +1,6 @@
 package applications.forkjoin;
 
 import applications.forkjoin.shared.TextFile;
-import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.lib.ICPExecutorService;
@@ -36,8 +35,7 @@ public class FutureThreadPool2 {
     // Fork
     List<Future<TextFile>> futures = executorService.invokeAll(Arrays.stream(textFiles)
       .map(textFile -> (Callable<TextFile>) () -> {
-        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
-          textFile.word));
+        textFile.run();
         ICP.setPermission(textFile, Permissions.getTransferPermission());
         return textFile;
       })

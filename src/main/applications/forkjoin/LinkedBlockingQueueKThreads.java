@@ -1,7 +1,6 @@
 package applications.forkjoin;
 
 import applications.forkjoin.shared.TextFile;
-import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.lib.ICPExecutors;
@@ -32,8 +31,7 @@ public class LinkedBlockingQueueKThreads {
   void compute() {
     for (TextFile textFile : textFiles) {
       executorService.execute(() -> {
-        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
-          textFile.word));
+        textFile.run();
 
         // What permission should be used here?
         // Transfer?

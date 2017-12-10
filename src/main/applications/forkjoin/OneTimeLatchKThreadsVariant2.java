@@ -1,7 +1,6 @@
 package applications.forkjoin;
 
 import applications.forkjoin.shared.TextFile;
-import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.Task;
@@ -53,8 +52,7 @@ public class OneTimeLatchKThreadsVariant2 {
         ICP.setPermission(textFile, latch.getPermission());
 
         // Compute results
-        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
-          textFile.word));
+        textFile.run();
 
         // If task is the last to compute, open the latch
         synchronized (tasksLeftLock) {

@@ -1,7 +1,6 @@
 package applications.forkjoin;
 
 import applications.forkjoin.shared.TextFile;
-import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Task;
 import icp.lib.OneTimeLatchRegistration;
@@ -37,7 +36,7 @@ public class OneTimeLatchOneThreadOneTask {
   void compute() {
     new Thread(Task.ofThreadSafe(() -> {
       latch.registerOpener();
-      textFile.setCount(WordCount.countWordsInFile(textFile.open(), textFile.word));
+      textFile.run();
       latch.open();
     })).start();
   }

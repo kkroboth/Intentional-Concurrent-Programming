@@ -2,14 +2,11 @@ package applications.forkjoin;
 
 import applications.Utils;
 import applications.forkjoin.shared.TextFile;
-import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.Task;
 import icp.lib.CountDownLatch;
 import icp.wrapper.Number;
-
-import java.io.BufferedReader;
 
 /**
  * Master waits via countdown latch and workers
@@ -51,11 +48,7 @@ public class CountDownLatchNThreadsKTasks {
         // See OneTimeLatchKThreads for why the writes to array can be read correctly in master
         TextFile textFile = textFiles[taskIndex];
         ICP.setPermission(textFile, latch.getPermission());
-        BufferedReader open = textFile.open();
-        String word = textFile.word;
-        int count = WordCount.countWordsInFile(open,
-          word);
-        textFile.setCount(count);
+        textFile.run();
         latch.countDown();
       }
     }));
