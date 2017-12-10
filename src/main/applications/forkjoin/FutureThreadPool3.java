@@ -1,13 +1,13 @@
 package applications.forkjoin;
 
-import applications.forkjoin.shared.Results;
 import applications.forkjoin.shared.TextFile;
 import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
+import icp.core.Permissions;
 import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 
-import java.util.concurrent.ExecutionException;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -17,44 +17,38 @@ import java.util.concurrent.TimeUnit;
  * Uses join permission on executor.
  */
 public class FutureThreadPool3 {
-  private final TextFile[] tasks;
+  private final TextFile[] textFiles;
   private final ICPExecutorService executorService;
-  private final Results[] results;
 
 
-  public FutureThreadPool3(TextFile[] tasks) {
-    this.tasks = tasks;
-    this.results = new Results[tasks.length];
+  public FutureThreadPool3(TextFile[] textFiles) {
+    this.textFiles = textFiles;
     executorService = ICPExecutors.newICPExecutorService(
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     );
   }
 
-  void compute() throws ExecutionException, InterruptedException {
+  void compute() {
     // Fork
-    for (int i = 0; i < tasks.length; i++) {
+    for (int i = 0; i < textFiles.length; i++) {
       int finalI = i;
       executorService.submit(() -> {
-        TextFile task = tasks[finalI];
-        Results results = new Results();
-        results.word = task.word;
-        results.count = WordCount.countWordsInFile(task.open(),
-          task.word);
-        ICP.setPermission(results, executorService.getAwaitTerminationPermission());
-        this.results[finalI] = results;
+        TextFile textFile = textFiles[finalI];
+        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
+          textFile.word));
+        ICP.setPermission(textFile, executorService.getAwaitTerminationPermission());
       });
     }
 
     executorService.shutdown();
   }
 
-  Results[] getResults() throws InterruptedException {
+  void awaitComputation() throws InterruptedException {
     executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
-    return results;
   }
 
-  public static void main(String[] args) throws ExecutionException, InterruptedException {
-    TextFile[] tasks = new TextFile[]{
+  public static void main(String[] args) throws InterruptedException {
+    TextFile[] textFiles = new TextFile[]{
       new TextFile("alice.txt", "the"),
       new TextFile("alice.txt", "alice"),
       new TextFile("alice.txt", "I"),
@@ -66,14 +60,17 @@ public class FutureThreadPool3 {
       new TextFile("alice.txt", "kill"),
     };
 
-    FutureThreadPool3 app = new FutureThreadPool3(tasks);
+    // Transfer the array of text files
+    Arrays.stream(textFiles).forEach(t -> ICP.setPermission(t, Permissions.getTransferPermission()));
+    FutureThreadPool3 app = new FutureThreadPool3(textFiles);
     // Compute
     app.compute();
-    Results[] results = app.getResults();
+    app.awaitComputation();
 
     // Print results
-    for (Results result : results) {
-      System.out.println("Word: " + result.word + " Count: " + result.count);
+    // Print results
+    for (TextFile textFile : textFiles) {
+      System.out.println("Word: " + textFile.word + " Count: " + textFile.getCount());
     }
   }
 }

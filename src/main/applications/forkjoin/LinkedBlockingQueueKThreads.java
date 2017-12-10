@@ -1,12 +1,12 @@
 package applications.forkjoin;
 
-import applications.forkjoin.shared.Results;
 import applications.forkjoin.shared.TextFile;
 import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.lib.ICPExecutors;
 
+import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,13 +16,13 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Allows master to retrieve results as they come in.
  */
 public class LinkedBlockingQueueKThreads {
-  private final TextFile[] tasks;
-  private final LinkedBlockingQueue<Results> queue;
+  private final TextFile[] textFiles;
+  private final LinkedBlockingQueue<TextFile> queue;
   private final ExecutorService executorService;
 
 
-  LinkedBlockingQueueKThreads(TextFile[] tasks) {
-    this.tasks = tasks;
+  LinkedBlockingQueueKThreads(TextFile[] textFiles) {
+    this.textFiles = textFiles;
     queue = new LinkedBlockingQueue<>();
     executorService = ICPExecutors.newICPExecutorService(
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
@@ -30,12 +30,10 @@ public class LinkedBlockingQueueKThreads {
   }
 
   void compute() {
-    for (TextFile task : tasks) {
+    for (TextFile textFile : textFiles) {
       executorService.execute(() -> {
-        Results results = new Results();
-        results.word = task.word;
-        results.count = WordCount.countWordsInFile(task.open(),
-          task.word);
+        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
+          textFile.word));
 
         // What permission should be used here?
         // Transfer?
@@ -50,31 +48,34 @@ public class LinkedBlockingQueueKThreads {
          * With a blocking queue, once the payload is offered, you cannot then put on the permission.
          */
 
-        ICP.setPermission(results, Permissions.getTransferPermission());
-        queue.offer(results);
+        ICP.setPermission(textFile, Permissions.getTransferPermission());
+        queue.offer(textFile);
       });
     }
 
     executorService.shutdown();
   }
 
-  BlockingQueue<Results> getResultQueue() {
+  BlockingQueue<TextFile> getResultQueue() {
     return queue;
   }
 
   public static void main(String[] args) throws InterruptedException {
-    TextFile[] tasks = new TextFile[100];
+    TextFile[] textFiles = new TextFile[100];
     for (int i = 0; i < 100; i++) {
-      tasks[i] = new TextFile("alice.txt", "the");
+      textFiles[i] = new TextFile("alice.txt", "the");
     }
-    LinkedBlockingQueueKThreads app = new LinkedBlockingQueueKThreads(tasks);
+    // Transfer the array of text files
+    Arrays.stream(textFiles).forEach(t -> ICP.setPermission(t, Permissions.getTransferPermission()));
+
+    LinkedBlockingQueueKThreads app = new LinkedBlockingQueueKThreads(textFiles);
 
     app.compute();
 
-    BlockingQueue<Results> queue = app.getResultQueue();
+    BlockingQueue<TextFile> queue = app.getResultQueue();
     for (int i = 0; i < 100; i++) {
-      Results result = queue.take();
-      System.out.println("Word: " + result.word + " Count: " + result.count);
+      TextFile result = queue.take();
+      System.out.println("Word: " + result.word + " Count: " + result.getCount());
     }
   }
 

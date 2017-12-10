@@ -1,6 +1,5 @@
 package applications.forkjoin;
 
-import applications.forkjoin.shared.Results;
 import applications.forkjoin.shared.TextFile;
 import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
@@ -13,17 +12,16 @@ import icp.lib.OneTimeLatchRegistration;
 public class OneTimeLatchOneThreadOneTask {
   // Final fields do not require any permission associated with
   // class (*this*).
-  private final TextFile task;
+  // Note: What did I mean by this?
+  //
+  // Permission: Latch permission
+  private final TextFile textFile;
   private final OneTimeLatchRegistration latch;
 
-  // Permission: Latch permission
-  private final Results results;
-
-  OneTimeLatchOneThreadOneTask(TextFile task) {
-    this.task = task;
+  OneTimeLatchOneThreadOneTask(TextFile textFile) {
+    this.textFile = textFile;
     latch = new OneTimeLatchRegistration();
-    results = new Results();
-    ICP.setPermission(results, latch.getPermission());
+    ICP.setPermission(this.textFile, latch.getPermission());
 
     /* Note:
      *
@@ -39,26 +37,23 @@ public class OneTimeLatchOneThreadOneTask {
   void compute() {
     new Thread(Task.ofThreadSafe(() -> {
       latch.registerOpener();
-      results.word = task.word;
-      results.count = WordCount.countWordsInFile(task.open(), task.word);
+      textFile.setCount(WordCount.countWordsInFile(textFile.open(), textFile.word));
       latch.open();
     })).start();
   }
 
-  Results getResults() throws InterruptedException {
+  void awaitComputation() throws InterruptedException {
     latch.registerWaiter();
     latch.await();
-    return results;
   }
 
   public static void main(String[] args) throws InterruptedException {
-    OneTimeLatchOneThreadOneTask app = new OneTimeLatchOneThreadOneTask(
-      new TextFile("alice.txt", "alice")
-    );
+    TextFile textFile = new TextFile("alice.txt", "alice");
+    OneTimeLatchOneThreadOneTask app = new OneTimeLatchOneThreadOneTask(textFile);
     app.compute();
+    app.awaitComputation();
 
-    Results results = app.getResults();
-    System.out.println("Word: " + results.word + " Count: " + results.count);
+    System.out.println("Word: " + textFile.word + " Count: " + textFile.getCount());
   }
 
 }

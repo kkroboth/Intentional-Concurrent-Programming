@@ -1,29 +1,29 @@
 package applications.forkjoin;
 
-import applications.forkjoin.shared.Results;
 import applications.forkjoin.shared.TextFile;
 import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
+import icp.core.Permissions;
 import icp.core.Task;
 import icp.lib.OneTimeLatchRegistration;
 import icp.lib.SimpleReentrantLock;
 
+import java.util.Arrays;
+
 /**
  * Same as OneTimeLatchKThreads except instead of using an
- * atomic integer for remaining tasks, a reentrant lock guarding
+ * atomic integer for remaining textFiles, a reentrant lock guarding
  * integer.
  */
 public class OneTimeLatchKThreadsVariant {
-  private final TextFile[] tasks;
+  // Permission[index]: Latch Permission
+  private final TextFile[] textFiles;
 
   // Permission: Reentrant locked permission
   private final MyInteger tasksLeft;
 
   private final SimpleReentrantLock tasksLeftLock;
   private final OneTimeLatchRegistration latch;
-
-  // Permission[index]: Latch Permission
-  private final Results[] results;
 
   // Container for integer
   @Deprecated()
@@ -36,12 +36,11 @@ public class OneTimeLatchKThreadsVariant {
     }
   }
 
-  OneTimeLatchKThreadsVariant(TextFile[] tasks) {
-    this.tasks = tasks;
+  OneTimeLatchKThreadsVariant(TextFile[] textFiles) {
+    this.textFiles = textFiles;
     latch = new OneTimeLatchRegistration();
     tasksLeftLock = new SimpleReentrantLock();
-    results = new Results[tasks.length];
-    tasksLeft = new MyInteger(tasks.length);
+    tasksLeft = new MyInteger(textFiles.length);
 
     /*
      * Potential Problem:
@@ -65,19 +64,18 @@ public class OneTimeLatchKThreadsVariant {
   }
 
   void compute() {
-    for (int i = 0; i < tasks.length; i++) {
+    for (int i = 0; i < textFiles.length; i++) {
       final int finalI = i;
       new Thread(Task.ofThreadSafe(() -> {
         latch.registerOpener();
 
         // Create results and add latch permission to ith index
-        results[finalI] = new Results();
-        ICP.setPermission(results[finalI], latch.getPermission());
+        TextFile textFile = textFiles[finalI];
+        ICP.setPermission(textFile, latch.getPermission());
 
         // Compute results
-        results[finalI].word = tasks[finalI].word;
-        results[finalI].count = WordCount.countWordsInFile(tasks[finalI].open(),
-          tasks[finalI].word);
+        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
+          textFile.word));
 
         // If task is the last to compute, open the latch
         tasksLeftLock.lock();
@@ -91,27 +89,29 @@ public class OneTimeLatchKThreadsVariant {
     }
   }
 
-  Results[] getResults() throws InterruptedException {
+  void awaitComputation() throws InterruptedException {
     latch.registerWaiter();
     latch.await();
-    return results;
   }
 
   public static void main(String[] args) throws InterruptedException {
-    TextFile[] tasks = new TextFile[]{
+    TextFile[] textFiles = new TextFile[]{
       new TextFile("alice.txt", "the"),
       new TextFile("alice.txt", "alice"),
       new TextFile("alice.txt", "I"),
     };
 
-    OneTimeLatchKThreadsVariant app = new OneTimeLatchKThreadsVariant(tasks);
+    // Transfer the array of text files
+    Arrays.stream(textFiles).forEach(t -> ICP.setPermission(t, Permissions.getTransferPermission()));
+
+    OneTimeLatchKThreadsVariant app = new OneTimeLatchKThreadsVariant(textFiles);
     // Compute
     app.compute();
+    app.awaitComputation();
 
-    Results[] results = app.getResults();
     // Print results
-    for (Results result : results) {
-      System.out.println("Word: " + result.word + " Count: " + result.count);
+    for (TextFile textFile : textFiles) {
+      System.out.println("Word: " + textFile.word + " Count: " + textFile.getCount());
     }
   }
 }

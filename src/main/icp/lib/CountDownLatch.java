@@ -38,16 +38,16 @@ public final class CountDownLatch {
     latchCount = new AtomicInteger(count);
     remainingCountDowners = new AtomicInteger(count);
 
-    countDowners = Utils.newBooleanTaskLocal(false);
-    waiters = Utils.newBooleanTaskLocal(false);
-    calledCountDown = Utils.newBooleanTaskLocal(false);
+    countDowners = Utils.newTaskLocal(false);
+    waiters = Utils.newTaskLocal(false);
+    calledCountDown = Utils.newTaskLocal(false);
 
     permission = new SingleCheckPermission("TODO: Failed") {
       @Override
       protected boolean singleCheck() {
         // Task is countdowner
         if (countDowners.get()) {
-          return !calledCountDown.get();
+          return latch.getCount() != 0;
         }
         // Task has to be a waiter
         else
@@ -87,8 +87,10 @@ public final class CountDownLatch {
   public void countDown() {
     if (!countDowners.get())
       throw new IntentError("Task is not a countdowner");
-    if (calledCountDown.get())
-      throw new IntentError("Countdowner task already called countDown()");
+    // Note: Don't care if a task calls countdown multiple times. As long as the count is
+    // never at zero of another countdown call.
+//    if (calledCountDown.get())
+//      throw new IntentError("Countdowner task already called countDown()");
 
     int count;
     do {

@@ -251,6 +251,8 @@ public final class PermissionSupport {
    * @throws NullPointerException if <code>obj</code> is null.
    */
   static void setPermission(Object obj, Permission permission) {
+    // Assert that autoboxed integers are not sent in
+
     logger.fine(String.format("[%s] setPermission called for %s with %s",
       Thread.currentThread(), obj, permission.toString()));
 

@@ -1,62 +1,59 @@
 package applications.forkjoin;
 
-import applications.forkjoin.shared.Results;
 import applications.forkjoin.shared.TextFile;
 import applications.forkjoin.shared.WordCount;
 import icp.core.ICP;
 import icp.core.Permissions;
+import icp.core.Task;
 import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Use ICP thread pool and ICP futures.
  */
 public class FutureThreadPool {
-  private final TextFile[] tasks;
+  private final TextFile[] textFiles;
   private final ICPExecutorService executorService;
 
 
-  public FutureThreadPool(TextFile[] tasks) {
-    this.tasks = tasks;
+  public FutureThreadPool(TextFile[] textFiles) {
+    this.textFiles = textFiles;
     executorService = ICPExecutors.newICPExecutorService(
       Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
     );
   }
 
-  Results[] compute() throws ExecutionException, InterruptedException {
-    // Fork all futures and get results individually
-    Results[] resultsArr = new Results[tasks.length];
-    Future<Results>[] futures = new Future[tasks.length];
+  void compute() throws ExecutionException, InterruptedException {
+    // Fork all futures
+    Task[] tasks = new Task[textFiles.length];
 
     // Fork
-    for (int i = 0; i < tasks.length; i++) {
-      TextFile task = tasks[i];
-      Future<Results> future = executorService.submit(() -> {
-        Results results = new Results();
-        results.word = task.word;
-        results.count = WordCount.countWordsInFile(task.open(),
-          task.word);
-        ICP.setPermission(results, Permissions.getTransferPermission());
-        return results;
+    for (int i = 0; i < textFiles.length; i++) {
+      TextFile textFile = textFiles[i];
+      int finalI = i;
+      tasks[i] = Task.ofThreadSafe(() -> {
+        textFile.setCount(WordCount.countWordsInFile(textFile.open(),
+          textFile.word));
+
+        ICP.setPermission(textFile, tasks[finalI].getJoinPermission());
       });
-      futures[i] = future;
+      executorService.execute(tasks[i]);
     }
 
     // Join
-    for (int i = 0; i < futures.length; i++) {
-      resultsArr[i] = futures[i].get();
+    for (Task task : tasks) {
+      task.join();
     }
 
     executorService.shutdown();
-    return resultsArr;
   }
 
   public static void main(String[] args) throws ExecutionException, InterruptedException {
-    TextFile[] tasks = new TextFile[]{
+    TextFile[] textFiles = new TextFile[]{
       new TextFile("alice.txt", "the"),
       new TextFile("alice.txt", "alice"),
       new TextFile("alice.txt", "I"),
@@ -68,13 +65,16 @@ public class FutureThreadPool {
       new TextFile("alice.txt", "kill"),
     };
 
-    FutureThreadPool app = new FutureThreadPool(tasks);
+    // Transfer the array of text files
+    Arrays.stream(textFiles).forEach(t -> ICP.setPermission(t, Permissions.getTransferPermission()));
+
+    FutureThreadPool app = new FutureThreadPool(textFiles);
     // Compute
-    Results[] results = app.compute();
+    app.compute();
 
     // Print results
-    for (Results result : results) {
-      System.out.println("Word: " + result.word + " Count: " + result.count);
+    for (TextFile textFile : textFiles) {
+      System.out.println("Word: " + textFile.word + " Count: " + textFile.getCount());
     }
   }
 }
