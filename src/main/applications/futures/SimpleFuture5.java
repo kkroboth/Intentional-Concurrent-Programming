@@ -6,11 +6,13 @@ import applications.futures.shared.Result;
 import icp.core.FutureTask;
 import icp.core.ICP;
 import icp.core.Permissions;
+import icp.core.Task;
 import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class SimpleFuture5 {
   ICPExecutorService executor = ICPExecutors.newICPExecutorService(
@@ -23,7 +25,7 @@ public class SimpleFuture5 {
   }
 
   void start() throws ExecutionException, InterruptedException {
-    FutureTask<Result> future = executor.submit(() -> {
+    Future<Result> future = executor.submit(() -> {
       Result result = new Result(42);
       ICP.setPermission(result, Permissions.getTransferPermission());
       return result;
@@ -32,10 +34,10 @@ public class SimpleFuture5 {
     assert future.get().getValue() == 42;
 
     // Runnable
-    future = executor.submit(() -> {
+    future = executor.submit(Task.ofThreadSafe(() -> {
       // ICP permission check in runnable
       assert immutableResult.getValue() == 43;
-    }, new Result(42));
+    }), new Result(42));
 
     assert future.get().getValue() == 42;
 

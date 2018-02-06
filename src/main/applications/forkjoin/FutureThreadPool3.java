@@ -3,6 +3,7 @@ package applications.forkjoin;
 import applications.forkjoin.shared.TextFile;
 import icp.core.ICP;
 import icp.core.Permissions;
+import icp.core.Task;
 import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 
@@ -31,11 +32,11 @@ public class FutureThreadPool3 {
     // Fork
     for (int i = 0; i < textFiles.length; i++) {
       int finalI = i;
-      executorService.submit(() -> {
+      executorService.submit(Task.ofThreadSafe(() -> {
         TextFile textFile = textFiles[finalI];
         textFile.run();
         ICP.setPermission(textFile, executorService.getAwaitTerminationPermission());
-      });
+      }));
     }
 
     executorService.shutdown();

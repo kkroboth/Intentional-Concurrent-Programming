@@ -3,11 +3,12 @@ package applications.forkjoin;
 import applications.forkjoin.shared.TextFile;
 import icp.core.ICP;
 import icp.core.Permissions;
+import icp.core.Task;
+import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 
 import java.util.Arrays;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -17,7 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class LinkedBlockingQueueKThreads {
   private final TextFile[] textFiles;
   private final LinkedBlockingQueue<TextFile> queue;
-  private final ExecutorService executorService;
+  private final ICPExecutorService executorService;
 
 
   LinkedBlockingQueueKThreads(TextFile[] textFiles) {
@@ -30,7 +31,7 @@ public class LinkedBlockingQueueKThreads {
 
   void compute() {
     for (TextFile textFile : textFiles) {
-      executorService.execute(() -> {
+      executorService.execute(Task.ofThreadSafe(() -> {
         textFile.run();
 
         // What permission should be used here?
@@ -48,7 +49,7 @@ public class LinkedBlockingQueueKThreads {
 
         ICP.setPermission(textFile, Permissions.getTransferPermission());
         queue.offer(textFile);
-      });
+      }));
     }
 
     executorService.shutdown();

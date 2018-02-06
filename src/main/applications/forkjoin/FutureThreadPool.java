@@ -34,10 +34,11 @@ public class FutureThreadPool {
     for (int i = 0; i < textFiles.length; i++) {
       TextFile textFile = textFiles[i];
       int finalI = i;
-      tasks[i] = Task.ofThreadSafe(() -> {
-        textFile.run();
-        ICP.setPermission(textFile, tasks[finalI].getJoinPermission());
-      });
+//      tasks[i] = Task.ofThreadSafe(() -> {
+//        textFile.run();
+//      });
+      tasks[i] = Task.ofThreadSafe(textFile);
+      ICP.setPermission(textFile, tasks[finalI].getJoinPermission());
       executorService.execute(tasks[i]);
     }
 
@@ -63,7 +64,7 @@ public class FutureThreadPool {
     };
 
     // Transfer the array of text files
-    Arrays.stream(textFiles).forEach(t -> ICP.setPermission(t, Permissions.getTransferPermission()));
+//    Arrays.stream(textFiles).forEach(t -> ICP.setPermission(t, Permissions.getTransferPermission()));
 
     FutureThreadPool app = new FutureThreadPool(textFiles);
     // Compute
