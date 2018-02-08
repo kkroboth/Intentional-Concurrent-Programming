@@ -1,0 +1,2 @@
+Main-Class: edu.unh.letsmeet.Main
+Class-Path: libs/icp-0.4.jar libs/javaassist.jar jhash-2.0.0.jar
