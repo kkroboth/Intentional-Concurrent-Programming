@@ -7,6 +7,8 @@ import javassist.ClassPool;
 import javassist.Loader;
 import javassist.NotFoundException;
 import javassist.Translator;
+import javassist.runtime.Desc;
+import javassist.tools.reflect.ClassMetaobject;
 
 /**
  * ICP's Javassist class loader.
@@ -25,6 +27,14 @@ public class ICPLoader extends Loader {
     // recursive invocation of java.lang.ClassLoader constructor
     super(parent, null);
 
+    // Use context class loader when javaassist looks up class names.
+    //
+    // Problems occur when method call bytecode is inserted in a static initializer.
+    // The class will be loaded twice, one with the ICPLoader and the other with
+    // AppClassLoader (or different loader other than ICP). The latter doesn't have a
+    // permission field.
+    Desc.useContextClassLoader = true;
+    ClassMetaobject.useContextClassLoader = true;
 
     // TODO: Move to config file
     // do not want to edit any of the javassist classes

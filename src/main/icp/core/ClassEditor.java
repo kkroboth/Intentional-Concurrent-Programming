@@ -40,13 +40,15 @@ final class ClassEditor {
     // insert a call to an ICP core routine at the end of the initializer
     // note that makeClassInitializer returns an empty static initializer
     // if there is not one already in the class
-    CtConstructor staticInit = null;
-    try {
-      staticInit = cc.makeClassInitializer();
-    } catch (CannotCompileException cce) {
-      logger.severe("makeClassInitializer() failed");
-      throw new ICPInternalError(
-        "makeClassInitializer() failed: ", cce);
+    CtConstructor staticInit = cc.getClassInitializer();
+    if (staticInit == null) {
+      try {
+        staticInit = cc.makeClassInitializer();
+      } catch (CannotCompileException cce) {
+        logger.severe("makeClassInitializer() failed");
+        throw new ICPInternalError(
+          "makeClassInitializer() failed: ", cce);
+      }
     }
     logger.fine("editing static initializer");
     try {
