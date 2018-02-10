@@ -6,18 +6,18 @@ lazy val root = (project in file(".")).
     version := "0.4",
     crossPaths := false,
     autoScalaLibrary := false,
-    javacOptions in (Compile,compile) ++= Seq("-deprecation", "-Xlint"),
-    libraryDependencies ++=  Seq(
+    javacOptions in(Compile, compile) ++= Seq("-deprecation", "-Xlint"),
+    libraryDependencies ++= Seq(
       "org.javassist" % "javassist" % "3.21.0-GA"
     ),
 
-    artifactPath in (Compile, packageBin) :=
+    artifactPath in(Compile, packageBin) :=
       baseDirectory.value / (artifact.value.name + "-" + version.value + ".jar"),
 
     javaSource in Compile := baseDirectory.value / "src" / "main",
     javaSource in Test := baseDirectory.value / "src" / "test",
 
-    javacOptions in (Compile, doc) ++= Seq(
+    javacOptions in(Compile, doc) ++= Seq(
       "-author",
       "-version",
       "-doctitle", "Intentional Concurrent Programming",

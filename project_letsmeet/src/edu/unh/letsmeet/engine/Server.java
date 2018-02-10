@@ -13,9 +13,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
+
+import static java.util.logging.Level.SEVERE;
 
 // TODO: Implement persistent connections (will add more server state!)
 public class Server {
+  private static final Logger logger = Logger.getLogger("Server");
+
   private final String host;
   private final int port;
   private final ServerSocket serverSocket;
@@ -63,8 +68,11 @@ public class Server {
           Socket socket = serverSocket.accept();
           executorService.execute(Task.ofThreadSafe(() -> handleRequest(socket)));
         } catch (IOException e) {
-          // TODO: Use logger
-          e.printStackTrace();
+          // Don't handle IOException for when a server was closed.
+          // Assuming IOException is coming from server being closed.
+          if (!serverSocket.isClosed()) {
+            logger.log(SEVERE, e.toString(), e);
+          }
         }
       }
     }), "server-dispatcher").start();
@@ -82,6 +90,13 @@ public class Server {
    * @param connection
    */
   protected void handleRequest(Socket connection) {
+    try {
+      Request request = Request.parse(connection.getInputStream());
+      System.out.println(request);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     // For now return simple response (Hello World)
     StringBuilder builder = new StringBuilder();
     String body = "Hello World";

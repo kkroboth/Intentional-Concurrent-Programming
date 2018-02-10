@@ -36,7 +36,6 @@ public class ICPLoader extends Loader {
     Desc.useContextClassLoader = true;
     ClassMetaobject.useContextClassLoader = true;
 
-    // TODO: Move to config file
     // do not want to edit any of the javassist classes
     delegateLoadingOf("javassist.");
 
@@ -47,6 +46,52 @@ public class ICPLoader extends Loader {
     delegateLoadingOf("sbt.");
     delegateLoadingOf("org.testng.");
     delegateLoadingOf("com.intellij.rt.");
+
+    // Third party ignores
+//    String icpPropFile = System.getProperty("icp.core.config.file");
+//    String logFile = System.getProperty("icp.core.config.file");
+//    System.out.println("FILE: " + new File(logFile).getAbsolutePath());
+//    System.out.println(icpPropFile);
+//
+//    delegateLoadingOf("org.sqlite.");
+//
+//    try {
+//      System.out.println("ICP>..");
+//      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(System.getProperty("icp.core.config.file"))));
+//      String line;
+//      while ((line = in.readLine()) != null) {
+//
+//        System.out.println(line);
+//      }
+//      System.out.println("ICP>..");
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+//    if (icpPropFile != null) {
+//      try {
+//        Properties props = new Properties();
+//        System.out.println(props.toString());
+//        props.load(new FileInputStream(icpPropFile));
+//        Optional<String> delegateLoading = Optional.of(
+//          props.getProperty("javaassist.delegate.loading"));
+//        if (delegateLoading.isPresent()) {
+//          String[] ignores = delegateLoading.get().split(",");
+//          for (String ignore : ignores) {
+//            delegateLoadingOf(ignore.trim());
+//          }
+//        }
+//
+//      } catch (IOException e) {
+//        e.printStackTrace();
+//      }
+//    }
+
+    String ignorePackages = System.getProperty("icp.core.ICPLoader.ignore");
+    if (ignorePackages != null) {
+      for (String ignore : ignorePackages.split(",")) {
+        delegateLoadingOf(ignore.trim());
+      }
+    }
 
     // need to attach bytecode editor to the loader
     Translator t = new BytecodeTranslator();
