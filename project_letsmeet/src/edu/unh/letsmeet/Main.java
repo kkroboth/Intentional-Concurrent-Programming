@@ -2,6 +2,8 @@ package edu.unh.letsmeet;
 
 import edu.unh.letsmeet.command.CommandLineScanner;
 import edu.unh.letsmeet.engine.Server;
+import edu.unh.letsmeet.server.PagesRequestHandler;
+import edu.unh.letsmeet.server.StaticFilesRequestHandler;
 import edu.unh.letsmeet.users.DatabaseHelper;
 import icp.core.ICP;
 import icp.core.Permissions;
@@ -22,7 +24,13 @@ public class Main {
 
   public synchronized void start() throws IOException {
     Props props = Props.getInstance();
-    server = new Server(props.getHost(), props.getPort(), new ServerRequestHandler());
+    server = new Server(props.getHost(), props.getPort(), new PagesRequestHandler(
+      props.getPagesDirectory(),
+      PagesRequestHandler.buildUrls(
+        "/", "index.html"
+      ), new StaticFilesRequestHandler(
+      props.getStaticDirectory(), "/static/")
+    ));
     DatabaseHelper.getInstance(); // Starts database
     server.start();
   }

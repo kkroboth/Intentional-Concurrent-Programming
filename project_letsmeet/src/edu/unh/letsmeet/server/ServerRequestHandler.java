@@ -1,4 +1,4 @@
-package edu.unh.letsmeet;
+package edu.unh.letsmeet.server;
 
 import edu.unh.letsmeet.engine.Request;
 import edu.unh.letsmeet.engine.RequestHandler;

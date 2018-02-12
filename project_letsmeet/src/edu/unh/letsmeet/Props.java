@@ -6,6 +6,8 @@ import icp.core.Permissions;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -59,6 +61,20 @@ public final class Props {
   public long getMaxContentLength() {
     Objects.requireNonNull(this.props);
     return Long.parseLong(props.getProperty("max_content_length"));
+  }
+
+  public Path getPagesDirectory() {
+    Objects.requireNonNull(this.props);
+    String path = props.getProperty("pages_directory");
+    Objects.requireNonNull(path, "pages_directory property is not set");
+    return Paths.get(path);
+  }
+
+  public Path getStaticDirectory() {
+    Objects.requireNonNull(this.props);
+    String path = props.getProperty("static_directory");
+    Objects.requireNonNull(path, "static_directory property is not set");
+    return Paths.get(path);
   }
 
   private Properties loadProps(InputStream stream) throws IOException {

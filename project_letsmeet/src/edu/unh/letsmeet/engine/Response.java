@@ -73,6 +73,17 @@ public class Response {
       return this;
     }
 
+    public Builder html(String body) {
+      this.body = body;
+      headers.put("Content-Type", "text/html; charset=utf8");
+      return this;
+    }
+
+    public Builder contentType(String type) {
+      this.headers.put("Content-Type", type);
+      return this;
+    }
+
     public Response build() {
       if (status == -1) throw new IllegalStateException("Status code not set");
       return new Response(this);

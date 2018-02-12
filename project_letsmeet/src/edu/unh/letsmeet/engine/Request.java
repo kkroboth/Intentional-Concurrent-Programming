@@ -38,6 +38,18 @@ public class Request {
     this.body = builder.body;
   }
 
+  public URI getUri() {
+    return this.uri;
+  }
+
+  public String getHeader(String name) {
+    return this.headers.get(name);
+  }
+
+  public StringBuilder getBody() {
+    return this.body;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
