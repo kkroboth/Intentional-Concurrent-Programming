@@ -22,7 +22,7 @@ public class Main {
 
   public synchronized void start() throws IOException {
     Props props = Props.getInstance();
-    server = new Server(props.getHost(), props.getPort());
+    server = new Server(props.getHost(), props.getPort(), new ServerRequestHandler());
     DatabaseHelper.getInstance(); // Starts database
     server.start();
   }

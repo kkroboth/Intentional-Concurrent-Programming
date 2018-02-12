@@ -54,77 +54,81 @@ public class Request {
     return builder.toString();
   }
 
-  public static Request parse(InputStream stream) throws IOException {
+  public static Request parse(InputStream stream) throws HttpException {
     BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
     Builder builder = new Builder();
 
-    // Request line
-    String[] requestLine = reader.readLine().split(" ");
-    logger.log(FINER, "Request-Line: {0}", Arrays.toString(requestLine));
-    if (requestLine.length != 3) {
-      logger.warning("Malformed request line");
-      throw new IOException("Invalid Request");
-    }
-
     try {
-      builder.setMethod(Method.valueOf(requestLine[0].toUpperCase()));
-    } catch (IllegalArgumentException e) {
-      logger.log(WARNING, "Unsupported method: {0}", requestLine[0].toUpperCase());
-      throw new IOException("Invalid Request");
-    }
-
-    try {
-      builder.setUri(new URI(requestLine[1]));
-    } catch (URISyntaxException e) {
-      logger.log(WARNING, "Invalid Request-URI: {0}", requestLine[1]);
-      throw new IOException(e);
-    }
-
-    // Either EOF or contains headers
-    String line;
-    while (!(line = reader.readLine()).isEmpty()) {
-      // parse header
-      String[] pair = line.split(":", 2);
-      if (pair.length != 2) {
-        logger.log(FINE, "Header not in pair format: {0}", line);
-        continue;
+      // Request line
+      String[] requestLine = reader.readLine().split(" ");
+      logger.log(FINER, "Request-Line: {0}", Arrays.toString(requestLine));
+      if (requestLine.length != 3) {
+        logger.warning("Malformed request line");
+        throw new HttpException(400, "Invalid Request");
       }
 
-      builder.addHeader(pair[0], pair[1]);
-    }
-
-    // Body
-    if (builder.getHeader("Content-Length") == null) {
-      return builder.build();
-    }
-
-    try {
-      long contentLength = Long.parseLong(builder.getHeader("Content-Length"));
-      if (contentLength > MAX_CONTENT_LENGTH) {
-        logger.log(INFO, "Body length exceeds max content length: {0}", contentLength);
-        throw new IOException("Invalid Request");
+      try {
+        builder.setMethod(Method.valueOf(requestLine[0].toUpperCase()));
+      } catch (IllegalArgumentException e) {
+        logger.log(WARNING, "Unsupported method: {0}", requestLine[0].toUpperCase());
+        throw new HttpException(405, "Invalid Request");
       }
 
+      try {
+        builder.setUri(new URI(requestLine[1]));
+      } catch (URISyntaxException e) {
+        logger.log(WARNING, "Invalid Request-URI: {0}", requestLine[1]);
+        throw new HttpException(400, e);
+      }
 
-      StringBuilder sb = new StringBuilder();
-      char[] buffer = new char[4096];
-      int rem = (int) contentLength; // Assuming never going to read > 2^32 bytes
-
-      while (rem > 0) {
-        int read = reader.read(buffer, 0, Math.min(4096, rem));
-        if (read <= 0) {
-          logger.log(INFO, "Abrupt EOF while reading body");
-          throw new IOException("Invalid Request");
+      // Either EOF or contains headers
+      String line;
+      while (!(line = reader.readLine()).isEmpty()) {
+        // parse header
+        String[] pair = line.split(":", 2);
+        if (pair.length != 2) {
+          logger.log(FINE, "Header not in pair format: {0}", line);
+          continue;
         }
 
-        sb.append(buffer, 0, read);
-        rem -= read;
+        builder.addHeader(pair[0], pair[1]);
       }
 
-      builder.setBody(sb);
-    } catch (NumberFormatException e) {
-      logger.log(WARNING, "Content-Length invalid format: {0}", builder.getHeader("Content-Length"));
-      throw new IOException("Invalid Request");
+      // Body
+      if (builder.getHeader("Content-Length") == null) {
+        return builder.build();
+      }
+
+      try {
+        long contentLength = Long.parseLong(builder.getHeader("Content-Length"));
+        if (contentLength > MAX_CONTENT_LENGTH) {
+          logger.log(INFO, "Body length exceeds max content length: {0}", contentLength);
+          throw new HttpException(413, "Invalid Request");
+        }
+
+
+        StringBuilder sb = new StringBuilder();
+        char[] buffer = new char[4096];
+        int rem = (int) contentLength; // Assuming never going to read > 2^32 bytes
+
+        while (rem > 0) {
+          int read = reader.read(buffer, 0, Math.min(4096, rem));
+          if (read <= 0) {
+            logger.log(INFO, "Abrupt EOF while reading body");
+            throw new HttpException(400, "Invalid Request");
+          }
+
+          sb.append(buffer, 0, read);
+          rem -= read;
+        }
+
+        builder.setBody(sb);
+      } catch (NumberFormatException e) {
+        logger.log(WARNING, "Content-Length invalid format: {0}", builder.getHeader("Content-Length"));
+        throw new HttpException(400, "Invalid Request");
+      }
+    } catch (IOException e) {
+      throw new HttpException(400, e);
     }
 
 
@@ -144,24 +148,28 @@ public class Request {
       headers = new HashMap<>();
     }
 
-    void setMethod(Method method) {
+    Builder setMethod(Method method) {
       this.method = method;
+      return this;
     }
 
-    void addHeader(String name, String value) {
+    Builder addHeader(String name, String value) {
       headers.put(name.toUpperCase(), value.trim());
+      return this;
     }
 
     String getHeader(String name) {
       return headers.get(name.toUpperCase());
     }
 
-    void setUri(URI uri) {
+    Builder setUri(URI uri) {
       this.uri = uri;
+      return this;
     }
 
-    void setBody(StringBuilder body) {
+    Builder setBody(StringBuilder body) {
       this.body = body;
+      return this;
     }
 
     Request build() {

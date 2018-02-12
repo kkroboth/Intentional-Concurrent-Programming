@@ -8,6 +8,7 @@ import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,6 +27,7 @@ public class Server {
   private final ServerSocket serverSocket;
   private final ICPExecutorService executorService;
   private volatile boolean started;
+  private final RequestHandler handler;
 
   /**
    * Creates server socket but does not bind address
@@ -34,10 +36,11 @@ public class Server {
    * @param port
    * @throws IOException could not open the server socket
    */
-  public Server(String host, int port, ICPExecutorService executorService) throws IOException {
+  public Server(String host, int port, ICPExecutorService executorService, RequestHandler handler) throws IOException {
     this.host = host;
     this.port = port;
     this.executorService = executorService;
+    this.handler = handler;
     serverSocket = new ServerSocket();
     ICP.setPermission(this, Permissions.getThreadSafePermission());
   }
@@ -46,10 +49,10 @@ public class Server {
    * Uses fixed thread pool executor with number of threads from
    * 'server_threads' in props.
    */
-  public Server(String host, int port) throws IOException {
+  public Server(String host, int port, RequestHandler handler) throws IOException {
     this(host, port, ICPExecutors.newICPExecutorService(
       Executors.newFixedThreadPool(Props.getInstance().getServerThreads())
-    ));
+    ), handler);
   }
 
   /**
@@ -90,35 +93,30 @@ public class Server {
    * @param connection
    */
   protected void handleRequest(Socket connection) {
+    InputStream inputStream;
     try {
-      Request request = Request.parse(connection.getInputStream());
-      System.out.println(request);
+      inputStream = connection.getInputStream();
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.log(SEVERE, e.getMessage(), e);
+      return;
     }
 
-    // For now return simple response (Hello World)
-    StringBuilder builder = new StringBuilder();
-    String body = "Hello World";
-    builder.append("HTTP/1.1 200 OK").append("\r\n")
-      .append("Content-Length: ").append(body.length()).append("\r\n")
-      .append("Connection: close").append("\r\n").append("\r\n")
-      .append(body);
 
-//    while (true) {
-//      Socket socket = serverSocket.accept();
-//      BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-//      for (; ; ) {
-//        System.out.println(reader.readLine());
-//      }
-//    }
+    Request request;
+    Response response;
+    try {
+      request = Request.parse(inputStream);
+      response = handler.handleRequest(request);
+    } catch (HttpException e) {
+      response = new Response.Builder(e.getStatus()).build();
+    }
+
 
     try {
-      connection.getOutputStream().write(builder.toString().getBytes(StandardCharsets.UTF_8));
+      connection.getOutputStream().write(response.createResponse().getBytes(StandardCharsets.UTF_8));
       connection.close();
     } catch (IOException e) {
-      // TODO: Use logger
-      e.printStackTrace();
+      logger.log(SEVERE, e.getMessage(), e);
     }
   }
 }
