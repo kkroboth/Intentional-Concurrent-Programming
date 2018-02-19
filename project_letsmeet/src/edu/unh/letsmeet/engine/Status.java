@@ -9,6 +9,8 @@ public final class Status {
   static {
     phrases = new HashMap<>();
     phrases.put(200, "OK");
+    phrases.put(204, "No Content");
+    phrases.put(302, "Found");
     phrases.put(400, "Bad Request");
     phrases.put(404, "Not Found");
     phrases.put(405, "Method Not Allowed");

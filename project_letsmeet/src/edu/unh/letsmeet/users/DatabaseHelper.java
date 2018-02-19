@@ -9,6 +9,7 @@ import org.sqlite.SQLiteException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
@@ -84,5 +85,27 @@ public final class DatabaseHelper {
     }
 
     return false;
+  }
+
+  public void login(String name, char[] password) throws Exception {
+    //language=SQLite
+    String query = "SELECT name, hash FROM user_account WHERE name = ?";
+    try (PreparedStatement statement = connection.prepareStatement(query)) {
+      statement.setString(1, name);
+      ResultSet resultSet = statement.executeQuery();
+
+      // Should only be one row
+      if (!resultSet.next()) {
+        throw new Exception("Username or password incorrect");
+      }
+
+      String hash = resultSet.getString("hash");
+      if (!Hash.password(password).verify(hash)) {
+        throw new Exception("Username or password incorrect");
+      }
+
+    } catch (SQLException e) {
+      logger.log(SEVERE, e.toString(), e);
+    }
   }
 }

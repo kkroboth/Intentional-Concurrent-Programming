@@ -13,14 +13,18 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
 
 // TODO: Implement persistent connections (will add more server state!)
-public class Server {
-  private static final Logger logger = Logger.getLogger("Server");
+public class HttpServer implements ServerProvider {
+  private static final Logger logger = Logger.getLogger("HttpServer");
 
   private final String host;
   private final int port;
@@ -28,6 +32,8 @@ public class Server {
   private final ICPExecutorService executorService;
   private volatile boolean started;
   private final RequestHandler handler;
+  private final List<Middleware> middlewares; // immutable list of middleware -- order matters!
+  private final Settings settings;
 
   /**
    * Creates server socket but does not bind address
@@ -36,32 +42,38 @@ public class Server {
    * @param port
    * @throws IOException could not open the server socket
    */
-  public Server(String host, int port, ICPExecutorService executorService, RequestHandler handler) throws IOException {
+  public HttpServer(String host, int port, ICPExecutorService executorService, RequestHandler handler,
+                    List<Middleware> middlewares) throws IOException {
     this.host = host;
     this.port = port;
     this.executorService = executorService;
     this.handler = handler;
     serverSocket = new ServerSocket();
+    if (middlewares == null) middlewares = Collections.emptyList();
+    this.middlewares = Collections.unmodifiableList(middlewares);
     ICP.setPermission(this, Permissions.getThreadSafePermission());
+    this.settings = new Settings();
   }
 
   /**
    * Uses fixed thread pool executor with number of threads from
    * 'server_threads' in props.
    */
-  public Server(String host, int port, RequestHandler handler) throws IOException {
+  public HttpServer(String host, int port, RequestHandler handler,
+                    List<Middleware> middlewares) throws IOException {
     this(host, port, ICPExecutors.newICPExecutorService(
       Executors.newFixedThreadPool(Props.getInstance().getServerThreads())
-    ), handler);
+    ), handler, middlewares);
   }
 
   /**
    * Continue to accept socket connections and submit new Jobs
    * to handle them in the executor.
    *
-   * @throws IOException Server connection could not be made
+   * @throws IOException HttpServer connection could not be made
    */
   public void start() throws IOException {
+    settings.freeze();
     started = true;
     serverSocket.bind(new InetSocketAddress(host, port));
 
@@ -82,7 +94,7 @@ public class Server {
   }
 
   public void stop() throws IOException {
-    if (!started) throw new IllegalStateException("Server not started");
+    if (!started) throw new IllegalStateException("HttpServer not started");
     serverSocket.close();
     executorService.shutdown();
   }
@@ -103,14 +115,30 @@ public class Server {
 
 
     Request request;
-    Response response;
+    Response response = null;
+    Map<String, Object> session = new HashMap<>();
     try {
       request = Request.parse(inputStream);
-      response = handler.handleRequest(request);
+      for (Middleware middleware : middlewares) {
+        Response result = middleware.onRequest(this, session, request);
+        if (result != null) {
+          response = result;
+          break;
+        }
+      }
+
+      // Only if middleware did not create own response
+      if (response == null) {
+        response = handler.handleRequest(this, request, session);
+        if (!middlewares.isEmpty()) {
+          Response.Builder builder = new Response.Builder(response);
+          middlewares.forEach(m -> m.onResponse(this, session, builder, request));
+          response = builder.build();
+        }
+      }
     } catch (HttpException e) {
       response = new Response.Builder(e.getStatus()).build();
     }
-
 
     try {
       connection.getOutputStream().write(response.createResponse().getBytes(StandardCharsets.UTF_8));
@@ -118,5 +146,20 @@ public class Server {
     } catch (IOException e) {
       logger.log(SEVERE, e.getMessage(), e);
     }
+  }
+
+  @Override
+  public int getPort() {
+    return port;
+  }
+
+  @Override
+  public String getHost() {
+    return host;
+  }
+
+  @Override
+  public Settings getSettings() {
+    return settings;
   }
 }

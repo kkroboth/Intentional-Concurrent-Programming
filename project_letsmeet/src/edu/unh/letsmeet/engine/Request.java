@@ -1,5 +1,7 @@
 package edu.unh.letsmeet.engine;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import edu.unh.letsmeet.Props;
 
 import java.io.BufferedReader;
@@ -8,8 +10,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -26,9 +30,10 @@ public class Request {
   private static final long MAX_CONTENT_LENGTH = Props.getInstance().getMaxContentLength();
 
   private final Method method;
-  private final Map<String, String> headers;
+  private final ListMultimap<String, String> headers;
   private final URI uri;
-  private final StringBuilder body;
+  private final byte[] body;
+  private final Map<String, Cookie> cookies;
 
 
   private Request(Builder builder) {
@@ -36,6 +41,11 @@ public class Request {
     this.headers = builder.headers;
     this.uri = builder.uri;
     this.body = builder.body;
+    this.cookies = builder.cookies;
+  }
+
+  public Method getMethod() {
+    return this.method;
   }
 
   public URI getUri() {
@@ -43,27 +53,26 @@ public class Request {
   }
 
   public String getHeader(String name) {
+    List<String> values = this.headers.get(name);
+    if (values.isEmpty()) return null;
+    return values.get(0);
+  }
+
+  public List<String> getHeaders(String name) {
     return this.headers.get(name);
   }
 
-  public StringBuilder getBody() {
+  public byte[] getBody() {
     return this.body;
+  }
+
+  public Cookie getCookie(String key) {
+    return cookies.get(key);
   }
 
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append(method.toString()).append(" ").append(uri).append('\n');
-    for (Map.Entry<String, String> entry : headers.entrySet()) {
-      builder.append(entry.getKey()).append(' ').append(entry.getValue()).append('\n');
-    }
-
-    if (body != null) {
-      int len = Math.min(100, body.length());
-      builder.append(body.substring(0, len)).append("\n\n");
-    }
-
-    return builder.toString();
+    return method.toString() + " " + uri + '\n';
   }
 
   public static Request parse(InputStream stream) throws HttpException {
@@ -152,12 +161,14 @@ public class Request {
    */
   private static class Builder {
     Method method;
-    Map<String, String> headers;
+    ListMultimap<String, String> headers;
     URI uri;
-    StringBuilder body;
+    byte[] body;
+    Map<String, Cookie> cookies;
 
     Builder() {
-      headers = new HashMap<>();
+      cookies = new HashMap<>();
+      headers = ArrayListMultimap.create();
     }
 
     Builder setMethod(Method method) {
@@ -171,7 +182,9 @@ public class Request {
     }
 
     String getHeader(String name) {
-      return headers.get(name.toUpperCase());
+      List<String> values = headers.get(name.toUpperCase());
+      if (values.isEmpty()) return null;
+      return values.get(0);
     }
 
     Builder setUri(URI uri) {
@@ -180,11 +193,20 @@ public class Request {
     }
 
     Builder setBody(StringBuilder body) {
-      this.body = body;
+      this.body = body.toString().getBytes(StandardCharsets.UTF_8);
       return this;
     }
 
     Request build() {
+      // Create cookies from header
+      String[] cookies = getHeader("Cookie").split(";");
+      for (String cookie : cookies) {
+        cookie = cookie.trim();
+        String[] parts = cookie.split("=");
+        this.cookies.put(parts[0].trim(), new Cookie(parts[0].trim(),
+          parts[1].trim()));
+      }
+
       return new Request(this);
     }
   }

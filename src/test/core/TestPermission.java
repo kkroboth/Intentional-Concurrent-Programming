@@ -4,13 +4,20 @@ package core;
 import icp.core.External;
 import icp.core.ICP;
 import icp.core.IntentError;
+import icp.core.PermissionSupport;
 import icp.core.Permissions;
 import icp.core.Task;
+import icp.wrapper.ICPProxy;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import util.ICPTest;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertThrows;
@@ -151,5 +158,49 @@ public class TestPermission extends ICPTest {
     Task task = Task.ofThreadSafe(() ->
       ICP.setPermission(shared, Permissions.getPrivatePermission()));
     assertThrows(IntentError.class, task::run);
+  }
+
+  @Test(description = "Proxied permissions")
+  public void testProxyPermission() throws Exception {
+    Target target = new Target();
+    List<Integer> actualList = new ArrayList<>();
+    @SuppressWarnings("unchecked") List<Integer> list =
+      (List<Integer>) Proxy.newProxyInstance(getClass().getClassLoader(),
+        new Class[]{List.class}, new InvocationHandler() {
+
+          {
+            ICP.setPermission(this, Permissions.getFrozenPermission());
+          }
+
+          @Override
+          public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            PermissionSupport.checkCall(target);
+            return method.invoke(actualList, args);
+          }
+        });
+
+    ICP.setPermission(target, Permissions.getHoldsLockPermission(list));
+    new Thread(Task.ofThreadSafe(() -> {
+      synchronized (list) {
+        list.add(10);
+      }
+    })).start();
+  }
+
+  @Test(description = "Test ICPProxy")
+  public void testICPProxy() throws Exception {
+    List<Integer> actualList = new ArrayList<>();
+    List<Integer> list = ICPProxy.newInstance(List.class, actualList,
+      (permissionObject, target) -> ICP.setPermission(permissionObject,
+        Permissions.getHoldsLockPermission(target)));
+
+    new Thread(Task.ofThreadSafe(() -> {
+      synchronized (list) {
+        list.add(10);
+      }
+    })).start();
+  }
+
+  private static class Target {
   }
 }
