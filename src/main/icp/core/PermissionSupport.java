@@ -251,7 +251,19 @@ public final class PermissionSupport {
    * @throws NullPointerException if <code>obj</code> is null.
    */
   static void setPermission(Object obj, Permission permission) {
-    // Assert that autoboxed integers are not sent in
+    // Cannot add permission to primitive values
+    Class klass = obj.getClass();
+    if (klass.equals(Integer.TYPE) ||
+      klass.equals(Long.TYPE) ||
+      klass.equals(Boolean.TYPE) ||
+      klass.equals(Float.TYPE) ||
+      klass.equals(Double.TYPE) ||
+      klass.equals(Short.TYPE) ||
+      klass.equals(Byte.TYPE) ||
+      klass.equals(Character.TYPE)) {
+      throw new ICPInternalError("Cannot set permission on autoboxed primitive type");
+    }
+
 
     logger.fine(String.format("[%s] setPermission called for %s with %s",
       Thread.currentThread(), obj, permission.toString()));
@@ -302,6 +314,9 @@ public final class PermissionSupport {
     // TODO: Should we allow @External class's set permissions directly?
     if (obj.getClass().getAnnotation(External.class) != null) {
       // Raise exception, log warning, what to do...
+      // For now, raise an IntentError
+      throw new IntentError("Cannot set or get permission on an @External class: " +
+        obj.getClass());
     }
 
     do {

@@ -31,8 +31,8 @@ public final class OneTimeLatch {
    */
   public OneTimeLatch() {
     latch = new CountDownLatch(1);
-    taskCalledOpen = Utils.newBooleanTaskLocal(false);
-    taskRegisteredAwait = Utils.newBooleanTaskLocal(false);
+    taskCalledOpen = Utils.newTaskLocal(false);
+    taskRegisteredAwait = Utils.newTaskLocal(false);
 
     isOpen = new SingleCheckPermission("latch not open") {
       @Override

@@ -4,8 +4,10 @@ import edu.unh.letsmeet.Props;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.Task;
+import icp.lib.DisjointSemaphore;
 import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
+import icp.lib.Permit;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,19 +23,27 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 
 // TODO: Implement persistent connections (will add more server state!)
 public class HttpServer implements ServerProvider {
   private static final Logger logger = Logger.getLogger("HttpServer");
 
+  // Settings and props
   private final String host;
   private final int port;
+  private final Settings settings;
+
+  // Server
   private final ServerSocket serverSocket;
-  private final ICPExecutorService executorService;
-  private volatile boolean started;
   private final RequestHandler handler;
   private final List<Middleware> middlewares; // immutable list of middleware -- order matters!
-  private final Settings settings;
+
+  private final ICPExecutorService executorService;
+  private volatile boolean started;
+
+  // Concurrent
+  private final DisjointSemaphore connectionLimiter;
 
   /**
    * Creates server socket but does not bind address
@@ -46,13 +56,16 @@ public class HttpServer implements ServerProvider {
                     List<Middleware> middlewares) throws IOException {
     this.host = host;
     this.port = port;
-    this.executorService = executorService;
     this.handler = handler;
+    this.executorService = executorService;
+    this.settings = new Settings();
+
     serverSocket = new ServerSocket();
     if (middlewares == null) middlewares = Collections.emptyList();
     this.middlewares = Collections.unmodifiableList(middlewares);
+    connectionLimiter = new DisjointSemaphore(Props.getInstance().getServerThreads());
+
     ICP.setPermission(this, Permissions.getThreadSafePermission());
-    this.settings = new Settings();
   }
 
   /**
@@ -78,16 +91,28 @@ public class HttpServer implements ServerProvider {
     serverSocket.bind(new InetSocketAddress(host, port));
 
     new Thread(Task.ofThreadSafe(() -> {
+      connectionLimiter.registerAcquirer();
+
       while (!serverSocket.isClosed()) {
         try {
           Socket socket = serverSocket.accept();
-          executorService.execute(Task.ofThreadSafe(() -> handleRequest(socket)));
+          Permit permit = connectionLimiter.acquire();
+          executorService.execute(Task.ofThreadSafe(() -> {
+            try {
+              connectionLimiter.registerReleaser();
+              handleRequest(socket);
+            } finally {
+              connectionLimiter.release(permit);
+            }
+          }));
         } catch (IOException e) {
           // Don't handle IOException for when a server was closed.
           // Assuming IOException is coming from server being closed.
           if (!serverSocket.isClosed()) {
             logger.log(SEVERE, e.toString(), e);
           }
+        } catch (InterruptedException e) {
+          logger.log(WARNING, e.getMessage(), e);
         }
       }
     }), "server-dispatcher").start();

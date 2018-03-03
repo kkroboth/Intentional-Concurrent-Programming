@@ -19,18 +19,24 @@ import edu.unh.letsmeet.users.DatabaseHelper;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.Task;
+import icp.lib.ICPExecutors;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
   private static final Logger logger = Logger.getLogger("Main");
+
+  // Guarded-by: Main instance
   private HttpServer httpServer;
+  // Guarded-by: Main instance
+  private SessionManager sessions;
 
   public Main() {
     ICP.setPermission(this, Permissions.getThreadSafePermission());
@@ -40,11 +46,12 @@ public class Main {
     Props props = Props.getInstance();
 
     // Middleware
-    SessionManager sessions = new SessionManager();
+    sessions = SessionManager.readFromStorage();
     List<Middleware> middlewares = new ArrayList<>();
     middlewares.add(sessions);
 
     httpServer = new HttpServer(props.getHost(), props.getPort(),
+      ICPExecutors.newICPExecutorService(Executors.newCachedThreadPool()),
       new PagesRequestHandler(
         createPageRoutes(),
 
@@ -69,6 +76,7 @@ public class Main {
     try {
       httpServer.stop();
       DatabaseHelper.getInstance().close();
+      SessionManager.saveToStorage(sessions);
     } catch (SQLException | IOException e) {
       logger.log(Level.SEVERE, e.toString(), e);
     }
@@ -122,7 +130,24 @@ public class Main {
 
             return htmlRoute.accept(method, path, request, meta, provider);
           } else if (method.equals(Method.POST)) {
-            // TODO: Read json and complete this!
+            DatabaseHelper db = DatabaseHelper.getInstance();
+            try {
+              Map<String, String> params = request.getFormEncodedBody();
+              // Login, create session storage and put username in it,
+              // and redirect to main page
+              db.login(params.get("username"), params.get("password").toCharArray());
+              Map.Entry<String, SessionManager.SessionStorage>
+                session = SessionManager.generateDetachedSessionStorage();
+              meta.put(SessionManager.META_DETACHED_SESSION, session);
+              session.getValue().putItem("user", params.get("username"));
+              return new Response.Builder(302).header("Location", "/").build();
+            } catch (Exception e) {
+              if (e.getMessage().equalsIgnoreCase("Username or password incorrect"))
+                logger.warning("Login failed");
+              else
+                logger.log(Level.SEVERE, e.getMessage(), e);
+              throw new HttpException(401);
+            }
           }
 
           return null;

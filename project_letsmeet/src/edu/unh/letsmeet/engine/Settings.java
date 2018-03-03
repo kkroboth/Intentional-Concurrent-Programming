@@ -16,27 +16,21 @@ public final class Settings {
   // Strategy:
   //
   // Once frozen, the settings map will be wrapped in an
-  // unmodifiableMap. Volatile as one thread may populate the
-  // settings, and afterwards another will read them.
-  //
-  // Note, no one is allowed to read the settings before frozen.
+  // unmodifiableMap.
 
-  private volatile Map<String, Object> settings;
+  private Map<String, Object> settings;
 
   Settings() {
     settings = new HashMap<>();
-
-    // Should it be thread safe???
-    // Is frozen after freeze() is called, but they are all method calls anyways
-    ICP.setPermission(this, Permissions.getThreadSafePermission());
+    // Permission: private util frozen
   }
 
   /**
    * Called by the server before starting.
    */
-  synchronized void freeze() {
-    // Someone could call this multiple times, but the map is still frozen.
+  void freeze() {
     settings = Collections.unmodifiableMap(settings);
+    ICP.setPermission(this, Permissions.getFrozenPermission());
   }
 
   public <V> void set(String key, V value) {

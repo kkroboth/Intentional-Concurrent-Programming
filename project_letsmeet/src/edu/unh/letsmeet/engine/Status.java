@@ -12,6 +12,7 @@ public final class Status {
     phrases.put(204, "No Content");
     phrases.put(302, "Found");
     phrases.put(400, "Bad Request");
+    phrases.put(401, "Unauthorized");
     phrases.put(404, "Not Found");
     phrases.put(405, "Method Not Allowed");
     phrases.put(413, "Request Entity Too Large");
