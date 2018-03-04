@@ -1,11 +1,34 @@
 <template>
-
+    <v-app>
+        <v-content>
+            <v-container fluid full-height>
+                <locationMap :locations="locations" class="location-map"></locationMap>
+            </v-container>
+        </v-content>
+    </v-app>
 </template>
 
 <script>
-    export default {}
+    import LocationMap from '../components/LocationMap.vue'
+    import { mapPoints } from '../api'
+
+    export default {
+        components: {LocationMap},
+
+        created() {
+            mapPoints().then(locations => this.locations = locations)
+        },
+
+        data() {
+            return {
+                locations: []
+            }
+        }
+    }
 </script>
 
 <style scoped>
-
+    .location-map {
+        height: 500px;
+    }
 </style>

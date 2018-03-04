@@ -42,6 +42,10 @@ public final class Props {
     ICP.setPermission(this, Permissions.getFrozenPermission());
   }
 
+  public Path getProjectPath() {
+    return Paths.get("./");
+  }
+
   public String getHost() {
     Objects.requireNonNull(this.props);
     return props.getProperty("host");
@@ -74,6 +78,20 @@ public final class Props {
     Objects.requireNonNull(this.props);
     String path = props.getProperty("static_directory");
     Objects.requireNonNull(path, "static_directory property is not set");
+    return Paths.get(path);
+  }
+
+  public Path getStorageDirectory() {
+    Objects.requireNonNull(this.props);
+    String path = props.getProperty("storage_directory");
+    Objects.requireNonNull(path, "storage_directory property is not set");
+    return Paths.get(path);
+  }
+
+  public Path getNodemodulesDirectory() {
+    Objects.requireNonNull(this.props);
+    String path = props.getProperty("nodemodules_directory");
+    Objects.requireNonNull(path, "nodemodules_directory property is not set");
     return Paths.get(path);
   }
 

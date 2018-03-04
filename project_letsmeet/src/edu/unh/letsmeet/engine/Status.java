@@ -16,6 +16,7 @@ public final class Status {
     phrases.put(404, "Not Found");
     phrases.put(405, "Method Not Allowed");
     phrases.put(413, "Request Entity Too Large");
+    phrases.put(500, "Internal Server Error");
   }
 
   public static String reasonPhrase(int status) {

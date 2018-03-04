@@ -14,6 +14,10 @@ public final class Utils {
     return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
   }
 
+  public static byte[] readFileBytes(Path path) throws IOException {
+    return Files.readAllBytes(path);
+  }
+
   public static String getFileExtension(String path) {
     return path.substring(path.lastIndexOf(".") + 1);
   }

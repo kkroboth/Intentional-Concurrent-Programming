@@ -22,6 +22,7 @@ import icp.core.Task;
 import icp.lib.ICPExecutors;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,8 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static edu.unh.letsmeet.engine.Method.GET;
 
 public class Main {
   private static final Logger logger = Logger.getLogger("Main");
@@ -65,8 +68,18 @@ public class Main {
     // Add settings
     Settings settings = httpServer.getSettings();
     settings.set(PagesRequestHandler.SETTING_PAGES_DIRECTORY, props.getPagesDirectory());
-    settings.set(StaticFilesRequestHandler.SETTING_STATIC_DIRECTORY, props.getStaticDirectory());
+    // Add static directories
+    List<Path> dirs = new ArrayList<>();
+    dirs.add(props.getStaticDirectory());
+    dirs.add(props.getStaticDirectory());
+    dirs.add(props.getNodemodulesDirectory());
+
+    settings.set(StaticFilesRequestHandler.SETTING_STATIC_DIRECTORIES, dirs);
     settings.set(StaticFilesRequestHandler.SETTING_URL_PATH, "/static/");
+
+    // Asset directory
+    Path value = props.getProjectPath().resolve("assets").toAbsolutePath();
+    settings.set("directory.assets", value);
 
     // start the server!
     httpServer.start();
@@ -84,6 +97,17 @@ public class Main {
 
   public ApiRequestHandler createApiHandler() {
     return new ApiRequestHandler.Builder("/api/")
+      .addMethodRoute(GET, "map/points", (method, path, request, meta, provider) -> {
+        Path pointsPath = ((Path) provider.getSettings().get("directory.assets"))
+          .resolve("airports_min.dat");
+        try {
+          String res = Utils.readFile(pointsPath);
+          return new Response.Builder(200)
+            .plain(res).build();
+        } catch (IOException e) {
+          throw new HttpException(500, e);
+        }
+      })
       .addRoute("login", (method, path, request, meta, provider) -> {
         if (!method.equals(Method.POST)) throw new HttpException(405);
         meta.put(SessionManager.META_CREATE_SESSION, true);
@@ -123,7 +147,7 @@ public class Main {
         public Response accept(Method method, String path, Request request,
                                Map<String, Object> meta, ServerProvider provider) throws HttpException {
 
-          if (method.equals(Method.GET)) {
+          if (method.equals(GET)) {
             if (meta.containsKey("session")) {
               return new Response.Builder(302).header("Location", "/").build();
             }

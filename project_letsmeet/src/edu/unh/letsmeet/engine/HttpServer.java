@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
@@ -162,11 +163,15 @@ public class HttpServer implements ServerProvider {
         }
       }
     } catch (HttpException e) {
+      if (e.getStatus() >= 500)
+        logger.log(SEVERE, e.getCause().getMessage(), e.getCause());
+      else
+        logger.log(INFO, e.getCause().getMessage(), e.getCause());
       response = new Response.Builder(e.getStatus()).build();
     }
 
     try {
-      connection.getOutputStream().write(response.createResponse().getBytes(StandardCharsets.UTF_8));
+      connection.getOutputStream().write(response.createResponse());
       connection.close();
     } catch (IOException e) {
       logger.log(SEVERE, e.getMessage(), e);

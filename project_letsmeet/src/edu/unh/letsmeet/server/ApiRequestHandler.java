@@ -1,6 +1,7 @@
 package edu.unh.letsmeet.server;
 
 import edu.unh.letsmeet.engine.HttpException;
+import edu.unh.letsmeet.engine.Method;
 import edu.unh.letsmeet.engine.Request;
 import edu.unh.letsmeet.engine.RequestHandler;
 import edu.unh.letsmeet.engine.Response;
@@ -50,6 +51,14 @@ public class ApiRequestHandler extends RequestHandlerDecorator {
 
     public Builder addRoute(String path, Route route) {
       this.routes.put(path, route);
+      return this;
+    }
+
+    public Builder addMethodRoute(Method method, String path, Route route) {
+      this.routes.put(path, (rmethod, rpath, request, meta, provider) -> {
+        if (!rmethod.equals(method)) throw new HttpException(405);
+        return route.accept(method, path, request, meta, provider);
+      });
       return this;
     }
 

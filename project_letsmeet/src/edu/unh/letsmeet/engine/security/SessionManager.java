@@ -1,5 +1,6 @@
 package edu.unh.letsmeet.engine.security;
 
+import edu.unh.letsmeet.Props;
 import edu.unh.letsmeet.engine.Cookie;
 import edu.unh.letsmeet.engine.Middleware;
 import edu.unh.letsmeet.engine.Request;
@@ -9,6 +10,13 @@ import icp.core.ICP;
 import icp.core.Permissions;
 import icp.wrapper.ICPProxy;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -27,24 +35,49 @@ import java.util.stream.Stream;
  * <p>
  * Sessions are added on demand and usually after a successful login.
  */
-public class SessionManager implements Middleware {
+public class SessionManager implements Middleware, Serializable {
   private static final Logger logger = Logger.getLogger("SessionManager");
 
   public static final int SESSION_BYTE_LEN = 32;
   public static final String SESSION_COOKIE_NAME = "sessionid";
   public static final String META_CREATE_SESSION = "create-session";
+  public static final String META_DETACHED_SESSION = "create-detached-session";
 
-  private final SecureRandom secureRandom;
+  private static final SecureRandom secureRandom = new SecureRandom();
 
   // Session cookie value -> Storage
   // Guarded-by: SessionMap (itself)
   private final Map<String, SessionStorage> sessionMap;
 
+  public static SessionManager readFromStorage() {
+    Path path = Props.getInstance().getStorageDirectory().resolve("sessions.dat");
+
+    if (Files.exists(path)) {
+      try {
+        ObjectInputStream in = new ObjectInputStream(Files.newInputStream(path));
+        return (SessionManager) in.readObject();
+      } catch (IOException | ClassNotFoundException | ClassCastException e) {
+        logger.log(Level.SEVERE, e.getMessage(), e);
+        throw new RuntimeException("Could not read sessions.dat");
+      }
+    } else {
+      return new SessionManager();
+    }
+  }
+
+  public static void saveToStorage(SessionManager sessions) throws IOException {
+    ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(Props.getInstance().getStorageDirectory()
+      .resolve("sessions.dat"), StandardOpenOption.CREATE_NEW));
+    out.writeObject(sessions);
+    out.flush();
+    out.close();
+    System.out.println(out);
+  }
+
   public SessionManager() {
     //noinspection unchecked
     sessionMap = ICPProxy.newInstance(Map.class, new HashMap(),
       (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(t)));
-    secureRandom = new SecureRandom();
 
     ICP.setPermission(this, Permissions.getThreadSafePermission());
   }
@@ -58,6 +91,14 @@ public class SessionManager implements Middleware {
     synchronized (sessionMap) {
       sessionMap.put(cookie, storage);
     }
+    return new AbstractMap.SimpleEntry<>(cookie, storage);
+  }
+
+  public static Entry<String, SessionStorage> generateDetachedSessionStorage() {
+    String cookie = Utils.generateSecureString(secureRandom, SESSION_BYTE_LEN);
+    String expiration = LocalDate.now().plusMonths(1).toString();
+    SessionStorage storage = new SessionStorage();
+    storage.setProtected("expiration", expiration);
     return new AbstractMap.SimpleEntry<>(cookie, storage);
   }
 
@@ -121,28 +162,40 @@ public class SessionManager implements Middleware {
 
   @Override
   public void onResponse(ServerProvider provider, Map<String, Object> meta, Response.Builder response, Request request) {
-    if (((Boolean) meta.getOrDefault("create-session", false))) {
+    if (((Boolean) meta.getOrDefault(META_CREATE_SESSION, false))) {
       // Remove previous session
       if (meta.containsKey("session-key")) {
         removeSession((String) meta.get("session-key"));
       }
 
       Map.Entry<String, SessionStorage> storageEntry = generateSessionStorage();
-      LocalDate date = LocalDate.parse(storageEntry.getValue().getProtected("expiration"));
-      String setCookie = Utils.createSetCookie(SESSION_COOKIE_NAME,
-        Utils.base64Encode(storageEntry.getKey()),
-        "/",
-        date.atStartOfDay(),
-        "httponly");
-      response.addCookie(setCookie);
+      response.addCookie(createCookie(storageEntry.getKey(), storageEntry.getValue()));
     } else if (((Boolean) meta.getOrDefault("delete-session", false))) {
       response.removeCookie(SESSION_COOKIE_NAME, "/");
+    } else if (meta.containsKey(META_DETACHED_SESSION)) {
+      // Register detached generated session storage
+      @SuppressWarnings("unchecked") Entry<String, SessionStorage> session =
+        (Entry<String, SessionStorage>) meta.get(META_DETACHED_SESSION);
+      synchronized (sessionMap) {
+        sessionMap.put(session.getKey(), session.getValue());
+      }
+
+      response.addCookie(createCookie(session.getKey(), session.getValue()));
     }
+  }
+
+  private static String createCookie(String sessionId, SessionStorage sessionStorage) {
+    LocalDate date = LocalDate.parse(sessionStorage.getProtected("expiration"));
+    return Utils.createSetCookie(SESSION_COOKIE_NAME,
+      Utils.base64Encode(sessionId),
+      "/",
+      date.atStartOfDay(),
+      "httponly");
   }
 
   // Guarded-by: Itself
   // Uses client-side locking
-  public static class SessionStorage {
+  public static class SessionStorage implements Serializable {
     private final Map<String, String> storage;
 
     private static final String[] PROTECTED_KEYS = new String[]{"expiration"};

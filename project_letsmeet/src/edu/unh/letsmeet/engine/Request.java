@@ -2,16 +2,19 @@ package edu.unh.letsmeet.engine;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.gson.Gson;
 import edu.unh.letsmeet.Props;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +67,27 @@ public class Request {
 
   public byte[] getBody() {
     return this.body;
+  }
+
+  public String getStringBody() {
+    return new String(this.body, StandardCharsets.UTF_8);
+  }
+
+  public Map<String, String> getFormEncodedBody() throws IOException {
+    Map<String, String> params = new HashMap<>();
+    String body = getStringBody();
+    String[] pairs = body.split("&");
+    for (String pair : pairs) {
+      String[] fields = pair.split("=");
+      if (fields.length != 2) throw new IOException("Invalid form encoded format");
+      params.put(fields[0], fields[1]);
+    }
+
+    return Collections.unmodifiableMap(params);
+  }
+
+  public <V> V getJson(Class<V> gsonClass) {
+    return new Gson().fromJson(new StringReader(getStringBody()), gsonClass);
   }
 
   public Cookie getCookie(String key) {
@@ -199,12 +223,15 @@ public class Request {
 
     Request build() {
       // Create cookies from header
-      String[] cookies = getHeader("Cookie").split(";");
-      for (String cookie : cookies) {
-        cookie = cookie.trim();
-        String[] parts = cookie.split("=");
-        this.cookies.put(parts[0].trim(), new Cookie(parts[0].trim(),
-          parts[1].trim()));
+      String header = getHeader("Cookie");
+      if (header != null) {
+        String[] cookies = header.split(";");
+        for (String cookie : cookies) {
+          cookie = cookie.trim();
+          String[] parts = cookie.split("=");
+          this.cookies.put(parts[0].trim(), new Cookie(parts[0].trim(),
+            parts[1].trim()));
+        }
       }
 
       return new Request(this);

@@ -14,7 +14,9 @@ public class Response {
   private final byte[] body;
   private final String[] cookies;
 
-  public String createResponse() {
+  public byte[] createResponse() {
+    // Use stringbuilder for header only
+
     StringBuilder builder = new StringBuilder();
     // Status line
     builder.append("HTTP/1.1 ").append(status).append(" ").append(Status.reasonPhrase(status));
@@ -39,10 +41,14 @@ public class Response {
 
     builder.append("\r\n");
     if (body != null) {
-      builder.append(new String(body, StandardCharsets.UTF_8));
+      byte[] headerBytes = builder.toString().getBytes(StandardCharsets.UTF_8);
+      byte[] payload = new byte[headerBytes.length + body.length];
+      System.arraycopy(headerBytes, 0, payload, 0, headerBytes.length);
+      System.arraycopy(body, 0, payload, headerBytes.length, body.length);
+      return payload;
+    } else {
+      return builder.toString().getBytes(StandardCharsets.UTF_8);
     }
-
-    return builder.toString();
   }
 
   private Response(Builder builder) {
@@ -89,8 +95,14 @@ public class Response {
       return this;
     }
 
-    public Builder body(String body) {
+    public Builder body(byte[] body) {
+      this.body = body;
+      return this;
+    }
+
+    public Builder plain(String body) {
       this.body = body.getBytes(StandardCharsets.UTF_8);
+      headers.put("Content-Type", "text/plain; charset=utf8");
       return this;
     }
 
