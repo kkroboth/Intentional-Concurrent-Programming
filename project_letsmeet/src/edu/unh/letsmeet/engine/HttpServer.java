@@ -11,10 +11,10 @@ import icp.lib.Permit;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +29,9 @@ import static java.util.logging.Level.WARNING;
 // TODO: Implement persistent connections (will add more server state!)
 public class HttpServer implements ServerProvider {
   private static final Logger logger = Logger.getLogger("HttpServer");
+
+  public static final byte[] CRLF_BYTES = "\r\n".getBytes();
+  public static final String CRLF = "\r\n";
 
   // Settings and props
   private final String host;
@@ -131,9 +134,11 @@ public class HttpServer implements ServerProvider {
    * @param connection
    */
   protected void handleRequest(Socket connection) {
-    InputStream inputStream;
+    InputStream inputStream, uncloseableInputStream;
+    OutputStream outputStream, uncloseableOutputStream;
     try {
       inputStream = connection.getInputStream();
+      uncloseableInputStream = new UncloseableInputStream(inputStream);
     } catch (IOException e) {
       logger.log(SEVERE, e.getMessage(), e);
       return;
@@ -144,7 +149,7 @@ public class HttpServer implements ServerProvider {
     Response response = null;
     Map<String, Object> session = new HashMap<>();
     try {
-      request = Request.parse(inputStream);
+      request = Request.parse(uncloseableInputStream);
       for (Middleware middleware : middlewares) {
         Response result = middleware.onRequest(this, session, request);
         if (result != null) {
@@ -171,7 +176,9 @@ public class HttpServer implements ServerProvider {
     }
 
     try {
-      connection.getOutputStream().write(response.createResponse());
+      outputStream = connection.getOutputStream();
+      uncloseableOutputStream = new UncloseableOutputStream(outputStream);
+      response.createResponse(uncloseableOutputStream);
       connection.close();
     } catch (IOException e) {
       logger.log(SEVERE, e.getMessage(), e);

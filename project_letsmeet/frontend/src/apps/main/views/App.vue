@@ -29,6 +29,7 @@
 
 <style scoped>
     .location-map {
-        height: 500px;
+        /* Full screen minus vuetify container padding */
+        height: calc(100vh - 32px)
     }
 </style>

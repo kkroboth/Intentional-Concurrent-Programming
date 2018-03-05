@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.gson.Gson;
 import edu.unh.letsmeet.Props;
+import edu.unh.letsmeet.Utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,7 +15,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,16 +74,7 @@ public class Request {
   }
 
   public Map<String, String> getFormEncodedBody() throws IOException {
-    Map<String, String> params = new HashMap<>();
-    String body = getStringBody();
-    String[] pairs = body.split("&");
-    for (String pair : pairs) {
-      String[] fields = pair.split("=");
-      if (fields.length != 2) throw new IOException("Invalid form encoded format");
-      params.put(fields[0], fields[1]);
-    }
-
-    return Collections.unmodifiableMap(params);
+    return Utils.parseQueryString(getStringBody());
   }
 
   public <V> V getJson(Class<V> gsonClass) {

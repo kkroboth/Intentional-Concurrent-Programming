@@ -9,6 +9,7 @@ run:
 	 -Djava.util.logging.config.file=logging.properties \
 	 -Dedu.unh.letsmeet.config.file=server.properties \
 	 -Dicp.core.config.file=icp.properties \
+	 -Dicp.core.ICPLoader.ignore=org.sqlite.,com.google.,org.apache.,com.opencsv.,com.amdelamar. \
 	  edu.unh.letsmeet.Main
 
 debug:

@@ -15,6 +15,7 @@ import edu.unh.letsmeet.server.ApiRequestHandler;
 import edu.unh.letsmeet.server.PagesRequestHandler;
 import edu.unh.letsmeet.server.StaticFilesRequestHandler;
 import edu.unh.letsmeet.server.routes.HtmlRoute;
+import edu.unh.letsmeet.storage.UniversalStorage;
 import edu.unh.letsmeet.users.DatabaseHelper;
 import icp.core.ICP;
 import icp.core.Permissions;
@@ -41,12 +42,21 @@ public class Main {
   // Guarded-by: Main instance
   private SessionManager sessions;
 
+  // Thread-safe
+  private UniversalStorage universalStorage;
+
   public Main() {
     ICP.setPermission(this, Permissions.getThreadSafePermission());
   }
 
   public synchronized void start() throws IOException {
     Props props = Props.getInstance();
+
+    // Setup storage
+    universalStorage = new UniversalStorage();
+    universalStorage.parseAndSetTravelMap(
+      props.getProjectPath().resolve("assets/airports_min.dat").toAbsolutePath()
+    );
 
     // Middleware
     sessions = SessionManager.readFromStorage();
@@ -68,6 +78,7 @@ public class Main {
     // Add settings
     Settings settings = httpServer.getSettings();
     settings.set(PagesRequestHandler.SETTING_PAGES_DIRECTORY, props.getPagesDirectory());
+
     // Add static directories
     List<Path> dirs = new ArrayList<>();
     dirs.add(props.getStaticDirectory());
@@ -95,18 +106,31 @@ public class Main {
     }
   }
 
+  // TODO: Bug - Api works without login!!
   public ApiRequestHandler createApiHandler() {
     return new ApiRequestHandler.Builder("/api/")
       .addMethodRoute(GET, "map/points", (method, path, request, meta, provider) -> {
-        Path pointsPath = ((Path) provider.getSettings().get("directory.assets"))
-          .resolve("airports_min.dat");
-        try {
-          String res = Utils.readFile(pointsPath);
-          return new Response.Builder(200)
-            .plain(res).build();
-        } catch (IOException e) {
-          throw new HttpException(500, e);
+        // Limit results by percentage
+        // Yes, not great design. A better one is to limit the amount of points in a given
+        // radius.
+        float filter = 0;
+        if (request.getUri().getQuery() != null) {
+          try {
+            Map<String, String> params = Utils.parseQueryString(request.getUri().getQuery());
+            if (params.containsKey("filter")) {
+              filter = Float.parseFloat(params.get("filter"));
+              if (filter < 0.0F) throw new HttpException(400);
+            }
+          } catch (IOException | NumberFormatException e) {
+            throw new HttpException(400);
+          }
         }
+
+        return new Response.Builder(200)
+          .header("Content-Type", "application/json")
+          .streamChunked(outputStream -> universalStorage.writeAllTravelLocations(outputStream))
+          .build();
+
       })
       .addRoute("login", (method, path, request, meta, provider) -> {
         if (!method.equals(Method.POST)) throw new HttpException(405);

@@ -14,7 +14,6 @@
 
     L.Icon.Default.imagePath = '/static/leaflet/dist/images/'
 
-
     export default {
         // array of location array
         // [id, location-name, lat, lng]
@@ -28,7 +27,10 @@
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(leafletMap)
 
-            this.markerGroup = L.markerClusterGroup()
+            this.markerGroup = L.markerClusterGroup({
+                disableClusteringAtZoom: 7,
+                spiderfyOnMaxZoom: false
+            })
             leafletMap.addLayer(this.markerGroup)
             this.leafletMap = leafletMap
 
@@ -46,10 +48,25 @@
     function populate(leafletMap, markerGroup, locations) {
         markerGroup.clearLayers()
         locations.forEach(l => {
-            const marker = L.marker([l[3], l[4]])
-                .bindPopup(`<strong>${l[1]}</strong><p>${l[2]}</p>`)
+            const marker = L.marker(l.location, {icon: getDivIcon()})
+                .bindPopup(`<strong>${l.place}</strong><p>${l.country}</p>`)
+                .bindTooltip(l.place + "")
+                .on('click', function () {
+                    // Optional zoom into marker if far out
+                    if (leafletMap.getZoom() >= 5) return
+                    leafletMap.fitBounds(L.latLngBounds([this.getLatLng()]))
+                    leafletMap.setZoom(5)
+                })
             markerGroup.addLayer(marker)
         })
+    }
+
+    function getDivIcon() {
+        if (!getDivIcon.icon) {
+            getDivIcon.icon = L.divIcon({className: 'fas fa-suitcase fa-lg'})
+        }
+
+        return getDivIcon.icon
     }
 </script>
 
