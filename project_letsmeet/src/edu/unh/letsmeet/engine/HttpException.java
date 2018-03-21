@@ -2,6 +2,7 @@ package edu.unh.letsmeet.engine;
 
 public class HttpException extends Exception {
   private final int status;
+  private String body;
 
   public HttpException(int status, String message) {
     super(message);
@@ -24,5 +25,14 @@ public class HttpException extends Exception {
 
   public int getStatus() {
     return this.status;
+  }
+
+  public HttpException body(String body) {
+    this.body = body;
+    return this;
+  }
+
+  public String getBody() {
+    return body;
   }
 }

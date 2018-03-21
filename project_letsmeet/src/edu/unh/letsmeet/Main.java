@@ -1,5 +1,12 @@
 package edu.unh.letsmeet;
 
+import ch.hsr.geohash.GeoHash;
+import com.google.gson.Gson;
+import com.krobothsoftware.commons.network.http.HttpHelper;
+import com.krobothsoftware.commons.network.http.HttpResponse;
+import com.krobothsoftware.commons.network.http.cookie.CookieManager;
+import com.krobothsoftware.commons.util.StringUtils;
+import edu.unh.letsmeet.api.ApiHelper;
 import edu.unh.letsmeet.command.CommandLineScanner;
 import edu.unh.letsmeet.engine.HttpException;
 import edu.unh.letsmeet.engine.HttpServer;
@@ -15,14 +22,19 @@ import edu.unh.letsmeet.server.ApiRequestHandler;
 import edu.unh.letsmeet.server.PagesRequestHandler;
 import edu.unh.letsmeet.server.StaticFilesRequestHandler;
 import edu.unh.letsmeet.server.routes.HtmlRoute;
+import edu.unh.letsmeet.storage.TravelLocation;
 import edu.unh.letsmeet.storage.UniversalStorage;
 import edu.unh.letsmeet.users.DatabaseHelper;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.Task;
 import icp.lib.ICPExecutors;
+import icp.wrapper.ICPProxy;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,7 +46,7 @@ import java.util.logging.Logger;
 
 import static edu.unh.letsmeet.engine.Method.GET;
 
-public class Main {
+public class Main implements ServiceProvider {
   private static final Logger logger = Logger.getLogger("Main");
 
   // Guarded-by: Main instance
@@ -45,25 +57,41 @@ public class Main {
   // Thread-safe
   private UniversalStorage universalStorage;
 
+  private ApiHelper apiHelper;
+  private Props props;
+  private Settings settings;
+
+  // Used to initiate http requests (not used in server)
+  private HttpHelper httpHelper;
+
   public Main() {
     ICP.setPermission(this, Permissions.getThreadSafePermission());
   }
 
   public synchronized void start() throws IOException {
-    Props props = Props.getInstance();
+    props = Props.getInstance();
+
+    // HttpHelper used for initiated outside http requests
+    httpHelper = new HttpHelper();
+    httpHelper.setCookieManager(readCookieManagerFromStorage(props));
 
     // Setup storage
     universalStorage = new UniversalStorage();
     universalStorage.parseAndSetTravelMap(
-      props.getProjectPath().resolve("assets/airports_min.dat").toAbsolutePath()
+      props.getProjectPath().resolve(Constants.ASSET_AIRPORTS).toAbsolutePath()
+    );
+    universalStorage.parseAndSetCountryCodes(
+      props.getProjectPath().resolve(Constants.ASSET_COUNTRIES).toAbsolutePath()
     );
 
     // Middleware
-    sessions = SessionManager.readFromStorage();
-    List<Middleware> middlewares = new ArrayList<>();
+    sessions = SessionManager.readFromStorage(props.getStorageDirectory().resolve(Constants.STORAGE_SESSIONS));
+    //noinspection unchecked
+    List<Middleware> middlewares = ICPProxy.newPrivateInstance(List.class, new ArrayList<>());
     middlewares.add(sessions);
 
-    httpServer = new HttpServer(props.getHost(), props.getPort(),
+    // RequestHandlers use the decorator pattern, messy but gets job done
+    httpServer = new HttpServer(this,
       ICPExecutors.newICPExecutorService(Executors.newCachedThreadPool()),
       new PagesRequestHandler(
         createPageRoutes(),
@@ -76,8 +104,15 @@ public class Main {
     DatabaseHelper.getInstance(); // Starts database
 
     // Add settings
-    Settings settings = httpServer.getSettings();
+    settings = new Settings();
     settings.set(PagesRequestHandler.SETTING_PAGES_DIRECTORY, props.getPagesDirectory());
+    // Add api keys to settings
+    settings.set(Constants.SETTING_APIKEYS, props.readApiKeys());
+
+    // Setup apis
+    apiHelper = new ApiHelper(httpHelper);
+    apiHelper.completeRegistration(settings);
+
 
     // Add static directories
     List<Path> dirs = new ArrayList<>();
@@ -90,7 +125,7 @@ public class Main {
 
     // Asset directory
     Path value = props.getProjectPath().resolve("assets").toAbsolutePath();
-    settings.set("directory.assets", value);
+    settings.set(Constants.ASSETS_DIR, value);
 
     // start the server!
     httpServer.start();
@@ -100,7 +135,10 @@ public class Main {
     try {
       httpServer.stop();
       DatabaseHelper.getInstance().close();
-      SessionManager.saveToStorage(sessions);
+      SessionManager.saveToStorage(sessions, props.getStorageDirectory().resolve(Constants.STORAGE_SESSIONS));
+      // Purge session cookies and save to disk
+      httpHelper.getCookieManager().purgeExpired(true);
+      saveCookieManagerToStorage(httpHelper.getCookieManager(), props);
     } catch (SQLException | IOException e) {
       logger.log(Level.SEVERE, e.toString(), e);
     }
@@ -109,36 +147,153 @@ public class Main {
   // TODO: Bug - Api works without login!!
   public ApiRequestHandler createApiHandler() {
     return new ApiRequestHandler.Builder("/api/")
-      .addMethodRoute(GET, "map/points", (method, path, request, meta, provider) -> {
+
+      // Map sub routes
+      .enterSubRoute("map/")
+      .addMethodRoute(GET, "points", (method, path, params, query, request, meta, provider) -> {
         // Limit results by percentage
         // Yes, not great design. A better one is to limit the amount of points in a given
         // radius.
         float filter = 0;
+        boolean useChunked = false;
         if (request.getUri().getQuery() != null) {
           try {
-            Map<String, String> params = Utils.parseQueryString(request.getUri().getQuery());
-            if (params.containsKey("filter")) {
-              filter = Float.parseFloat(params.get("filter"));
+            Map<String, String> queryParams = Utils.parseQueryString(request.getUri().getQuery());
+            if (queryParams.containsKey("filter")) {
+              filter = Float.parseFloat(queryParams.get("filter"));
               if (filter < 0.0F) throw new HttpException(400);
             }
+
+            if (queryParams.containsKey("chunked")) useChunked = true;
           } catch (IOException | NumberFormatException e) {
             throw new HttpException(400);
           }
         }
 
-        return new Response.Builder(200)
-          .header("Content-Type", "application/json")
-          .streamChunked(outputStream -> universalStorage.writeAllTravelLocations(outputStream))
-          .build();
+
+        Response.Builder response = Response.create(200)
+          .header("Content-Type", "application/json; charset=utf8");
+
+        if (useChunked) {
+          return response.streamChunked(output -> universalStorage.writeAllTravelLocations(output))
+            .build();
+        } else {
+          try {
+            universalStorage.writeAllTravelLocations(response);
+            return response.build();
+          } catch (IOException e) {
+            throw new HttpException(500, e);
+          }
+        }
 
       })
-      .addRoute("login", (method, path, request, meta, provider) -> {
-        if (!method.equals(Method.POST)) throw new HttpException(405);
-        meta.put(SessionManager.META_CREATE_SESSION, true);
-        return new Response.Builder(200)
-          .json("{\"status\": \"good\"}")
-          .build();
-      }).build();
+      .addMethodRoute(GET, "point/(?<id>\\d+)", (method, path, params, query, request, meta, provider) -> {
+        TravelLocation location = universalStorage.getTravelLocation(Integer.parseInt(params.get("id")));
+        if (location == null) throw new HttpException(404);
+
+        Gson gson = new Gson();
+        String json = gson.toJson(location);
+
+        return Response.create(200)
+          .json(json).build();
+      })
+      .exitSubRoute() // map
+
+      // Source sub routes
+      .enterSubRoute("source/")
+      // Weather
+      .enterSubRoute("weather/")
+      .addMethodRoute(GET, "location", ((method, path, params, query, request, meta, provider) -> {
+        // TODO: Cache weather api calls (updated every 10 minutes)
+        // TODO: Build cache of city ids instead of querying by name every time (permanent)
+        // TODO: Add call throttler
+
+        Utils.ensureAllQueryParams(query, "lat", "lng");
+        String lat = query.get("lat");
+        String lng = query.get("lng");
+
+        try (HttpResponse response = getApiHelper().startCall("weather")
+          .buildUrl(url ->
+            url.path("weather")
+              .query("lat", lat)
+              .query("lon", lng))
+          .execute(httpHelper)) {
+          String content = StringUtils.toString(response.getStream(), "UTF-8");
+          return Response.create(200).json(content).build();
+        }
+      }))
+      .addMethodRoute(GET, "city", ((method, path, params, query, request, meta, provider) -> {
+        Utils.ensureAllQueryParams(query, "city", "country");
+        String city = query.get("city");
+        String country = query.get("country");
+
+        String countryCode = universalStorage.getCountryCode(country);
+
+        try (HttpResponse response = getApiHelper().startCall("weather")
+          .buildUrl(url -> url.path("weather")
+            .query("q", city + "," + countryCode))
+          .execute(httpHelper)) {
+          String content = StringUtils.toString(response.getStream(), "UTF-8");
+          return Response.create(200).json(content).build();
+        }
+      }))
+      .exitSubRoute() // weather
+
+      // Events
+      .enterSubRoute("events/")
+      .addMethodRoute(GET, "location", (method, path, params, query, request, meta, provider) -> {
+        Utils.ensureAllQueryParams(query, "lat", "lng");
+        String lat = query.get("lat");
+        String lng = query.get("lng");
+
+        String geohash = GeoHash.geoHashStringWithCharacterPrecision(Double.valueOf(lat), Double.valueOf(lng), 5);
+
+        try (HttpResponse response = getApiHelper().startCall("events")
+          .buildUrl(url -> url.path("events.join")
+            .query("geoPoint", geohash)
+            .query("size", "10"))
+          .execute(httpHelper)) {
+          String content = StringUtils.toString(response.getStream(), "UTF-8");
+          return Response.create(200).json(content).build();
+        }
+      })
+      .exitSubRoute() // events
+
+      // Restaurants
+      .enterSubRoute("restaurants/")
+      .addMethodRoute(GET, "location", (method, path, params, query, request, meta, provider) -> {
+        Utils.ensureAllQueryParams(query, "lat", "lng");
+        String lat = query.get("lat");
+        String lng = query.get("lng");
+
+        try (HttpResponse response = getApiHelper().startCall("restaurants")
+          .buildUrl(url -> url.path("geocode")
+            .query("lat", lat)
+            .query("lon", lng)).execute(httpHelper)) {
+          String content = StringUtils.toString(response.getStream(), "UTF-8");
+          return Response.create(200).json(content).build();
+        }
+      })
+      .exitSubRoute() // restaurants
+
+      // News
+      .enterSubRoute("news/")
+      .addMethodRoute(GET, "top", ((method, path, params, query, request, meta, provider) -> {
+        Utils.ensureAllQueryParams(query, "country");
+        String country = query.get("country");
+        String countryCode = universalStorage.getCountryCode(country);
+
+        try (HttpResponse response = getApiHelper().startCall("news")
+          .buildUrl(url -> url.path("top-headlines")
+            .query("country", countryCode))
+          .execute(httpHelper)) {
+          String content = StringUtils.toString(response.getStream(), "UTF-8");
+          return Response.create(200).json(content).build();
+        }
+      }))
+      .exitSubRoute() // news
+      .exitSubRoute() // source
+      .build();
   }
 
   public Map<String, Route> createPageRoutes() {
@@ -151,10 +306,10 @@ public class Main {
         }
 
         @Override
-        public Response accept(Method method, String path, Request request,
-                               Map<String, Object> meta, ServerProvider provider) throws HttpException {
+        public Response accept(Method method, String path, Map<String, String> params, Map<String, String> query,
+                               Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
           if (!meta.containsKey("session")) {
-            return new Response.Builder(302).header("Location", "/login").build();
+            return Response.create(302).header("Location", "/login").build();
           }
 
           return htmlRoute.accept(method, path, request, meta, provider);
@@ -168,27 +323,27 @@ public class Main {
         }
 
         @Override
-        public Response accept(Method method, String path, Request request,
-                               Map<String, Object> meta, ServerProvider provider) throws HttpException {
+        public Response accept(Method method, String path, Map<String, String> params, Map<String, String> query,
+                               Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
 
           if (method.equals(GET)) {
             if (meta.containsKey("session")) {
-              return new Response.Builder(302).header("Location", "/").build();
+              return Response.create(302).header("Location", "/").build();
             }
 
             return htmlRoute.accept(method, path, request, meta, provider);
           } else if (method.equals(Method.POST)) {
             DatabaseHelper db = DatabaseHelper.getInstance();
             try {
-              Map<String, String> params = request.getFormEncodedBody();
+              Map<String, String> queryParams = request.getFormEncodedBody();
               // Login, create session storage and put username in it,
               // and redirect to main page
-              db.login(params.get("username"), params.get("password").toCharArray());
+              db.login(queryParams.get("username"), queryParams.get("password").toCharArray());
               Map.Entry<String, SessionManager.SessionStorage>
                 session = SessionManager.generateDetachedSessionStorage();
               meta.put(SessionManager.META_DETACHED_SESSION, session);
-              session.getValue().putItem("user", params.get("username"));
-              return new Response.Builder(302).header("Location", "/").build();
+              session.getValue().putItem("user", queryParams.get("username"));
+              return Response.create(302).header("Location", "/").build();
             } catch (Exception e) {
               if (e.getMessage().equalsIgnoreCase("Username or password incorrect"))
                 logger.warning("Login failed");
@@ -205,6 +360,51 @@ public class Main {
       .done();
   }
 
+  @Override
+  public ApiHelper getApiHelper() {
+    return apiHelper;
+  }
+
+  @Override
+  public int getPort() {
+    return props.getPort();
+  }
+
+  @Override
+  public String getHost() {
+    return props.getHost();
+  }
+
+  @Override
+  public Settings getSettings() {
+    return settings;
+  }
+
+  private static CookieManager readCookieManagerFromStorage(Props props) {
+    Path path = props.getStorageDirectory().resolve(Constants.STORAGE_CLIENT_COOKIES);
+    if (Files.exists(path)) {
+      try {
+        ObjectInputStream in = new ObjectInputStream(Files.newInputStream(path));
+        return (CookieManager) in.readObject();
+      } catch (IOException | ClassNotFoundException | ClassCastException e) {
+        logger.log(Level.SEVERE, e.getMessage(), e);
+        throw new RuntimeException("Could not read client cookies data");
+      }
+    } else {
+      return new CookieManager();
+    }
+  }
+
+  private static void saveCookieManagerToStorage(CookieManager cookieManager, Props props) throws IOException {
+    Path path = props.getStorageDirectory().resolve(Constants.STORAGE_CLIENT_COOKIES);
+    Files.createDirectories(path.getParent());
+
+    ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(path));
+    out.writeObject(cookieManager);
+    out.flush();
+    out.close();
+  }
+
   public static void main(String[] args) throws Exception {
     Main main = new Main();
     Runtime.getRuntime().addShutdownHook(new Thread(Task.ofThreadSafe(main::stop)));
@@ -214,5 +414,4 @@ public class Main {
     CommandLineScanner cmdline = new CommandLineScanner();
     cmdline.parseInput();
   }
-
 }

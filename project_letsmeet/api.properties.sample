@@ -1,0 +1,25 @@
+# !ALERT!
+# Do not track this file with api keys!
+# The sample file is only here reference and real file must be created and ignored.
+#
+# Rename 'api.properties.sample_DO_NOT_TRACK' to 'api.properties' or the location defined in settings.properties
+# !ALERT!
+
+
+# API keys for project
+#
+# API's with missing keys will be ignored and disabled.
+# API's with invalid keys will be disabled and logged.
+
+
+# OpenWeatherMap: http://openweathermap.org/api
+key_weather=
+
+# TicketMaster: https://developer.ticketmaster.com/products-and-docs/apis/getting-started/
+key_events=
+
+# NewsAPI: https://newsapi.org/docs/endpoints
+key_news=
+
+# Zomato: https://developers.zomato.com/documentation
+key_restaurants=

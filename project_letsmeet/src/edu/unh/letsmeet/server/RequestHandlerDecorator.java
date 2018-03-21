@@ -6,6 +6,7 @@ import edu.unh.letsmeet.engine.RequestHandler;
 import edu.unh.letsmeet.engine.Response;
 import edu.unh.letsmeet.engine.ServerProvider;
 
+import java.io.IOException;
 import java.util.Map;
 
 public abstract class RequestHandlerDecorator implements RequestHandler {
@@ -20,8 +21,8 @@ public abstract class RequestHandlerDecorator implements RequestHandler {
   }
 
   @Override
-  public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException {
-    return handler != null ? handler.handleRequest(provider, request, meta)
-      : new Response.Builder(404).build();
+  public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
+    if (handler != null) return handler.handleRequest(provider, request, meta);
+    else throw new HttpException(404, "No matching request: " + request.toString());
   }
 }

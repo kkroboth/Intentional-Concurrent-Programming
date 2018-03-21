@@ -8,6 +8,7 @@ import icp.lib.DisjointSemaphore;
 import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 import icp.lib.Permit;
+import icp.wrapper.ICPProxy;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.INFO;
@@ -27,16 +29,14 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
 // TODO: Implement persistent connections (will add more server state!)
-public class HttpServer implements ServerProvider {
+public class HttpServer {
   private static final Logger logger = Logger.getLogger("HttpServer");
 
   public static final byte[] CRLF_BYTES = "\r\n".getBytes();
   public static final String CRLF = "\r\n";
 
   // Settings and props
-  private final String host;
-  private final int port;
-  private final Settings settings;
+  private final ServerProvider serverProvider;
 
   // Server
   private final ServerSocket serverSocket;
@@ -52,21 +52,18 @@ public class HttpServer implements ServerProvider {
   /**
    * Creates server socket but does not bind address
    *
-   * @param host
-   * @param port
    * @throws IOException could not open the server socket
    */
-  public HttpServer(String host, int port, ICPExecutorService executorService, RequestHandler handler,
+  public HttpServer(ServerProvider serverProvider, ICPExecutorService executorService, RequestHandler handler,
                     List<Middleware> middlewares) throws IOException {
-    this.host = host;
-    this.port = port;
+    this.serverProvider = serverProvider;
     this.handler = handler;
     this.executorService = executorService;
-    this.settings = new Settings();
 
     serverSocket = new ServerSocket();
     if (middlewares == null) middlewares = Collections.emptyList();
-    this.middlewares = Collections.unmodifiableList(middlewares);
+    else ICPProxy.setProxyPermission(middlewares, Permissions.getFrozenPermission());
+    this.middlewares = ICPProxy.newFrozenInstance(List.class, Collections.unmodifiableList(middlewares));
     connectionLimiter = new DisjointSemaphore(Props.getInstance().getServerThreads());
 
     ICP.setPermission(this, Permissions.getThreadSafePermission());
@@ -76,9 +73,9 @@ public class HttpServer implements ServerProvider {
    * Uses fixed thread pool executor with number of threads from
    * 'server_threads' in props.
    */
-  public HttpServer(String host, int port, RequestHandler handler,
+  public HttpServer(ServerProvider serverProvider, RequestHandler handler,
                     List<Middleware> middlewares) throws IOException {
-    this(host, port, ICPExecutors.newICPExecutorService(
+    this(serverProvider, ICPExecutors.newICPExecutorService(
       Executors.newFixedThreadPool(Props.getInstance().getServerThreads())
     ), handler, middlewares);
   }
@@ -90,9 +87,9 @@ public class HttpServer implements ServerProvider {
    * @throws IOException HttpServer connection could not be made
    */
   public void start() throws IOException {
-    settings.freeze();
+    serverProvider.getSettings().freeze();
     started = true;
-    serverSocket.bind(new InetSocketAddress(host, port));
+    serverSocket.bind(new InetSocketAddress(serverProvider.getHost(), serverProvider.getPort()));
 
     new Thread(Task.ofThreadSafe(() -> {
       connectionLimiter.registerAcquirer();
@@ -147,11 +144,12 @@ public class HttpServer implements ServerProvider {
 
     Request request;
     Response response = null;
-    Map<String, Object> session = new HashMap<>();
+    //noinspection unchecked
+    Map<String, Object> session = ICPProxy.newPrivateInstance(Map.class, new HashMap<>());
     try {
       request = Request.parse(uncloseableInputStream);
       for (Middleware middleware : middlewares) {
-        Response result = middleware.onRequest(this, session, request);
+        Response result = middleware.onRequest(serverProvider, session, request);
         if (result != null) {
           response = result;
           break;
@@ -160,19 +158,31 @@ public class HttpServer implements ServerProvider {
 
       // Only if middleware did not create own response
       if (response == null) {
-        response = handler.handleRequest(this, request, session);
+        response = handler.handleRequest(serverProvider, request, session);
         if (!middlewares.isEmpty()) {
           Response.Builder builder = new Response.Builder(response);
-          middlewares.forEach(m -> m.onResponse(this, session, builder, request));
+          middlewares.forEach(m -> m.onResponse(serverProvider, session, builder, request));
           response = builder.build();
         }
       }
     } catch (HttpException e) {
-      if (e.getStatus() >= 500)
-        logger.log(SEVERE, e.getCause().getMessage(), e.getCause());
-      else
-        logger.log(INFO, e.getCause().getMessage(), e.getCause());
-      response = new Response.Builder(e.getStatus()).build();
+      Level level = e.getStatus() >= 500 ? SEVERE : INFO;
+      if (e.getCause() != null) {
+        logger.log(level, e.getCause().getMessage(), e.getCause());
+      } else {
+        logger.log(level, e.getMessage());
+      }
+
+      // Add optional body message to response
+      Response.Builder builder = Response.create(e.getStatus());
+      if (e.getBody() != null) {
+        builder.plain(e.getBody());
+      }
+
+      response = builder.build();
+    } catch (IOException e) {
+      logger.log(SEVERE, e.getMessage(), e);
+      response = Response.create(500).build();
     }
 
     try {
@@ -183,20 +193,5 @@ public class HttpServer implements ServerProvider {
     } catch (IOException e) {
       logger.log(SEVERE, e.getMessage(), e);
     }
-  }
-
-  @Override
-  public int getPort() {
-    return port;
-  }
-
-  @Override
-  public String getHost() {
-    return host;
-  }
-
-  @Override
-  public Settings getSettings() {
-    return settings;
   }
 }

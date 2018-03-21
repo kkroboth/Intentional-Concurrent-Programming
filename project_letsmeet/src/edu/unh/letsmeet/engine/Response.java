@@ -21,6 +21,18 @@ public class Response {
   private final CheckedConsumer<OutputStream> streamer;
   private final String[] cookies;
 
+  public static Builder create(int status) {
+    return new Builder(status);
+  }
+
+  public static Builder create() {
+    return new Builder();
+  }
+
+  public static Builder create(Response response) {
+    return new Builder(response);
+  }
+
   public void createResponse(OutputStream outputStream) throws IOException {
     // Use stringbuilder for header only
 
@@ -31,6 +43,7 @@ public class Response {
 
     // Headers
     Map<String, String> headers = new HashMap<>();
+    // TODO: For now, all connections are closed until persistent connections are implemented
     if (close) headers.put("Connection", "close");
     if (body != null) headers.put("Content-Length", String.valueOf(body.length));
     headers.putAll(this.headers); // Allow this.headers to override above
@@ -86,13 +99,13 @@ public class Response {
     CheckedConsumer<OutputStream> streamer;
     List<String> cookies;
 
-    public Builder(int status) {
+    Builder(int status) {
       this.status = status;
       headers = new HashMap<>();
       cookies = new ArrayList<>();
     }
 
-    public Builder(Response response) {
+    Builder(Response response) {
       this.status = response.status;
       this.close = response.close;
       this.headers = response.headers;
@@ -102,8 +115,13 @@ public class Response {
       this.cookies = new ArrayList(Arrays.asList(response.cookies));
     }
 
-    public Builder() {
+    Builder() {
       this(-1);
+    }
+
+    public Builder status(int status) {
+      this.status = status;
+      return this;
     }
 
     public Builder close(boolean close) {

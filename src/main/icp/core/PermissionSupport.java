@@ -9,6 +9,7 @@ import javassist.CtField;
 import javassist.NotFoundException;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.logging.Logger;
 
 /**
@@ -109,6 +110,7 @@ public final class PermissionSupport {
     CtField f;
     try {
       f = new CtField(PERMISSION_TYPE, AddedPermissionFieldName, clss);
+      f.setModifiers(Modifier.TRANSIENT);
     } catch (CannotCompileException e) {
       throw new ICPInternalError("CannotCompileException in addPermissionField", e);
     }
@@ -252,7 +254,7 @@ public final class PermissionSupport {
    */
   static void setPermission(Object obj, Permission permission) {
     // Cannot add permission to primitive values
-    Class klass = obj.getClass();
+    Class<?> klass = obj.getClass();
     if (klass.equals(Integer.TYPE) ||
       klass.equals(Long.TYPE) ||
       klass.equals(Boolean.TYPE) ||
@@ -286,8 +288,9 @@ public final class PermissionSupport {
    *
    * @param obj        the object to set permission for (forced)
    * @param permission the permission to set in object (forced)
-   * @deprecated Do not use, will throw execption
+   * @deprecated Do not use, will throw exception
    */
+  @Deprecated
   static void forceSetPermission(Object obj, Permission permission) {
     if (true)
       throw new ICPInternalError("Violates Hatcher's Principle!");

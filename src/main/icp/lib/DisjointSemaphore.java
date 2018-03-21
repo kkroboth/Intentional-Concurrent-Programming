@@ -131,5 +131,9 @@ public class DisjointSemaphore {
    * The permit users use to acquire and release.
    */
   private final class VirtualPermit implements Permit {
+
+    {
+      ICP.setPermission(this, Permissions.getFrozenPermission());
+    }
   }
 }

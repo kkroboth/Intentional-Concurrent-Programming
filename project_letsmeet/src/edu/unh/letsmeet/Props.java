@@ -2,14 +2,20 @@ package edu.unh.letsmeet;
 
 import icp.core.ICP;
 import icp.core.Permissions;
+import icp.wrapper.ICPProxy;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 /**
  * Singleton class that holds server properties (read-only).
@@ -93,6 +99,31 @@ public final class Props {
     String path = props.getProperty("nodemodules_directory");
     Objects.requireNonNull(path, "nodemodules_directory property is not set");
     return Paths.get(path);
+  }
+
+  /**
+   * Reads and returns the following api keys:
+   * <ul>
+   * <li>key_weather (openweathermap)</li>
+   * <li>key_restaurants (Zomato)</li>
+   * <li>key_news (newsapi)</li>
+   * <li>key_events (TicketMaster)</li>
+   * </ul>
+   */
+  public Map<String, String> readApiKeys() throws IOException {
+    Objects.requireNonNull(this.props);
+    String strPath = props.getProperty("api_properties_file");
+    Objects.requireNonNull(strPath, "api_properties_file property is not set");
+    Path path = Paths.get(strPath);
+    Properties props = new Properties();
+    props.load(Files.newInputStream(path));
+
+    Map<String, String> keys = new HashMap<>();
+    Stream.of("key_weather", "key_restaurants", "key_news", "key_events")
+      .forEach(key -> keys.put(key, props.getProperty(key)));
+
+    //noinspection unchecked
+    return ICPProxy.newFrozenInstance(Map.class, Collections.unmodifiableMap(keys));
   }
 
   private Properties loadProps(InputStream stream) throws IOException {

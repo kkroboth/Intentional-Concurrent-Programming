@@ -1,6 +1,5 @@
 package edu.unh.letsmeet.engine.security;
 
-import edu.unh.letsmeet.Props;
 import edu.unh.letsmeet.engine.Cookie;
 import edu.unh.letsmeet.engine.Middleware;
 import edu.unh.letsmeet.engine.Request;
@@ -16,7 +15,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -36,6 +34,7 @@ import java.util.stream.Stream;
  * Sessions are added on demand and usually after a successful login.
  */
 public class SessionManager implements Middleware, Serializable {
+  private static final long serialVersionUID = -6449014629565276748L;
   private static final Logger logger = Logger.getLogger("SessionManager");
 
   public static final int SESSION_BYTE_LEN = 32;
@@ -47,11 +46,13 @@ public class SessionManager implements Middleware, Serializable {
 
   // Session cookie value -> Storage
   // Guarded-by: SessionMap (itself)
-  private final Map<String, SessionStorage> sessionMap;
+  // TODO: Use lock Object for synchronization (non-final field)
+  private transient Map<String, SessionStorage> sessionMap;
 
-  public static SessionManager readFromStorage() {
-    Path path = Props.getInstance().getStorageDirectory().resolve("sessions.dat");
+  // Private -- Only used for serialization
+  private Map<String, SessionStorage> sessionMapTarget;
 
+  public static SessionManager readFromStorage(Path path) {
     if (Files.exists(path)) {
       try {
         ObjectInputStream in = new ObjectInputStream(Files.newInputStream(path));
@@ -61,32 +62,46 @@ public class SessionManager implements Middleware, Serializable {
         throw new RuntimeException("Could not read sessions.dat");
       }
     } else {
-      return new SessionManager();
+      return new SessionManager(true);
     }
   }
 
-  public static void saveToStorage(SessionManager sessions) throws IOException {
-    ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(Props.getInstance().getStorageDirectory()
-      .resolve("sessions.dat"), StandardOpenOption.CREATE_NEW));
+  public static void saveToStorage(SessionManager sessions, Path path) throws IOException {
+    Files.createDirectories(path.getParent());
+
+    ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(path));
     out.writeObject(sessions);
     out.flush();
     out.close();
-    System.out.println(out);
   }
 
-  public SessionManager() {
+
+  {
+    ICP.setPermission(this, Permissions.getThreadSafePermission());
+  }
+
+//  /**
+//   * No-arg constructor for deserialization purposes.
+//   */
+//  public SessionManager() {
+//  }
+
+  /**
+   * Normal constructor with not deserialization
+   */
+  protected SessionManager(boolean nonserialized) {
+    sessionMapTarget = new HashMap<>(); // target is exported to instance only for serialization!
     //noinspection unchecked
-    sessionMap = ICPProxy.newInstance(Map.class, new HashMap(),
+    sessionMap = ICPProxy.newInstance(Map.class, sessionMapTarget,
       (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(t)));
 
-    ICP.setPermission(this, Permissions.getThreadSafePermission());
   }
 
 
   public Entry<String, SessionStorage> generateSessionStorage() {
     String cookie = Utils.generateSecureString(secureRandom, SESSION_BYTE_LEN);
     String expiration = LocalDate.now().plusMonths(1).toString();
-    SessionStorage storage = new SessionStorage();
+    SessionStorage storage = new SessionStorage(true);
     storage.setProtected("expiration", expiration);
     synchronized (sessionMap) {
       sessionMap.put(cookie, storage);
@@ -97,7 +112,7 @@ public class SessionManager implements Middleware, Serializable {
   public static Entry<String, SessionStorage> generateDetachedSessionStorage() {
     String cookie = Utils.generateSecureString(secureRandom, SESSION_BYTE_LEN);
     String expiration = LocalDate.now().plusMonths(1).toString();
-    SessionStorage storage = new SessionStorage();
+    SessionStorage storage = new SessionStorage(true);
     storage.setProtected("expiration", expiration);
     return new AbstractMap.SimpleEntry<>(cookie, storage);
   }
@@ -184,6 +199,13 @@ public class SessionManager implements Middleware, Serializable {
     }
   }
 
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    //noinspection unchecked
+    sessionMap = ICPProxy.newInstance(Map.class, sessionMapTarget,
+      (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(t)));
+  }
+
   private static String createCookie(String sessionId, SessionStorage sessionStorage) {
     LocalDate date = LocalDate.parse(sessionStorage.getProtected("expiration"));
     return Utils.createSetCookie(SESSION_COOKIE_NAME,
@@ -196,18 +218,23 @@ public class SessionManager implements Middleware, Serializable {
   // Guarded-by: Itself
   // Uses client-side locking
   public static class SessionStorage implements Serializable {
-    private final Map<String, String> storage;
+    private static final long serialVersionUID = 478132322503301305L;
+    private transient Map<String, String> storage;
+    private final Map<String, String> storageTarget;
 
     private static final String[] PROTECTED_KEYS = new String[]{"expiration"};
 
-    SessionStorage() {
+    {
+      ICP.setPermission(this, Permissions.getThreadSafePermission());
+    }
+
+    SessionStorage(boolean nonserialized) {
+      storageTarget = new HashMap<>();
       synchronized (this) {
         //noinspection unchecked
-        storage = ICPProxy.newInstance(Map.class, new HashMap(),
+        storage = ICPProxy.newInstance(Map.class, storageTarget,
           (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(this)));
       }
-
-      ICP.setPermission(this, Permissions.getThreadSafePermission());
     }
 
     public synchronized String getItem(String key) {
@@ -235,6 +262,15 @@ public class SessionManager implements Middleware, Serializable {
 
     private boolean isKeyProtected(String key) {
       return Stream.of(PROTECTED_KEYS).anyMatch(k -> k.equals(key));
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+      in.defaultReadObject();
+      synchronized (this) {
+        //noinspection unchecked
+        storage = ICPProxy.newInstance(Map.class, storageTarget,
+          (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(this)));
+      }
     }
   }
 }

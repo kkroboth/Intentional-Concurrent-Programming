@@ -87,7 +87,7 @@ public class Request {
 
   @Override
   public String toString() {
-    return method.toString() + " " + uri + '\n';
+    return method.toString() + " " + uri;
   }
 
   public static Request parse(InputStream stream) throws HttpException {

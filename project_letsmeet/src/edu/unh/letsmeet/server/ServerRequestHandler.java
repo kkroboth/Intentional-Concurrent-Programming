@@ -17,6 +17,6 @@ public class ServerRequestHandler implements RequestHandler {
 
   @Override
   public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) {
-    return new Response.Builder(200).plain("Hello World").build();
+    return Response.create(200).plain("Hello World").build();
   }
 }

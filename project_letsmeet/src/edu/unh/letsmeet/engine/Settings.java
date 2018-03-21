@@ -20,7 +20,7 @@ public final class Settings {
 
   private Map<String, Object> settings;
 
-  Settings() {
+  public Settings() {
     settings = new HashMap<>();
     // Permission: private util frozen
   }
@@ -41,6 +41,7 @@ public final class Settings {
     //noinspection unchecked
     if (!settings.containsKey(key))
       throw new IllegalStateException("Settings: " + key + " accessed but has not value set");
+    //noinspection unchecked
     return (V) settings.get(key);
   }
 

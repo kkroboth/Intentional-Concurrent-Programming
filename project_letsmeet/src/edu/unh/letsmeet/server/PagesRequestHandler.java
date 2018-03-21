@@ -9,6 +9,7 @@ import edu.unh.letsmeet.engine.ServerProvider;
 import icp.core.ICP;
 import icp.core.Permissions;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -32,7 +33,7 @@ public class PagesRequestHandler extends RequestHandlerDecorator {
   }
 
   @Override
-  public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException {
+  public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
     URI uri = request.getUri();
     String path = uri.getPath().toLowerCase();
     Route route = routes.get(path);

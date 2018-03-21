@@ -1,6 +1,7 @@
 package icp.wrapper;
 
 import icp.core.ICP;
+import icp.core.Permission;
 import icp.core.PermissionSupport;
 import icp.core.Permissions;
 
@@ -16,9 +17,37 @@ public final class ICPProxy {
                                   BiConsumer<Object, Object> permissionApplier) {
     PermissionTarget permissionTarget = new PermissionTarget();
     T proxy = (T) Proxy.newProxyInstance(ICPProxy.class.getClassLoader(),
-      new Class<?>[]{singleInterface}, new PermissionInvocationHandler(target, permissionTarget));
+      new Class<?>[]{singleInterface, ProxyInfo.class},
+      new PermissionInvocationHandler(target, permissionTarget));
     permissionApplier.accept(permissionTarget, proxy);
     return proxy;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T newPrivateInstance(Class<? extends T> singleInterface, T target) {
+    return newInstance(singleInterface, target, (i, j) -> {
+    });
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T newFrozenInstance(Class<? extends T> singleInterface, T target) {
+    return newInstance(singleInterface, target, (permHolder, targetObj) -> ICP.setPermission(permHolder,
+      Permissions.getFrozenPermission()));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T newThreadSafeInstance(Class<? extends T> singleInterface, T target) {
+    return newInstance(singleInterface, target, (permHolder, targetObj) -> ICP.setPermission(permHolder,
+      Permissions.getThreadSafePermission()));
+  }
+
+  public static void setProxyPermission(Object proxy, Permission permission) {
+    if (!Proxy.isProxyClass(proxy.getClass())) {
+      throw new RuntimeException("Proxy is not a java.reflect.Proxy");
+    }
+
+    ProxyInfo info = (ProxyInfo) proxy;
+    ICP.setPermission(info.ICPGetPermissionHolder(), permission);
   }
 
   private static class PermissionInvocationHandler implements InvocationHandler {
@@ -33,6 +62,12 @@ public final class ICPProxy {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      if (method.getName().equals("ICPGetPermissionHolder")) {
+        return permissionTarget;
+      } else if (method.getName().equals("ICPGetObjectTarget")) {
+        return target;
+      }
+
       PermissionSupport.checkCall(permissionTarget);
       return method.invoke(target, args);
     }
@@ -44,5 +79,16 @@ public final class ICPProxy {
    */
   private static class PermissionTarget {
 
+  }
+
+  /**
+   * Interface for which every proxy will implement to access the target.
+   * <p>
+   * Internally used to update the permission
+   */
+  private interface ProxyInfo {
+    Object ICPGetPermissionHolder();
+
+    Object ICPGetObjectTarget();
   }
 }

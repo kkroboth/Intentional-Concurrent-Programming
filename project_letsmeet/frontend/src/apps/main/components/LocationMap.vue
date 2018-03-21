@@ -15,9 +15,8 @@
     L.Icon.Default.imagePath = '/static/leaflet/dist/images/'
 
     export default {
-        // array of location array
-        // [id, location-name, lat, lng]
-        props: ['locations'],
+        // array of locations
+        props: ['locations', 'showSelected'],
 
         mounted() {
             const mountPoint = this.$el
@@ -34,29 +33,48 @@
             leafletMap.addLayer(this.markerGroup)
             this.leafletMap = leafletMap
 
-            populate(this.leafletMap, this.markerGroup, this.locations)
+            populate(this.leafletMap, this.markerGroup, this.locations, this)
+        },
+
+        data() {
+            return {
+                internalSelected: null
+            }
+
+        },
+
+        methods: {
+            centerSelected() {
+                if (this.internalSelected) {
+                    this.leafletMap.fitBounds(L.latLngBounds([this.internalSelected.getLatLng()]))
+                    this.leafletMap.setZoom(5)
+                }
+            }
         },
 
         watch: {
             'locations'(to) {
                 if (!to || !to.length) return
-                populate(this.leafletMap, this.markerGroup, to)
+                populate(this.leafletMap, this.markerGroup, to, this)
             }
         }
     }
 
-    function populate(leafletMap, markerGroup, locations) {
+    function populate(leafletMap, markerGroup, locations, vm) {
         markerGroup.clearLayers()
         locations.forEach(l => {
-            const marker = L.marker(l.location, {icon: getDivIcon()})
-                .bindPopup(`<strong>${l.place}</strong><p>${l.country}</p>`)
+            const marker = L.marker(l.latlong, {icon: getDivIcon()})
                 .bindTooltip(l.place + "")
                 .on('click', function () {
                     // Optional zoom into marker if far out
                     if (leafletMap.getZoom() >= 5) return
                     leafletMap.fitBounds(L.latLngBounds([this.getLatLng()]))
                     leafletMap.setZoom(5)
+                }).on('click', (e) => {
+                    vm.$emit('selected', e.target.locationId)
+                    vm.internalSelected = e.target
                 })
+            marker.locationId = l.id
             markerGroup.addLayer(marker)
         })
     }
