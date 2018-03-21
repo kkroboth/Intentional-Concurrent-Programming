@@ -21,7 +21,7 @@ public abstract class RequestHandlerDecorator implements RequestHandler {
   }
 
   @Override
-  public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
+  public Response.Builder handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
     if (handler != null) return handler.handleRequest(provider, request, meta);
     else throw new HttpException(404, "No matching request: " + request.toString());
   }

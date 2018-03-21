@@ -6,5 +6,6 @@ import java.util.Map;
 @FunctionalInterface
 public interface RequestHandler {
 
-  Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException;
+  Response.Builder handleRequest(ServerProvider provider, Request request, Map<String, Object> meta)
+    throws HttpException, IOException;
 }

@@ -41,7 +41,7 @@ public class ApiRequestHandler extends RequestHandlerDecorator {
   }
 
   @Override
-  public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
+  public Response.Builder handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
     String path = request.getUri().getPath();
 
     if (path.startsWith(rootPath)) {

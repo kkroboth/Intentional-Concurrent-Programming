@@ -12,7 +12,7 @@ public interface Middleware {
    * @param request
    * @return Response to end or null to continue
    */
-  Response onRequest(ServerProvider provider, Map<String, Object> meta, Request request) throws HttpException;
+  Response.Builder onRequest(ServerProvider provider, Map<String, Object> meta, Request request) throws HttpException;
 
   /**
    * Handle final stage and making changes to response

@@ -28,17 +28,17 @@ public class HtmlRoute implements Route {
   }
 
   @Override
-  public Response accept(Method method, String path, Map<String, String> params,
-                         Map<String, String> query, Request request,
-                         Map<String, Object> meta, ServerProvider provider) throws HttpException {
+  public Response.Builder accept(Method method, String path, Map<String, String> params,
+                                 Map<String, String> query, Request request,
+                                 Map<String, Object> meta, ServerProvider provider) throws HttpException {
     Path root = provider.getSettings().get(PagesRequestHandler.SETTING_PAGES_DIRECTORY);
 
     try {
       return Response.create(200)
-        .html(Utils.readFile(root.resolve(this.path).toAbsolutePath())).build();
+        .html(Utils.readFile(root.resolve(this.path).toAbsolutePath()));
     } catch (IOException e) {
       logger.log(Level.SEVERE, e.getMessage(), e);
-      return Response.create(404).build();
+      return Response.create(404);
     }
   }
 }

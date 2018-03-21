@@ -175,12 +175,11 @@ public class Main implements ServiceProvider {
           .header("Content-Type", "application/json; charset=utf8");
 
         if (useChunked) {
-          return response.streamChunked(output -> universalStorage.writeAllTravelLocations(output))
-            .build();
+          return response.streamChunked(output -> universalStorage.writeAllTravelLocations(output));
         } else {
           try {
             universalStorage.writeAllTravelLocations(response);
-            return response.build();
+            return response;
           } catch (IOException e) {
             throw new HttpException(500, e);
           }
@@ -195,7 +194,7 @@ public class Main implements ServiceProvider {
         String json = gson.toJson(location);
 
         return Response.create(200)
-          .json(json).build();
+          .json(json);
       })
       .exitSubRoute() // map
 
@@ -219,7 +218,7 @@ public class Main implements ServiceProvider {
               .query("lon", lng))
           .execute(httpHelper)) {
           String content = StringUtils.toString(response.getStream(), "UTF-8");
-          return Response.create(200).json(content).build();
+          return Response.create(200).json(content);
         }
       }))
       .addMethodRoute(GET, "city", ((method, path, params, query, request, meta, provider) -> {
@@ -234,7 +233,7 @@ public class Main implements ServiceProvider {
             .query("q", city + "," + countryCode))
           .execute(httpHelper)) {
           String content = StringUtils.toString(response.getStream(), "UTF-8");
-          return Response.create(200).json(content).build();
+          return Response.create(200).json(content);
         }
       }))
       .exitSubRoute() // weather
@@ -254,7 +253,7 @@ public class Main implements ServiceProvider {
             .query("size", "10"))
           .execute(httpHelper)) {
           String content = StringUtils.toString(response.getStream(), "UTF-8");
-          return Response.create(200).json(content).build();
+          return Response.create(200).json(content);
         }
       })
       .exitSubRoute() // events
@@ -271,7 +270,7 @@ public class Main implements ServiceProvider {
             .query("lat", lat)
             .query("lon", lng)).execute(httpHelper)) {
           String content = StringUtils.toString(response.getStream(), "UTF-8");
-          return Response.create(200).json(content).build();
+          return Response.create(200).json(content);
         }
       })
       .exitSubRoute() // restaurants
@@ -288,7 +287,7 @@ public class Main implements ServiceProvider {
             .query("country", countryCode))
           .execute(httpHelper)) {
           String content = StringUtils.toString(response.getStream(), "UTF-8");
-          return Response.create(200).json(content).build();
+          return Response.create(200).json(content);
         }
       }))
       .exitSubRoute() // news
@@ -306,10 +305,10 @@ public class Main implements ServiceProvider {
         }
 
         @Override
-        public Response accept(Method method, String path, Map<String, String> params, Map<String, String> query,
-                               Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
+        public Response.Builder accept(Method method, String path, Map<String, String> params, Map<String, String> query,
+                                       Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
           if (!meta.containsKey("session")) {
-            return Response.create(302).header("Location", "/login").build();
+            return Response.create(302).header("Location", "/login");
           }
 
           return htmlRoute.accept(method, path, request, meta, provider);
@@ -323,12 +322,12 @@ public class Main implements ServiceProvider {
         }
 
         @Override
-        public Response accept(Method method, String path, Map<String, String> params, Map<String, String> query,
-                               Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
+        public Response.Builder accept(Method method, String path, Map<String, String> params, Map<String, String> query,
+                                       Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
 
           if (method.equals(GET)) {
             if (meta.containsKey("session")) {
-              return Response.create(302).header("Location", "/").build();
+              return Response.create(302).header("Location", "/");
             }
 
             return htmlRoute.accept(method, path, request, meta, provider);
@@ -343,7 +342,7 @@ public class Main implements ServiceProvider {
                 session = SessionManager.generateDetachedSessionStorage();
               meta.put(SessionManager.META_DETACHED_SESSION, session);
               session.getValue().putItem("user", queryParams.get("username"));
-              return Response.create(302).header("Location", "/").build();
+              return Response.create(302).header("Location", "/");
             } catch (Exception e) {
               if (e.getMessage().equalsIgnoreCase("Username or password incorrect"))
                 logger.warning("Login failed");

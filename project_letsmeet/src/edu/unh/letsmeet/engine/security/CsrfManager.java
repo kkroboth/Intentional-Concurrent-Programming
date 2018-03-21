@@ -43,7 +43,7 @@ public class CsrfManager implements Middleware {
   }
 
   @Override
-  public Response onRequest(ServerProvider provider, Map<String, Object> meta, Request request) {
+  public Response.Builder onRequest(ServerProvider provider, Map<String, Object> meta, Request request) {
     // Session storage middleware must come before csrf middleware
     if (!meta.containsKey("session")) return null;
 

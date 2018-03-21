@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -143,13 +144,13 @@ public class HttpServer {
 
 
     Request request;
-    Response response = null;
+    Response.Builder response = null;
     //noinspection unchecked
     Map<String, Object> session = ICPProxy.newPrivateInstance(Map.class, new HashMap<>());
     try {
       request = Request.parse(uncloseableInputStream);
       for (Middleware middleware : middlewares) {
-        Response result = middleware.onRequest(serverProvider, session, request);
+        Response.Builder result = middleware.onRequest(serverProvider, session, request);
         if (result != null) {
           response = result;
           break;
@@ -160,9 +161,8 @@ public class HttpServer {
       if (response == null) {
         response = handler.handleRequest(serverProvider, request, session);
         if (!middlewares.isEmpty()) {
-          Response.Builder builder = new Response.Builder(response);
-          middlewares.forEach(m -> m.onResponse(serverProvider, session, builder, request));
-          response = builder.build();
+          Response.Builder finalResponse = response;
+          middlewares.forEach(m -> m.onResponse(serverProvider, session, finalResponse, request));
         }
       }
     } catch (HttpException e) {
@@ -179,16 +179,17 @@ public class HttpServer {
         builder.plain(e.getBody());
       }
 
-      response = builder.build();
     } catch (IOException e) {
       logger.log(SEVERE, e.getMessage(), e);
-      response = Response.create(500).build();
+      response = Response.create(500);
     }
+
+    Objects.requireNonNull(response, "No response was built");
 
     try {
       outputStream = connection.getOutputStream();
       uncloseableOutputStream = new UncloseableOutputStream(outputStream);
-      response.createResponse(uncloseableOutputStream);
+      response.build().createResponse(uncloseableOutputStream);
       connection.close();
     } catch (IOException e) {
       logger.log(SEVERE, e.getMessage(), e);

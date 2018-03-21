@@ -157,7 +157,7 @@ public class SessionManager implements Middleware, Serializable {
   }
 
   @Override
-  public Response onRequest(ServerProvider provider, Map<String, Object> meta, Request request) {
+  public Response.Builder onRequest(ServerProvider provider, Map<String, Object> meta, Request request) {
     // If session cookie is valid -- put session storage into meta
     Cookie sessionCookie = request.getCookie("sessionid");
     if (sessionCookie != null) {

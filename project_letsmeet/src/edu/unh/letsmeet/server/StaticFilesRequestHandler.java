@@ -35,7 +35,7 @@ public class StaticFilesRequestHandler extends RequestHandlerDecorator {
   }
 
   @Override
-  public Response handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
+  public Response.Builder handleRequest(ServerProvider provider, Request request, Map<String, Object> meta) throws HttpException, IOException {
     String path = request.getUri().getPath();
     String urlPath = provider.getSettings().get(SETTING_URL_PATH);
     List<Path> staticPaths = provider.getSettings().get(SETTING_STATIC_DIRECTORIES);
@@ -59,11 +59,10 @@ public class StaticFilesRequestHandler extends RequestHandlerDecorator {
               contentTypeStr = contentType.getType();
             }
             return Response.create(200).body(Utils.readFileBytes(staticFile))
-              .contentType(contentTypeStr)
-              .build();
+              .contentType(contentTypeStr);
           } catch (IOException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
-            return Response.create(404).build();
+            return Response.create(404);
           }
         }
       }
