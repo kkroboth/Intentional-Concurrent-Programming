@@ -86,6 +86,8 @@ public class Main implements ServiceProvider {
 
     // Middleware
     sessions = SessionManager.readFromStorage(props.getStorageDirectory().resolve(Constants.STORAGE_SESSIONS));
+    sessions.requireAuthorization("/api");
+
     //noinspection unchecked
     List<Middleware> middlewares = ICPProxy.newPrivateInstance(List.class, new ArrayList<>());
     middlewares.add(sessions);
@@ -101,7 +103,7 @@ public class Main implements ServiceProvider {
           // Finally the api handler
           createApiHandler())
       ), middlewares);
-    DatabaseHelper.getInstance(); // Starts database
+    DatabaseHelper noop = DatabaseHelper.getInstance(); // Starts database
 
     // Add settings
     settings = new Settings();
@@ -110,7 +112,7 @@ public class Main implements ServiceProvider {
     settings.set(Constants.SETTING_APIKEYS, props.readApiKeys());
 
     // Setup apis
-    apiHelper = new ApiHelper(httpHelper);
+    apiHelper = new ApiHelper();
     apiHelper.completeRegistration(settings);
 
 
@@ -144,8 +146,7 @@ public class Main implements ServiceProvider {
     }
   }
 
-  // TODO: Bug - Api works without login!!
-  public ApiRequestHandler createApiHandler() {
+  private ApiRequestHandler createApiHandler() {
     return new ApiRequestHandler.Builder("/api/")
 
       // Map sub routes
@@ -154,7 +155,7 @@ public class Main implements ServiceProvider {
         // Limit results by percentage
         // Yes, not great design. A better one is to limit the amount of points in a given
         // radius.
-        float filter = 0;
+        float filter;
         boolean useChunked = false;
         if (request.getUri().getQuery() != null) {
           try {
@@ -295,7 +296,7 @@ public class Main implements ServiceProvider {
       .build();
   }
 
-  public Map<String, Route> createPageRoutes() {
+  private Map<String, Route> createPageRoutes() {
     return new Route.Builder()
       .addRoute("/", new Route() {
         private final HtmlRoute htmlRoute = new HtmlRoute("index.html");

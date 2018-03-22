@@ -166,7 +166,7 @@ public class HttpServer {
         }
       }
     } catch (HttpException e) {
-      Level level = e.getStatus() >= 500 ? SEVERE : INFO;
+      Level level = e.getStatus() >= 500 ? SEVERE : WARNING;
       if (e.getCause() != null) {
         logger.log(level, e.getCause().getMessage(), e.getCause());
       } else {
@@ -174,9 +174,9 @@ public class HttpServer {
       }
 
       // Add optional body message to response
-      Response.Builder builder = Response.create(e.getStatus());
+      response = Response.create(e.getStatus());
       if (e.getBody() != null) {
-        builder.plain(e.getBody());
+        response.plain(e.getBody());
       }
 
     } catch (IOException e) {

@@ -1,6 +1,7 @@
 package edu.unh.letsmeet.engine.security;
 
 import edu.unh.letsmeet.engine.Cookie;
+import edu.unh.letsmeet.engine.HttpException;
 import edu.unh.letsmeet.engine.Middleware;
 import edu.unh.letsmeet.engine.Request;
 import edu.unh.letsmeet.engine.Response;
@@ -19,8 +20,10 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -45,14 +48,18 @@ public class SessionManager implements Middleware, Serializable {
   private static final SecureRandom secureRandom = new SecureRandom();
 
   // Session cookie value -> Storage
-  // Guarded-by: SessionMap (itself)
-  // TODO: Use lock Object for synchronization (non-final field)
+  // Guarded-by: SessionMapLock
+  private transient final Object sessionMapLock = new Object();
   private transient Map<String, SessionStorage> sessionMap;
+  private transient final Object authPathsLock = new Object();
+  private transient List<String> authPaths;
 
   // Private -- Only used for serialization
   private Map<String, SessionStorage> sessionMapTarget;
 
+
   public static SessionManager readFromStorage(Path path) {
+    if (1 == 1) return new SessionManager(true);
     if (Files.exists(path)) {
       try {
         ObjectInputStream in = new ObjectInputStream(Files.newInputStream(path));
@@ -80,12 +87,6 @@ public class SessionManager implements Middleware, Serializable {
     ICP.setPermission(this, Permissions.getThreadSafePermission());
   }
 
-//  /**
-//   * No-arg constructor for deserialization purposes.
-//   */
-//  public SessionManager() {
-//  }
-
   /**
    * Normal constructor with not deserialization
    */
@@ -93,7 +94,11 @@ public class SessionManager implements Middleware, Serializable {
     sessionMapTarget = new HashMap<>(); // target is exported to instance only for serialization!
     //noinspection unchecked
     sessionMap = ICPProxy.newInstance(Map.class, sessionMapTarget,
-      (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(t)));
+      (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(sessionMapLock)));
+
+    //noinspection unchecked
+    authPaths = ICPProxy.newInstance(List.class, new ArrayList<>(),
+      (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(authPathsLock)));
 
   }
 
@@ -103,7 +108,7 @@ public class SessionManager implements Middleware, Serializable {
     String expiration = LocalDate.now().plusMonths(1).toString();
     SessionStorage storage = new SessionStorage(true);
     storage.setProtected("expiration", expiration);
-    synchronized (sessionMap) {
+    synchronized (sessionMapLock) {
       sessionMap.put(cookie, storage);
     }
     return new AbstractMap.SimpleEntry<>(cookie, storage);
@@ -117,6 +122,14 @@ public class SessionManager implements Middleware, Serializable {
     return new AbstractMap.SimpleEntry<>(cookie, storage);
   }
 
+  public SessionManager requireAuthorization(String path) {
+    synchronized (authPathsLock) {
+      authPaths.add(path);
+    }
+
+    return this;
+  }
+
   /**
    * Retrieve session storage for session id or null if none exist
    *
@@ -124,13 +137,13 @@ public class SessionManager implements Middleware, Serializable {
    * @return Storage or null
    */
   public SessionStorage getSessionStorage(String sessionId) {
-    synchronized (sessionMap) {
+    synchronized (sessionMapLock) {
       return sessionMap.get(sessionId);
     }
   }
 
   public void removeSession(String sessionId) {
-    synchronized (sessionMap) {
+    synchronized (sessionMapLock) {
       sessionMap.remove(sessionId);
     }
   }
@@ -157,7 +170,7 @@ public class SessionManager implements Middleware, Serializable {
   }
 
   @Override
-  public Response.Builder onRequest(ServerProvider provider, Map<String, Object> meta, Request request) {
+  public Response.Builder onRequest(ServerProvider provider, Map<String, Object> meta, Request request) throws HttpException {
     // If session cookie is valid -- put session storage into meta
     Cookie sessionCookie = request.getCookie("sessionid");
     if (sessionCookie != null) {
@@ -170,6 +183,15 @@ public class SessionManager implements Middleware, Serializable {
         meta.put("session-key", sessionId);
         meta.put("session", storage);
       }
+    } else {
+      // If path belongs to authPaths or subpath. Response 403.
+      String path = request.getUri().getPath();
+      synchronized (authPathsLock) {
+        if (authPaths.stream().anyMatch(path::startsWith)) {
+          throw new HttpException(403, "Unauthorized access to " + path);
+        }
+      }
+
     }
 
     return null;
@@ -191,7 +213,7 @@ public class SessionManager implements Middleware, Serializable {
       // Register detached generated session storage
       @SuppressWarnings("unchecked") Entry<String, SessionStorage> session =
         (Entry<String, SessionStorage>) meta.get(META_DETACHED_SESSION);
-      synchronized (sessionMap) {
+      synchronized (sessionMapLock) {
         sessionMap.put(session.getKey(), session.getValue());
       }
 
@@ -203,7 +225,10 @@ public class SessionManager implements Middleware, Serializable {
     in.defaultReadObject();
     //noinspection unchecked
     sessionMap = ICPProxy.newInstance(Map.class, sessionMapTarget,
-      (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(t)));
+      (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(sessionMapLock)));
+    //noinspection unchecked
+    authPaths = ICPProxy.newInstance(List.class, new ArrayList<>(),
+      (p, t) -> ICP.setPermission(p, Permissions.getHoldsLockPermission(authPathsLock)));
   }
 
   private static String createCookie(String sessionId, SessionStorage sessionStorage) {

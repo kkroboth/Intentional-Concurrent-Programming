@@ -1,6 +1,5 @@
 package edu.unh.letsmeet.api;
 
-import com.krobothsoftware.commons.network.http.HttpHelper;
 import edu.unh.letsmeet.Constants;
 import edu.unh.letsmeet.engine.Settings;
 import icp.core.ICP;
@@ -22,10 +21,8 @@ public class ApiHelper {
   private static final Logger logger = Logger.getLogger("ApiHelper");
   private Map<String, Endpoint> endpoints;
   private Map<String, Endpoint> domainEndpointMap;
-  private final HttpHelper httpHelper;
 
-  public ApiHelper(HttpHelper httpHelper) {
-    this.httpHelper = httpHelper;
+  public ApiHelper() {
     //noinspection unchecked
     endpoints = ICPProxy.newPrivateInstance(Map.class, new HashMap<>());
     //noinspection unchecked
