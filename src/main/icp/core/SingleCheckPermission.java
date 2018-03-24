@@ -64,7 +64,7 @@ public abstract class SingleCheckPermission implements Permission {
   private void doCheck(boolean checked, Object target, String message) {
     if (!checked)
       throw new IntentError(String.format("task '%s' %s on '%s'%s",
-        Task.currentTask(), message, target, cause));
+        Task.currentTask(), message, ICP.identityToString(target), cause));
 
   }
 

@@ -53,4 +53,23 @@ final public class ICP {
   public static void setPermission(Object target, Permission permission) {
     PermissionSupport.setPermission(target, permission);
   }
+
+  /**
+   * Reset the of an object with multiple permissions that are each checked in the order
+   * given to arguments.
+   *
+   * @param target      object to have permission set.
+   * @param permissions Array of permissions for an object
+   */
+  public static void setCompoundPermission(Object target, Permission... permissions) {
+    setPermission(target, Permissions.getCompoundPermission(permissions));
+  }
+
+  /**
+   * When logging or raising IntentErrors and calling toString on a target, infinite recursion
+   * may and will happen when the overrided toString() asserts the permission.
+   */
+  public static String identityToString(Object target) {
+    return target.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(target));
+  }
 }

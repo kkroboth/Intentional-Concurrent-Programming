@@ -128,4 +128,40 @@ public class Permissions {
       }
     };
   }
+
+  /**
+   * A permission asserting all permission in order.
+   */
+  static Permission getCompoundPermission(Permission... permissions) {
+
+    return new Permission() {
+      @Override
+      public void checkCall(Object target) {
+        for (Permission permission : permissions) {
+          permission.checkCall(permission);
+        }
+      }
+
+      @Override
+      public void checkGet(Object target) {
+        for (Permission permission : permissions) {
+          permission.checkGet(permission);
+        }
+      }
+
+      @Override
+      public void checkPut(Object target) {
+        for (Permission permission : permissions) {
+          permission.checkPut(permission);
+        }
+      }
+
+      @Override
+      public void checkResetPermission(Object target) {
+        for (Permission permission : permissions) {
+          permission.checkResetPermission(permission);
+        }
+      }
+    };
+  }
 }

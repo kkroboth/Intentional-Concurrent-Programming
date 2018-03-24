@@ -44,7 +44,7 @@ class LoanPermission extends SingleCheckPermission {
     Task caller = Task.currentTask();
     if (caller != owner)
       throw new IntentError(String.format("task '%s' cannot reset permission on '%s' (not owner)",
-        caller, target));
+        caller, ICP.identityToString(target)));
     // may do an unnecessary call to set, but shouldn't happen much (the permission is likely
     // being replaced)
     this.borrower.set(owner);

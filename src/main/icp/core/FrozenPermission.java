@@ -32,7 +32,7 @@ class FrozenPermission implements Permission {
    */
   public void checkPut(Object target) {
     throw new IntentError(String.format("task '%s' cannot write object '%s' (frozen)",
-      Task.currentTask(), target));
+      Task.currentTask(), ICP.identityToString(target)));
   }
 
   /**
@@ -40,7 +40,7 @@ class FrozenPermission implements Permission {
    */
   public void checkResetPermission(Object target) {
     throw new IntentError(String.format("task '%s' cannot reset permission of object '%s' (frozen)",
-      Task.currentTask(), target));
+      Task.currentTask(), ICP.identityToString(target)));
   }
 }
 

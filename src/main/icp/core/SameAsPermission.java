@@ -54,6 +54,7 @@ final class SameAsPermission implements Permission {
    * @throws IntentError if the reset is not allowed.
    */
   public void checkResetPermission(Object target) {
-    throw new IntentError(String.format("cannot reset a same-as permission on '%s'", target));
+    throw new IntentError(String.format("cannot reset a same-as permission on '%s'", ICP.identityToString(target)));
+
   }
 }
