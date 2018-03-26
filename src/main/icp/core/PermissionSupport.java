@@ -2,6 +2,7 @@
 
 package icp.core;
 
+import icp.wrapper.ICPProxy;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -10,6 +11,7 @@ import javassist.NotFoundException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
 import java.util.logging.Logger;
 
 /**
@@ -233,7 +235,7 @@ public final class PermissionSupport {
    */
   static Permission getPermission(Object obj) {
     logger.fine(String.format("[%s] getPermission called for %s",
-      Thread.currentThread(), obj.toString()));
+      Thread.currentThread(), ICP.identityToString(obj)));
 
     Permission permission = getPermissionFieldValue(obj);
     assert permission != null;
@@ -268,7 +270,7 @@ public final class PermissionSupport {
 
 
     logger.fine(String.format("[%s] setPermission called for %s with %s",
-      Thread.currentThread(), obj, permission.toString()));
+      Thread.currentThread(), ICP.identityToString(obj), permission.toString()));
 
     // need to retrieve the permission to be replaced in order to
     // check that the calling task has permission to re-set the
@@ -280,6 +282,24 @@ public final class PermissionSupport {
     oldPermission.checkResetPermission(obj);
 
     setPermissionFieldValue(obj, permission);
+
+    // Apply permission to all @InheritPermission annotated fields
+    for (Field field : klass.getDeclaredFields()) {
+      // Fields have been validated in java assist beforehand
+      if (field.getAnnotation(InheritPermission.class) != null) {
+        field.setAccessible(true);
+        try {
+          // Special handling of setting ICPProxy fields
+          Object fieldObj = field.get(obj);
+          if (Proxy.isProxyClass(fieldObj.getClass()))
+            ICPProxy.setProxyPermission(fieldObj, permission);
+          else
+            setPermission(fieldObj, permission);
+        } catch (IllegalAccessException e) {
+          throw new ICPInternalError("InheritPermission field: " + field.toString() + " is not accessible", e);
+        }
+      }
+    }
   }
 
   /**
@@ -298,7 +318,7 @@ public final class PermissionSupport {
     // This breaks some of our principles -- use caution.
     // Currently only used for thread joining
     logger.fine(String.format("[%s] forceSetPermission called for %s with %s",
-      Thread.currentThread(), obj, permission.toString()));
+      Thread.currentThread(), ICP.identityToString(obj), permission.toString()));
     setPermissionFieldValue(obj, permission);
   }
 
@@ -370,7 +390,7 @@ public final class PermissionSupport {
    */
   private static void initPermissionFieldValue(Object obj) {
     logger.fine(String.format("[%s] initPermission called for %s",
-      Thread.currentThread(), obj));
+      Thread.currentThread(), ICP.identityToString(obj)));
 
     Permission perm = Permissions.getPrivatePermission();
     setPermissionFieldValue(obj, perm);
@@ -384,7 +404,7 @@ public final class PermissionSupport {
    */
   private static void setPermissionFieldValue(Object obj,
                                               Permission permission) {
-    logger.fine(String.format("setting permission '%s' on object '%s'", permission, obj));
+    logger.fine(String.format("setting permission '%s' on object '%s'", permission, ICP.identityToString(obj)));
 
     Field f = findPermissionField(obj);
     assert f != null;

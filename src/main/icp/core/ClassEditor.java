@@ -176,5 +176,16 @@ final class ClassEditor {
         throw new ICPInternalError("cannot compile insertion of field check", cce);
       }
     }
+
+    // Assert @InheritPermission annotation on fields are instance members
+    CtField[] fields = cc.getDeclaredFields();
+    for (CtField field : fields) {
+      if (field.hasAnnotation(InheritPermission.class) && Modifier.isStatic(field.getModifiers()))
+        throw new ICPInternalError("@InheritPermission annotation can only be applied on instance members");
+    }
+  }
+
+  static void setupProxySuperClass(CtClass cc) {
+    cc.setModifiers(Modifier.clear(cc.getModifiers(), Modifier.FINAL));
   }
 }

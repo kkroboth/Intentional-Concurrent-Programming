@@ -6,6 +6,7 @@ import icp.core.PermissionSupport;
 import icp.core.Permissions;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.function.BiConsumer;
@@ -26,6 +27,7 @@ public final class ICPProxy {
   @SuppressWarnings("unchecked")
   public static <T> T newPrivateInstance(Class<? extends T> singleInterface, T target) {
     return newInstance(singleInterface, target, (i, j) -> {
+      // do nothing -- already private
     });
   }
 
@@ -46,8 +48,19 @@ public final class ICPProxy {
       throw new RuntimeException("Proxy is not a java.reflect.Proxy");
     }
 
-    ProxyInfo info = (ProxyInfo) proxy;
-    ICP.setPermission(info.ICPGetPermissionHolder(), permission);
+    // Note: The ProxyInfo class must be from ICPLoader or the loader that created the proxy class.
+    // Otherwise ClassCastException will be thrown.
+    try {
+      //noinspection unchecked
+      Class<ProxyInfo> proxyInfoClass = (Class<ProxyInfo>) Class.forName("icp.wrapper.ICPProxy$ProxyInfo", true,
+        proxy.getClass().getClassLoader());
+      Method method = proxyInfoClass.getMethod("ICPGetPermissionHolder");
+      method.setAccessible(true);
+      Object permissionHolder = method.invoke(proxy);
+      ICP.setPermission(permissionHolder, permission);
+    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private static class PermissionInvocationHandler implements InvocationHandler {
