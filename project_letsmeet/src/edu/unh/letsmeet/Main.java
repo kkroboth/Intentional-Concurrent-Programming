@@ -1,12 +1,21 @@
 package edu.unh.letsmeet;
 
 import ch.hsr.geohash.GeoHash;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.krobothsoftware.commons.network.http.HttpHelper;
 import com.krobothsoftware.commons.network.http.HttpResponse;
 import com.krobothsoftware.commons.network.http.cookie.CookieManager;
 import com.krobothsoftware.commons.util.StringUtils;
-import edu.unh.letsmeet.api.ApiHelper;
+import edu.unh.letsmeet.api.ApiHttpRequest;
+import edu.unh.letsmeet.api.ApiRegistry;
+import edu.unh.letsmeet.api.extractors.EventsExtractor;
+import edu.unh.letsmeet.api.extractors.JsonExtractor;
+import edu.unh.letsmeet.api.extractors.RestaurantsExtractor;
+import edu.unh.letsmeet.api.extractors.WeatherHourlyExtractor;
 import edu.unh.letsmeet.command.CommandLineScanner;
 import edu.unh.letsmeet.engine.HttpException;
 import edu.unh.letsmeet.engine.HttpServer;
@@ -28,8 +37,11 @@ import edu.unh.letsmeet.users.DatabaseHelper;
 import icp.core.ICP;
 import icp.core.Permissions;
 import icp.core.Task;
+import icp.lib.CountDownLatch;
+import icp.lib.ICPExecutorService;
 import icp.lib.ICPExecutors;
 import icp.wrapper.ICPProxy;
+import icp.wrapper.ICPWrapper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -37,7 +49,9 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -57,14 +71,27 @@ public class Main implements ServiceProvider {
   // Thread-safe
   private UniversalStorage universalStorage;
 
-  private ApiHelper apiHelper;
+  private ApiRegistry apiRegistry;
   private Props props;
   private Settings settings;
 
   // Used to initiate http requests (not used in server)
   private HttpHelper httpHelper;
 
+  private boolean shuttingDown;
+
+  private final ICPExecutorService requestExecutor;
+  private final Cache<Integer, String> aggregateCache =
+    Caffeine.newBuilder()
+      .maximumSize(100)
+      .expireAfterWrite(Duration.ofMinutes(10))
+      .build();
+
+
   public Main() {
+    requestExecutor = ICPExecutors.newICPExecutorService(
+      Executors.newCachedThreadPool()
+    );
     ICP.setPermission(this, Permissions.getThreadSafePermission());
   }
 
@@ -78,10 +105,7 @@ public class Main implements ServiceProvider {
     // Setup storage
     universalStorage = new UniversalStorage();
     universalStorage.parseAndSetTravelMap(
-      props.getProjectPath().resolve(Constants.ASSET_AIRPORTS).toAbsolutePath()
-    );
-    universalStorage.parseAndSetCountryCodes(
-      props.getProjectPath().resolve(Constants.ASSET_COUNTRIES).toAbsolutePath()
+      props.getProjectPath().resolve(Constants.ASSET_CITIES).toAbsolutePath()
     );
 
     // Middleware
@@ -112,8 +136,8 @@ public class Main implements ServiceProvider {
     settings.set(Constants.SETTING_APIKEYS, props.readApiKeys());
 
     // Setup apis
-    apiHelper = new ApiHelper();
-    apiHelper.completeRegistration(settings);
+    apiRegistry = new ApiRegistry(httpHelper);
+    apiRegistry.completeRegistration(settings);
 
 
     // Add static directories
@@ -134,7 +158,10 @@ public class Main implements ServiceProvider {
   }
 
   public synchronized void stop() {
+    if (shuttingDown) return;
+    shuttingDown = true;
     try {
+      requestExecutor.shutdown();
       httpServer.stop();
       DatabaseHelper.getInstance().close();
       SessionManager.saveToStorage(sessions, props.getStorageDirectory().resolve(Constants.STORAGE_SESSIONS));
@@ -212,7 +239,7 @@ public class Main implements ServiceProvider {
         String lat = query.get("lat");
         String lng = query.get("lng");
 
-        try (HttpResponse response = getApiHelper().startCall("weather")
+        try (HttpResponse response = getApiRegistry().startCall("weather")
           .buildUrl(url ->
             url.path("weather")
               .query("lat", lat)
@@ -222,21 +249,21 @@ public class Main implements ServiceProvider {
           return Response.create(200).json(content);
         }
       }))
-      .addMethodRoute(GET, "city", ((method, path, params, query, request, meta, provider) -> {
-        Utils.ensureAllQueryParams(query, "city", "country");
-        String city = query.get("city");
-        String country = query.get("country");
-
-        String countryCode = universalStorage.getCountryCode(country);
-
-        try (HttpResponse response = getApiHelper().startCall("weather")
-          .buildUrl(url -> url.path("weather")
-            .query("q", city + "," + countryCode))
-          .execute(httpHelper)) {
-          String content = StringUtils.toString(response.getStream(), "UTF-8");
-          return Response.create(200).json(content);
-        }
-      }))
+//      .addMethodRoute(GET, "city", ((method, path, params, query, request, meta, provider) -> {
+//        Utils.ensureAllQueryParams(query, "city", "country");
+//        String city = query.get("city");
+//        String country = query.get("country");
+//
+//        String countryCode = universalStorage.getCountryCode(country);
+//
+//        try (HttpResponse response = getApiRegistry().startCall("weather")
+//          .buildUrl(url -> url.path("weather")
+//            .query("q", city + "," + countryCode))
+//          .execute(httpHelper)) {
+//          String content = StringUtils.toString(response.getStream(), "UTF-8");
+//          return Response.create(200).json(content);
+//        }
+//      }))
       .exitSubRoute() // weather
 
       // Events
@@ -248,7 +275,7 @@ public class Main implements ServiceProvider {
 
         String geohash = GeoHash.geoHashStringWithCharacterPrecision(Double.valueOf(lat), Double.valueOf(lng), 5);
 
-        try (HttpResponse response = getApiHelper().startCall("events")
+        try (HttpResponse response = getApiRegistry().startCall("events")
           .buildUrl(url -> url.path("events.join")
             .query("geoPoint", geohash)
             .query("size", "10"))
@@ -266,7 +293,7 @@ public class Main implements ServiceProvider {
         String lat = query.get("lat");
         String lng = query.get("lng");
 
-        try (HttpResponse response = getApiHelper().startCall("restaurants")
+        try (HttpResponse response = getApiRegistry().startCall("restaurants")
           .buildUrl(url -> url.path("geocode")
             .query("lat", lat)
             .query("lon", lng)).execute(httpHelper)) {
@@ -278,21 +305,136 @@ public class Main implements ServiceProvider {
 
       // News
       .enterSubRoute("news/")
-      .addMethodRoute(GET, "top", ((method, path, params, query, request, meta, provider) -> {
-        Utils.ensureAllQueryParams(query, "country");
-        String country = query.get("country");
-        String countryCode = universalStorage.getCountryCode(country);
+//      .addMethodRoute(GET, "top", ((method, path, params, query, request, meta, provider) -> {
+//        Utils.ensureAllQueryParams(query, "country");
+//        String country = query.get("country");
+//        String countryCode = universalStorage.getCountryCode(country);
+//
+//        try (HttpResponse response = getApiRegistry().startCall("news")
+//          .buildUrl(url -> url.path("top-headlines")
+//            .query("country", countryCode))
+//          .execute(httpHelper)) {
+//          String content = StringUtils.toString(response.getStream(), "UTF-8");
+//          return Response.create(200).json(content);
+//        }
+//      }))
+      .exitSubRoute() // news
 
-        try (HttpResponse response = getApiHelper().startCall("news")
-          .buildUrl(url -> url.path("top-headlines")
-            .query("country", countryCode))
+      // Country
+      .enterSubRoute("country/")
+      .addMethodRoute(GET, "code/(?<code>\\w+)", (method, path, params, query, request, meta, provider) -> {
+        Utils.ensureAllQueryParams(params, "code");
+        String code = params.get("code");
+
+        try (HttpResponse response = getApiRegistry().startCall("country")
+          .buildUrl(url -> url.path("alpha")
+            .path(code))
           .execute(httpHelper)) {
           String content = StringUtils.toString(response.getStream(), "UTF-8");
           return Response.create(200).json(content);
         }
-      }))
-      .exitSubRoute() // news
+      })
+
+      .exitSubRoute() // country
       .exitSubRoute() // source
+
+      .enterSubRoute("aggregate/")
+      .addMethodRoute(GET, "all/(?<id>\\d+)", ((method, path, params, query, request, meta, provider) -> {
+        int id = Integer.parseInt(params.get("id"));
+
+        String res = aggregateCache.getIfPresent(id);
+        if (res != null) {
+          return Response.create(200).json(res);
+        }
+
+        TravelLocation location = universalStorage.getTravelLocation(id);
+        if (location == null)
+          throw new HttpException(404, "TravelLocation not found: " + id)
+            .body("Invalid id: " + id);
+
+
+        String countryCode = location.getIso2();
+        float lat = location.getLatlong()[0];
+        float lng = location.getLatlong()[1];
+        String latStr = String.valueOf(lat);
+        String lngStr = String.valueOf(lng);
+        String geohash = GeoHash.geoHashStringWithCharacterPrecision(lat, lng, 5);
+
+        // Guarded-by: Itself and the countdown latch
+        Map<String, ApiHttpRequest> requests = new HashMap<>();
+
+        ApiHttpRequest weatherReq = apiRegistry.startCall("weather",
+          WeatherHourlyExtractor.get());
+        weatherReq.buildUrl().path("forecast")
+          .query("lat", latStr)
+          .query("lon", lngStr)
+          .query("units", "imperial");
+        requests.put("weather", weatherReq);
+
+        ApiHttpRequest eventsReq = getApiRegistry().startCall("events",
+          EventsExtractor.get())
+          .buildUrl(url -> url.path("events.join")
+            .query("geoPoint", geohash)
+            .query("size", "10"));
+        requests.put("events", eventsReq);
+
+
+        ApiHttpRequest restaurantsReq = getApiRegistry().startCall("restaurants",
+          RestaurantsExtractor.get())
+          .buildUrl(url -> url.path("geocode")
+            .query("lat", String.valueOf(lat))
+            .query("lon", String.valueOf(lng)));
+        requests.put("restaurants", restaurantsReq);
+
+        ApiHttpRequest countryReq = getApiRegistry().startCall("country",
+          JsonExtractor.identity());
+        countryReq.buildUrl().path("alpha").path(countryCode);
+        requests.put("country", countryReq);
+
+        CountDownLatch latch = new CountDownLatch(requests.size());
+        ICPWrapper<JsonObject> payload = ICPWrapper.of(new JsonObject());
+
+        ICP.setCompoundPermission(payload, Permissions.getHoldsLockPermission(payload),
+          latch.getPermission());
+
+        latch.registerWaiter();
+
+        // Fork requests
+        requests.forEach((name, req) -> {
+          ICP.setPermission(req, latch.getPermission());
+          requestExecutor.execute(Task.ofThreadSafe(() -> {
+            try {
+              latch.registerCountDowner();
+              JsonElement content = req.execute(httpHelper)
+                .getExtractedJson().orElseThrow(() -> new IOException("Request content missing"));
+              synchronized (payload) {
+                payload.target().add(name, content);
+              }
+            } catch (IOException e) {
+              logger.log(Level.SEVERE, e.getMessage(), e);
+            } finally {
+              latch.countDown();
+            }
+          }));
+        });
+
+
+        try {
+          latch.await();
+        } catch (InterruptedException e) {
+          throw new HttpException(404, e);
+        }
+
+        synchronized (payload) {
+          JsonObject json = payload.target();
+          String jsonString = UniversalStorage.GSON.toJson(json);
+          aggregateCache.put(id, jsonString);
+          return Response.create(200)
+            .json(jsonString);
+        }
+      }))
+      .exitSubRoute()
+
       .build();
   }
 
@@ -361,8 +503,8 @@ public class Main implements ServiceProvider {
   }
 
   @Override
-  public ApiHelper getApiHelper() {
-    return apiHelper;
+  public ApiRegistry getApiRegistry() {
+    return apiRegistry;
   }
 
   @Override

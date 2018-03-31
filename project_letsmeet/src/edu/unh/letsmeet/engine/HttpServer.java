@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Level.WARNING;
 
@@ -51,8 +51,9 @@ public class HttpServer {
   private final DisjointSemaphore connectionLimiter;
 
   /**
-   * Creates server socket but does not bind address
+   * Creates server socket but does not bind address.
    *
+   * @param middlewares Makes a shallow copy of items
    * @throws IOException could not open the server socket
    */
   public HttpServer(ServerProvider serverProvider, ICPExecutorService executorService, RequestHandler handler,
@@ -62,9 +63,9 @@ public class HttpServer {
     this.executorService = executorService;
 
     serverSocket = new ServerSocket();
-    if (middlewares == null) middlewares = Collections.emptyList();
-    else ICPProxy.setProxyPermission(middlewares, Permissions.getFrozenPermission());
-    this.middlewares = ICPProxy.newFrozenInstance(List.class, Collections.unmodifiableList(middlewares));
+    //noinspection unchecked
+    this.middlewares = ICPProxy.newFrozenInstance(List.class, Collections.unmodifiableList(middlewares == null ?
+      Collections.emptyList() : new ArrayList<>(middlewares)));
     connectionLimiter = new DisjointSemaphore(Props.getInstance().getServerThreads());
 
     ICP.setPermission(this, Permissions.getThreadSafePermission());

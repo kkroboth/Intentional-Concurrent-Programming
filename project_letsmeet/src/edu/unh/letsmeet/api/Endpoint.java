@@ -15,14 +15,6 @@ public interface Endpoint {
   String endpoint();
 
   /**
-   * Add api key to url
-   *
-   * @param builder builder to insert api key to
-   * @return url with key inserted
-   */
-  void insertKey(URLBuilder builder);
-
-  /**
    * Perform final modifications to request before sent off.
    *
    * @param request HttpRequest builder

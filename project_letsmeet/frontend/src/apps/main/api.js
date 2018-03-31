@@ -4,12 +4,21 @@ export function mapPoints() {
         mode: 'cors',
         redirect: 'follow',
         referrer: 'no-referrer'
-    })
-        .then(res => res.json())
+    }).then(res => res.json())
 }
 
 export function retrievePoint(id) {
     return fetch(`/api/map/point/${id}`, {
+        credentials: 'same-origin',
+        mode: 'cors',
+        redirect: 'follow',
+        referrer: 'no-referrer'
+    }).then(res => res.json())
+}
+
+
+export function retrieveAggregation(id) {
+    return fetch(`/api/aggregate/all/${id}`, {
         credentials: 'same-origin',
         mode: 'cors',
         redirect: 'follow',

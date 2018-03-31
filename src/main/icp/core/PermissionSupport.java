@@ -367,6 +367,11 @@ public final class PermissionSupport {
    * does not edit)
    */
   private static Permission getPermissionFieldValue(Object obj) {
+    // Special handling when ICPProxy
+    if (Proxy.isProxyClass(obj.getClass())) {
+      return getPermissionFieldValue(ICPProxy.getHolderPermissionObject(obj));
+    }
+
     Field f = findPermissionField(obj);
     if (f == null) {
       // objects with no permission field are considered permanently thread-safe
@@ -405,6 +410,12 @@ public final class PermissionSupport {
   private static void setPermissionFieldValue(Object obj,
                                               Permission permission) {
     logger.fine(String.format("setting permission '%s' on object '%s'", permission, ICP.identityToString(obj)));
+
+    // Special handling when ICPProxy
+    if (Proxy.isProxyClass(obj.getClass())) {
+      setPermissionFieldValue(ICPProxy.getHolderPermissionObject(obj), permission);
+      return;
+    }
 
     Field f = findPermissionField(obj);
     assert f != null;

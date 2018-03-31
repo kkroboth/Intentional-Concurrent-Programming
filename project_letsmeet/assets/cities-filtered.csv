@@ -1,0 +1,1048 @@
+id,city,city_ascii,lat,lng,pop,country,iso2,iso3,province
+1,Jingmen,Jingmen,31.03039146,112.1000203,400000,China,CN,CHN,Hubei
+2,Mawlamyine,Mawlamyine,16.50042564,97.67004838,400249,Myanmar,MM,MMR,Mon
+3,Sunchon,Sunchon,39.42360008,125.9389689,400629,North Korea,KP,PRK,P'yongan-namdo
+4,Awka,Awka,6.210433572,7.06999711,400828.5,Nigeria,NG,NGA,Anambra
+5,Jalalabad,Jalalabad,34.44152692,70.43610347,401697,Afghanistan,AF,AFG,Nangarhar
+6,Kitwe,Kitwe,-12.81003335,28.22002397,402907.5,Zambia,ZM,ZMB,Copperbelt
+7,Pasay City,Pasay City,14.5504413,120.9999939,403064,Philippines,PH,PHL,Metropolitan Manila
+8,Kaliningrad,Kaliningrad,54.70000612,20.49734289,403226.5,Russia,RU,RUS,Kaliningrad
+9,Yining,Yining,43.90001935,81.35001094,403489,China,CN,CHN,Xinjiang Uygur
+10,Syracuse,Syracuse,43.04999371,-76.15001367,403873.5,United States of America,US,USA,New York
+11,Sohag,Sohag,26.55040651,31.70001827,404709.5,Egypt,EG,EGY,Suhaj
+12,Tanta,Tanta,30.79043194,31.00000932,404901,Egypt,EG,EGY,Al Gharbiyah
+13,Gifu,Gifu,35.42309491,136.7627526,405304.5,Japan,JP,JPN,Gifu
+14,Binjai,Binjai,3.620359109,98.50007524,405494.5,Indonesia,ID,IDN,Sumatera Utara
+15,Douma,Duma,33.5833364,36.39998979,406912,Syria,SY,SYR,Damascus
+16,Oujda,Oujda,34.69001304,-1.909971559,407322,Morocco,MA,MAR,Oriental
+17,Yanji,Yanji,42.88230369,129.5127559,407848.5,China,CN,CHN,Jilin
+18,Shuozhou,Shuozhou,39.30037762,112.4200008,408068.5,China,CN,CHN,Shanxi
+19,Oshogbo,Oshogbo,7.770364196,4.560021117,408245,Nigeria,NG,NGA,Osun
+20,Bari,Bari,41.1142204,16.87275793,408554.5,Italy,IT,ITA,Apulia
+21,Luhansk,Luhansk,48.56976015,39.33438432,408931,Ukraine,UA,UKR,Luhans'k
+22,Mataram,Mataram,-8.579542217,116.1350195,409041.5,Indonesia,ID,IDN,Nusa Tenggara Barat
+23,Oita,Oita,33.24322797,131.5978999,412100.5,Japan,JP,JPN,Oita
+24,Ardabil,Ardabil,38.25000246,48.30003861,412678,Iran,IR,IRN,Ardebil
+25,Kitchener,Kitchener,43.44999514,-80.50000655,413056.5,Canada,CA,CAN,Ontario
+26,Jundiai,Jundiai,-23.19999347,-46.8799915,413568.5,Brazil,BR,BRA,São Paulo
+27,Bandar-e-Abbas,Bandar-e-Abbas,27.20405978,56.27213554,414503.5,Iran,IR,IRN,Hormozgan
+28,Zhuozhou,Zuozhou,39.54005292,115.789976,415000,China,CN,CHN,Beijing
+29,Thai Nguyen,Thai Nguyen,21.59995933,105.8300154,415000,Vietnam,VN,VNM,Thái Nguyên
+30,Lowell,Lowell,42.63368837,-71.31669112,415074,United States of America,US,USA,Massachusetts
+31,Ibague,Ibague,4.438913797,-75.2322144,415156,Colombia,CO,COL,Tolima
+32,Mariupol,Mariupol,47.09618085,37.55619828,416435,Ukraine,UA,UKR,Donets'k
+33,Knoxville,Knoxville,35.97001243,-83.92003036,417137,United States of America,US,USA,Tennessee
+34,Santa Marta,Santa Marta,11.24720624,-74.20165715,417211,Colombia,CO,COL,Magdalena
+35,Luohe,Luohe,33.57000388,114.02998,417356,China,CN,CHN,Henan
+36,Ivanovo,Ivanovo,57.01002016,41.00999263,417527,Russia,RU,RUS,Ivanovo
+37,Sukkur,Sukkur,27.71356549,68.8485518,417767,Pakistan,PK,PAK,Sind
+38,Kolwezi,Kolwezi,-10.71672443,25.47243974,418000,Congo (Kinshasa),CD,COD,Katanga
+39,Bamenda,Bamenda,5.959983743,10.15001583,419567,Cameroon,CM,CMR,Nord-Ouest
+40,Freetown,Freetown,8.470011412,-13.23421574,420384,Sierra Leone,SL,SLE,Western
+41,Asyut,Asyut,27.18997988,31.17994665,420585,Egypt,EG,EGY,Asyut
+42,Akure,Akure,7.250395934,5.199982054,420594,Nigeria,NG,NGA,Ondo
+43,Zhaoqing,Zhaoqing,23.05041343,112.4500248,420984.5,China,CN,CHN,Guangdong
+44,Nagasaki,Nagasaki,32.76498842,129.8850329,422829.5,Japan,JP,JPN,Nagasaki
+45,Dhule,Dhule,20.89997622,74.76999914,423026.5,India,IN,IND,Maharashtra
+46,Hisar,Hisar,29.16998822,75.72503129,423039,India,IN,IND,Haryana
+47,Arak,Arak,25.2799931,3.749993041,423251,Algeria,DZ,DZA,Tamanghasset
+48,Gaya,Gaya,24.79997072,85.00002071,423692,India,IN,IND,Bihar
+49,Chaozhou,Chaozhou,23.68003908,116.630028,424787,China,CN,CHN,Guangdong
+50,Bytom,Bytom,50.35003908,18.90999792,425716.5,Poland,PL,POL,Silesian
+51,An Nasiriyah,An Nasiriyah,31.04294883,46.26755286,425898,Iraq,IQ,IRQ,Dhi-Qar
+52,Bryansk,Bryansk,53.25999066,34.42998083,426510,Russia,RU,RUS,Bryansk
+53,Colorado Springs,Colorado Springs,38.86296246,-104.7919863,427272,United States of America,US,USA,Colorado
+54,Likasi,Likasi,-10.9700423,26.7800085,428411,Congo (Kinshasa),CD,COD,Katanga
+55,Bologna,Bologna,44.50042198,11.34002071,429694.5,Italy,IT,ITA,Emilia-Romagna
+56,Gold Coast,Gold Coast,-28.08150429,153.4482458,429954.5,Australia,AU,AUS,Queensland
+57,Sanliurfa,Sanliurfa,37.16999086,38.79498572,431407.5,Turkey,TR,TUR,Sanliurfa
+58,Aurora,Aurora,39.69585736,-104.808497,431966.5,United States of America,US,USA,Colorado
+59,Katsina,Katsina,12.99040733,7.599990599,432149,Nigeria,NG,NGA,Katsina
+60,Macapá,Macapa,0.033007018,-51.0500212,433781.5,Brazil,BR,BRA,Amapá
+61,San Juan,San Juan,-31.55002643,-68.51998845,433892,Argentina,AR,ARG,San Juan
+62,Stamford,Stamford,41.05334556,-73.53919112,434781.5,United States of America,US,USA,Connecticut
+63,Valparaiso,Valparaiso,-33.04776447,-71.62101363,434969,Chile,CL,CHL,Valparaíso
+64,Pohang,Pohang,36.02086204,129.3715242,435266,South Korea,KR,KOR,Daegu
+65,Tuticorin,Tuticorin,8.81999005,78.13000077,436094,India,IN,IND,Tamil Nadu
+66,Bilaspur,Bilaspur,22.09042035,82.15998734,436780,India,IN,IND,Chhattisgarh
+67,Khomeini Shahr,Khomeini Shahr,32.70041872,51.46997432,437138,Iran,IR,IRN,Esfahan
+68,Tongling,Tongling,30.95044802,117.7800354,437710,China,CN,CHN,Anhui
+69,Otsu,Otsu,35.006402,135.8674068,437802.5,Japan,JP,JPN,Shiga
+70,Xalapa,Xalapa,19.52998232,-96.91998621,438667,Mexico,MX,MEX,Veracruz
+71,Jambi,Jambi,-1.589994691,103.6100476,438706.5,Indonesia,ID,IDN,Jambi
+72,Herat,Herat,34.33000917,62.16999304,439232.5,Afghanistan,AF,AFG,Hirat
+73,Al Ladhiqiyah,Al Ladhiqiyah,35.539987,35.77997595,439664,Syria,SY,SYR,Lattakia (Al Ladhiqiyah)
+74,Shymkent,Shymkent,42.32001243,69.59501786,439712,Kazakhstan,KZ,KAZ,South Kazakhstan
+75,Hamah,Hamah,35.1503467,36.72999548,439796,Syria,SY,SYR,Hamah
+76,Balikpapan,Balikpapan,-1.250015443,116.8300158,439885.5,Indonesia,ID,IDN,Kalimantan Timur
+77,Chaoyang,Chaoyang,41.55042116,120.4199776,440150.5,China,CN,CHN,Liaoning
+78,La Plata,La Plata,-34.90961465,-57.95996118,440388.5,Argentina,AR,ARG,Ciudad de Buenos Aires
+79,Abeokuta,Abeokuta,7.160427265,3.350017455,441231,Nigeria,NG,NGA,Ogun
+80,Yichun,Yichun,47.69994244,128.8999768,443111.5,China,CN,CHN,Heilongjiang
+81,Keelung,Keelung,25.13325787,121.7332824,443603.5,Taiwan,TW,TWN,Keelung City
+82,Cheboksary,Cheboksary,56.12997052,47.25002519,444027.5,Russia,RU,RUS,Chuvash
+83,Wiesbaden,Wiesbaden,50.08039146,8.250028441,444779,Germany,DE,DEU,Hessen
+84,Udaipur,Udaipur,24.59998293,73.73001094,446260.5,India,IN,IND,Rajasthan
+85,Panzhihua,Panzhihua,26.5499931,101.7300073,446298,China,CN,CHN,Sichuan
+86,Ado Ekiti,Ado Ekiti,7.630372741,5.219980834,446749,Nigeria,NG,NGA,Ekiti
+87,Iquitos,Iquitos,-3.750017884,-73.25000981,448174.5,Peru,PE,PER,Loreto
+88,Chlef,Chlef,36.17041363,1.319960489,449167,Algeria,DZ,DZA,Chlef
+89,Feira de Santana,Feira de Santana,-12.25001585,-38.9700092,449194.5,Brazil,BR,BRA,Bahia
+90,Xuchang,Xuchang,34.02038983,113.8200187,449258,China,CN,CHN,Henan
+91,Manado,Manado,1.480024637,124.8499914,449497.5,Indonesia,ID,IDN,Sulawesi Utara
+92,Taoyuan,Taoyuan,24.98888889,121.3111111,451007,Taiwan,TW,TWN,Taoyuan
+93,Akron,Akron,41.07039878,-81.51999597,451155,United States of America,US,USA,Ohio
+94,Matamoros,Matamoros,25.87998232,-97.50000248,451394.5,Mexico,MX,MEX,Tamaulipas
+95,Malatya,Malatya,38.37043439,38.30002885,451689.5,Turkey,TR,TUR,Malatya
+96,Yazd,Yazd,31.92005292,54.37000403,451923.5,Iran,IR,IRN,Yazd
+97,Bello,Bello,6.329986998,-75.5699974,456304.5,Colombia,CO,COL,Antioquia
+98,Hengshui,Hengshui,37.71998313,115.7000073,456356,China,CN,CHN,Hebei
+99,Durango,Durango,24.03110292,-104.67003,456368.5,Mexico,MX,MEX,Durango
+100,Kirov,Kirov,58.59005292,49.66998083,457410,Russia,RU,RUS,Kirov
+101,Naga,Naga,13.61915448,123.1813594,458283,Philippines,PH,PHL,Camarines Sur
+102,Reynosa,Reynosa,26.07999595,-98.30003117,458997,Mexico,MX,MEX,Tamaulipas
+103,Kenitra,Kenitra,34.27040041,-6.579996583,459178,Morocco,MA,MAR,Gharb - Chrarda - Béni Hssen
+104,Zhaotang,Zhaotang,27.32038535,103.720015,459200,China,CN,CHN,Yunnan
+105,Bloemfontein,Bloemfontein,-29.11999388,26.22991288,459866.5,South Africa,ZA,ZAF,Orange Free State
+106,Tacoma,Tacoma,47.21131594,-122.5150131,460273,United States of America,US,USA,Washington
+107,Tyumen,Tyumen,57.14001223,65.52999467,460952,Russia,RU,RUS,Tyumen'
+108,Naberezhnyye Chelny,Naberezhnyye Chelny,55.69999676,52.31994828,461086,Russia,RU,RUS,Tatarstan
+109,Chandrapur,Chandrapur,19.9699813,79.30000688,461734.5,India,IN,IND,Maharashtra
+110,Arak,Arak,34.08041201,49.70000484,463449,Iran,IR,IRN,Markazi
+111,Moshi,Moshi,-3.339603659,37.33998409,463873,Tanzania,TZ,TZA,Kilimanjaro
+112,Iligan,Iligan,8.171244119,124.2153531,464599,Philippines,PH,PHL,Lanao del Norte
+113,Butterworth,Butterworth,5.417071146,100.4000109,464621.5,Malaysia,MY,MYS,Pulau Pinang
+114,Juiz de Fora,Juiz de Fora,-21.77000324,-43.3749858,464764.5,Brazil,BR,BRA,Minas Gerais
+115,Mwanza,Mwanza,-2.520015443,32.93002071,465372.5,Tanzania,TZ,TZA,Mwanza
+116,Kikwit,Kikwit,-5.030043112,18.85000159,465973,Congo (Kinshasa),CD,COD,Bandundu
+117,Dayton,Dayton,39.750376,-84.19998743,466067,United States of America,US,USA,Ohio
+118,Akola,Akola,20.70998781,77.01001745,466179.5,India,IN,IND,Maharashtra
+119,Canoas,Canoas,-29.91999673,-51.17998743,466661,Brazil,BR,BRA,Rio Grande do Sul
+120,Mazatlán,Mazatlan,29.01710349,-110.1333399,469217,Mexico,MX,MEX,Sonora
+121,Davangere,Davangere,14.47000694,75.92000647,469344.5,India,IN,IND,Karnataka
+122,Anqing,Anqing,30.49995872,117.0500024,469579,China,CN,CHN,Anhui
+123,Edinburgh,Edinburgh,55.94832786,-3.219090618,470378.5,United Kingdom,GB,GBR,Edinburgh
+124,Ismailia,Ismailia,30.5903408,32.25998409,470474,Egypt,EG,EGY,Al Isma`iliyah
+125,Kemerovo,Kemerovo,55.33996706,86.08998002,470684.5,Russia,RU,RUS,Kemerovo
+126,Irbid,Irbid,32.54998863,35.84999752,471020,Jordan,JO,JOR,Irbid
+127,Jiaojing,Jiaojing,28.6804057,121.4499922,471152,China,CN,CHN,Zhejiang
+128,Tomsk,Tomsk,56.494987,84.97500932,471950,Russia,RU,RUS,Tomsk
+129,Kashgar,Kashi,39.47633588,75.9699259,472069.5,China,CN,CHN,Xinjiang Uygur
+130,Sao Jose dos Pinhais,Sao Jose dos Pinhais,-25.57002968,-49.18000615,472180,Brazil,BR,BRA,Paraná
+131,Homyel,Homyel,52.43001548,31.00000932,472337.5,Belarus,BY,BLR,Homyel'
+132,Karbala,Karbala,32.61492006,44.02448564,472571,Iraq,IQ,IRQ,Karbala'
+133,Liege,Liege,50.62999615,5.580010537,472803,Belgium,BE,BEL,Liege
+134,Saarbrucken,Saarbrucken,49.25039044,6.970003213,472871,Germany,DE,DEU,Saarland
+135,Samarinda,Samarinda,-0.500035381,117.1499963,473694,Indonesia,ID,IDN,Kalimantan Timur
+136,Tuxtla Gutierrez,Tuxtla Gutierrez,16.74999697,-93.1500096,473719,Mexico,MX,MEX,Chiapas
+137,Palu,Palu,-0.907038962,119.8330367,473871,Indonesia,ID,IDN,Sulawesi Tengah
+138,Oyo,Oyo,7.850436828,3.929982054,475016.5,Nigeria,NG,NGA,Oyo
+139,Nagano,Nagano,36.64999676,138.1700052,477243.5,Japan,JP,JPN,Nagano
+140,Sialkote,Sialkote,32.5200163,74.5600378,477396,Pakistan,PK,PAK,Punjab
+141,Gaza,Gaza,31.52999921,34.44501868,477460.5,Palestine,PS,PSE,
+142,Utrecht,Utrecht,52.10034568,5.120038614,478224,Netherlands,NL,NLD,Utrecht
+143,Tula,Tula,54.19995913,37.62994055,479155.5,Russia,RU,RUS,Tula
+144,Al Hillah,Al Hillah,32.47213808,44.42172237,479652.5,Iraq,IQ,IRQ,Babil
+145,Shah Alam,Shah Alam,3.066695996,101.5499977,481654,Malaysia,MY,MYS,Selangor
+146,Fargona,Fargona,40.3899752,71.78000077,482000,Uzbekistan,UZ,UZB,Ferghana
+147,Ife,Ife,7.480433572,4.560021117,482365,Nigeria,NG,NGA,Osun
+148,Gulbarga,Gulbarga,17.34996035,76.82000321,482546.5,India,IN,IND,Karnataka
+149,Catania,Catania,37.49997072,15.07999914,482908,Italy,IT,ITA,Sicily
+150,Bhatpara,Bhatpara,22.85042564,88.52001257,483129,India,IN,IND,West Bengal
+151,Rochester,Rochester,43.17042564,-77.61994979,483177,United States of America,US,USA,New York
+152,Albany,Albany,42.67001691,-73.81994918,484286,United States of America,US,USA,New York
+153,Skopje,Skopje,42.00000612,21.43346147,484488,Macedonia,MK,MKD,Centar
+154,Salta,Salta,-24.78335936,-65.41663782,484646,Argentina,AR,ARG,Salta
+155,Uberlandia,Uberlandia,-18.89999754,-48.27998356,484862,Brazil,BR,BRA,Minas Gerais
+156,Saharanpur,Saharanpur,29.97001691,77.55003617,484873,India,IN,IND,Uttar Pradesh
+157,Ujjain,Ujjain,23.19040489,75.79004024,485348,India,IN,IND,Madhya Pradesh
+158,Liaoyuan,Liaoyuan,42.89997703,125.1299743,485898.5,China,CN,CHN,Jilin
+159,Bikaner,Bikaner,28.0303937,73.32993201,485961.5,India,IN,IND,Rajasthan
+160,Shimoga,Shimoga,13.93037579,75.56002844,486802.5,India,IN,IND,Karnataka
+161,Andijon,Andijon,40.79000246,72.33996659,486950,Uzbekistan,UZ,UZB,Andijon
+162,Stockton,Stockton,37.95813397,-121.289739,488506.5,United States of America,US,USA,California
+163,Tirunelveli,Tirunelveli,8.730408955,77.68997595,489022,India,IN,IND,Tamil Nadu
+164,Cancun,Cancun,21.16995974,-86.83000777,489452.5,Mexico,MX,MEX,Quintana Roo
+165,Port Sudan,Port Sudan,19.61579103,37.21642574,489725,Sudan,SD,SDN,Red Sea
+166,Jian,Jian,27.13042279,114.9999983,490221,China,CN,CHN,Jiangxi
+167,Eskisehir,Eskisehir,39.7949986,30.52996049,490644.5,Turkey,TR,TUR,Eskisehir
+168,Penza,Penza,53.18002138,44.99998165,491943,Russia,RU,RUS,Penza
+169,Bristol,Bristol,51.44999778,-2.583315472,492120.5,United Kingdom,GB,GBR,Bristol
+170,Kota Kinabalu,Kota Kinabalu,5.979982523,116.1100081,492498.5,Malaysia,MY,MYS,Sabah
+171,Wuwei,Wuwei,37.92800661,102.6410111,493092,China,CN,CHN,Gansu
+172,Changhua,Changhua,24.07340008,120.5134086,493294,Taiwan,TW,TWN,Changhua
+173,Astrakhan,Astrakhan,46.34865541,48.05498897,493363.5,Russia,RU,RUS,Astrakhan'
+174,Uyo,Uyo,5.007996056,7.849998524,495756,Nigeria,NG,NGA,Akwa Ibom
+175,Londrina,Londrina,-23.30003904,-51.17998743,496035,Brazil,BR,BRA,Paraná
+176,Bonn,Bonn,50.72045575,7.080022337,496834,Germany,DE,DEU,Nordrhein-Westfalen
+177,Trabzon,Trabzon,40.97999086,39.71999385,497556.5,Turkey,TR,TUR,Trabzon
+178,Suez,Suez,30.00497601,32.54994055,498230,Egypt,EG,EGY,As Suways
+179,Chongjin,Chongjin,41.78461875,129.79,499807,North Korea,KP,PRK,Hamgyong-bukto
+180,Shuangyashan,Shuangyashan,46.67041872,131.3500081,500000,China,CN,CHN,Heilongjiang
+181,Guwahati,Guwahati,26.16001691,91.76999508,500258,India,IN,IND,Assam
+182,Basel,Basel,47.58038902,7.590017048,500317.5,Switzerland,CH,CHE,Basel-Stadt
+183,Puerto la Cruz,Puerto la Cruz,10.16995933,-64.68001612,500464,Venezuela,VE,VEN,Anzoátegui
+184,Santiago de Cuba,Santiago de Cuba,20.0250167,-75.82132573,500964,Cuba,CU,CUB,Santiago de Cuba
+185,Tabuk,Tabuk,28.38383465,36.55496741,501703.5,Saudi Arabia,SA,SAU,Tabuk
+186,Lipetsk,Lipetsk,52.62000389,39.63999874,502144,Russia,RU,RUS,Lipetsk
+187,Ryazan,Ryazan,54.61995933,39.71999385,502373,Russia,RU,RUS,Ryazan'
+188,Matola,Matola,-25.96959186,32.46002356,503368,Mozambique,MZ,MOZ,Maputo
+189,Braga,Braga,41.55499453,-8.421331219,504326,Portugal,PT,PRT,Braga
+190,Pereira,Pereira,4.81038983,-75.67999068,504434,Colombia,CO,COL,Risaralda
+191,Kanazawa,Kanazawa,36.56000226,136.6400211,505093,Japan,JP,JPN,Ishikawa
+192,Xinyu,Xinyu,27.80002016,114.9299768,505240,China,CN,CHN,Jiangxi
+193,Beira,Beira,-19.82004474,34.87000565,507196.5,Mozambique,MZ,MOZ,Sofala
+194,Shashi,Shashi,30.32002138,112.2299865,509390,China,CN,CHN,Hubei
+195,Bhavnagar,Bhavnagar,21.77842389,72.12995357,509790,India,IN,IND,Dadra and Nagar Haveli
+196,St. Paul,St. Paul,44.94398663,-93.08497481,509961,United States of America,US,USA,Minnesota
+197,Bouake,Bouake,7.689981505,-5.030013673,511151,Ivory Coast,CI,CIV,Vallée du Bandama
+198,Vinh,Vinh,18.6999813,105.6799987,514426.5,Vietnam,VN,VNM,Nghệ An 
+199,Siliguri,Siliguri,26.72042198,88.45500362,515574,India,IN,IND,West Bengal
+200,Bordeaux,Bordeaux,44.85001304,-0.595013063,517422,France,FR,FRA,Aquitaine
+201,Hartford,Hartford,41.77002016,-72.67996708,518509.5,United States of America,US,USA,Connecticut
+202,Al Hufuf,Al Hufuf,25.3487486,49.58559322,518694.5,Saudi Arabia,SA,SAU,Ash Sharqiyah
+203,Jincheng,Jincheng,35.50037701,112.8300016,520000,China,CN,CHN,Shanxi
+204,Soledad,Soledad,10.92001691,-74.76999455,520704,Colombia,CO,COL,Atlántico
+205,Ribeirao Preto,Ribeirao Preto,-21.17003986,-47.82998519,520774,Brazil,BR,BRA,São Paulo
+206,Göteborg,Goteborg,57.75000083,12.0000321,520940.5,Sweden,SE,SWE,Västra Götaland
+207,Trujillo,Trujillo,-8.120035381,-79.01996769,521046,Peru,PE,PER,La Libertad
+208,St. Petersburg,St. Petersburg,27.77053876,-82.67938257,523314.5,United States of America,US,USA,Florida
+209,Leipzig,Leipzig,51.33540529,12.40998124,523750,Germany,DE,DEU,Sachsen
+210,São Luís,Sao Luis,-2.515984681,-44.26599085,524692.5,Brazil,BR,BRA,Maranhão
+211,Vilnius,Vilnius,54.68336631,25.31663529,524697.5,Lithuania,LT,LTU,Vilniaus
+212,Matsuyama,Matsuyama,33.84554262,132.765839,525089,Japan,JP,JPN,Ehime
+213,Makhachkala,Makhachkala,42.98002382,47.49998409,526470,Russia,RU,RUS,Dagestan
+214,New Orleans,New Orleans,29.99500246,-90.03996688,527428.5,United States of America,US,USA,Louisiana
+215,Constantine,Constantine,36.35998863,6.599948281,527638,Algeria,DZ,DZA,Constantine
+216,Cangzhou,Cangzhou,38.32038576,116.8700134,527681,China,CN,CHN,Hebei
+217,Siping,Siping,43.17001223,124.3300232,528811,China,CN,CHN,Jilin
+218,Novokuznetsk,Novokuznetsk,53.75001243,87.11498205,530325.5,Russia,RU,RUS,Kemerovo
+219,Guntur,Guntur,16.32999676,80.4500142,530577,India,IN,IND,Andhra Pradesh
+220,Libreville,Libreville,0.38538861,9.457965046,530755.5,Gabon,GA,GAB,Estuaire
+221,Orenburg,Orenburg,51.77997764,55.11001054,530820.5,Russia,RU,RUS,Orenburg
+222,Jiangmen,Jiangmen,22.58039044,113.0800122,532419,China,CN,CHN,Guangdong
+223,Linfen,Linfen,36.08034161,111.520004,533283,China,CN,CHN,Shanxi
+224,Kagoshima,Kagoshima,31.58596478,130.561064,536092.5,Japan,JP,JPN,Kagoshima
+225,Newcastle,Newcastle,55.00037539,-1.59999048,537191,United Kingdom,GB,GBR,Tyne and Wear
+226,Niigata,Niigata,37.91999676,139.0400297,537534.5,Japan,JP,JPN,Niigata
+227,Kuching,Kuching,1.529969909,110.3299991,537685,Malaysia,MY,MYS,Sarawak
+228,Yuci,Yuci,37.68039899,112.7300077,537964.5,China,CN,CHN,Shanxi
+229,Malaga,Malaga,36.7204059,-4.419999228,539381.5,Spain,ES,ESP,Andalucía
+230,Xingyi,Xingyi,25.09041811,104.8900211,539536,China,CN,CHN,Guizhou
+231,Yangzhou,Yangzhou,32.39999778,119.4300122,539715,China,CN,CHN,Jiangsu
+232,El Mansura,El Mansura,31.05044191,31.3800378,540247,Egypt,EG,EGY,Ad Daqahliyah
+233,Fresno,Fresno,36.7477169,-119.7729841,540768,United States of America,US,USA,California
+234,Nellore,Nellore,14.43998293,79.98993892,541081,India,IN,IND,Andhra Pradesh
+235,Sargodha,Sargodha,32.08536582,72.6749849,542603,Pakistan,PK,PAK,Punjab
+236,Qui Nhon,Qui Nhon,13.77997154,109.1800435,543095,Vietnam,VN,VNM,Bình Định 
+237,Rasht,Rasht,37.29998293,49.62998328,544737.5,Iran,IR,IRN,Gilan
+238,Arlington,Grand Prairie,32.68476076,-97.02023849,545107.5,United States of America,US,USA,Texas
+239,Jiujiang,Jiujiang,29.72997988,115.9800419,545616,China,CN,CHN,Jiangxi
+240,Salerno,Salerno,40.68039675,14.76994055,546922,Italy,IT,ITA,Campania
+241,Tiruppur,Tiruppur,11.08042055,77.32999792,547271.5,India,IN,IND,Tamil Nadu
+242,Luxor,Luxor,25.70001914,32.6500378,548572,Egypt,EG,EGY,Qina
+243,Hungnam,Hungnam,39.82313641,127.6231555,548702,North Korea,KP,PRK,Hamgyong-namdo
+244,Zaragoza,Zaragoza,41.65000165,-0.889982138,548955.5,Spain,ES,ESP,Aragón
+245,Concepcion,Concepcion,-36.83001422,-73.05002202,550864,Chile,CL,CHL,Bío-Bío
+246,Richmond,Richmond,37.55001935,-77.449986,551443,United States of America,US,USA,Virginia
+247,Dresden,Dresden,51.04997052,13.75000281,552184.5,Germany,DE,DEU,Sachsen
+248,Bahawalpur,Bahawalpur,29.38997479,71.67499426,552607,Pakistan,PK,PAK,Punjab
+249,Ajmer,Ajmer,26.44999921,74.63998124,553948,India,IN,IND,Rajasthan
+250,Hermosillo,Hermosillo,29.09888145,-110.954065,554373,Mexico,MX,MEX,Sonora
+251,Raurkela,Raurkela,22.2304118,84.82995357,554730,India,IN,IND,Orissa
+252,Mar del Plata,Mar del Plata,-38.00002033,-57.57998438,554916,Argentina,AR,ARG,Ciudad de Buenos Aires
+253,Kirkuk,Kirkuk,35.4722392,44.3922668,555052.5,Iraq,IQ,IRQ,At-Ta'mim
+254,Surakarta,Surakarta,-7.564978822,110.8250077,555308,Indonesia,ID,IDN,Jawa Tengah
+255,Rizhao,Rizhao,35.43038129,119.4500109,555693.5,China,CN,CHN,Shandong
+256,Kerman,Kerman,30.29999676,57.08001949,556518,Iran,IR,IRN,Kerman
+257,Novo Hamburgo,Novo Hamburgo,-29.70962197,-51.13998987,557017,Brazil,BR,BRA,Rio Grande do Sul
+258,Utsunomiya,Utsunomiya,36.54997703,139.8700048,558808.5,Japan,JP,JPN,Tochigi
+259,Kisangani,Kisangani,0.520005716,25.22000036,558814,Congo (Kinshasa),CD,COD,Orientale
+260,Sorocaba,Sorocaba,-23.49000161,-47.46998132,561071.5,Brazil,BR,BRA,São Paulo
+261,Bur Said,Bur Said,31.25998985,32.2900081,561932,Egypt,EG,EGY,Bur Sa`id
+262,Kayseri,Kayseri,38.73495994,35.49001949,562215.5,Turkey,TR,TUR,Kayseri
+263,Naypyidaw,Naypyidaw,19.76655703,96.11861853,562412,Myanmar,MM,MMR,Mandalay
+264,Khabarovsk,Khabarovsk,48.4549868,135.1200105,562705.5,Russia,RU,RUS,Khabarovsk
+265,Wuppertal,Wuppertal,51.25000999,7.169991006,562997.5,Germany,DE,DEU,Nordrhein-Westfalen
+266,Malegaon,Malegaon,20.5603587,74.52500118,563103,India,IN,IND,Maharashtra
+267,Nottingham,Nottingham,52.97034426,-1.170016725,565650,United Kingdom,GB,GBR,Nottingham
+268,Tarsus,Tarsus,36.9203937,34.87997921,566297,Turkey,TR,TUR,Mersin
+269,Beihai,Beihai,21.4804059,109.1000484,567289,China,CN,CHN,Guangxi
+270,Macau,Macau,22.20299746,113.5450484,568700,Macau S.A.R,MO,MAC,
+271,Florianopolis,Florianopolis,-27.57998452,-48.52002059,568783,Brazil,BR,BRA,Santa Catarina
+272,Denpasar,Denpasar,-8.650028871,115.2199849,569133.5,Indonesia,ID,IDN,Bali
+273,Barnaul,Barnaul,53.35499778,83.74500688,569711,Russia,RU,RUS,Altay
+274,Voronezh,Voronezh,51.72998069,39.26999548,569734.5,Russia,RU,RUS,Voronezh
+275,Yaroslavl,Yaroslavl,57.61998293,39.87001054,571154,Russia,RU,RUS,Yaroslavl'
+276,Ulyanovsk,Ulyanovsk,54.32997703,48.41000606,571553.5,Russia,RU,RUS,Ul'yanovsk
+277,Kryvyy Rih,Kryvyy Rih,47.92832644,33.34498246,571643.5,Ukraine,UA,UKR,Dnipropetrovs'k
+278,Salt Lake City,Salt Lake City,40.7750163,-111.9300519,572013,United States of America,US,USA,Utah
+279,Yibin,Yibin,28.7699868,104.5700406,572055.5,China,CN,CHN,Sichuan
+280,Irkutsk,Irkutsk,52.31997052,104.2450476,572325,Russia,RU,RUS,Irkutsk
+281,Tongliao,Tongliao,43.61995892,122.2699939,572555,China,CN,CHN,Nei Mongol
+282,Shihezi,Shihezi,44.29996909,86.02993201,572977,China,CN,CHN,Xinjiang Uygur
+283,Veracruz,Veracruz,19.17734235,-96.15998092,573638,Mexico,MX,MEX,Veracruz
+284,Samsun,Samsun,41.27999839,36.34366247,573722.5,Turkey,TR,TUR,Samsun
+285,Zahedan,Zahedan,29.49999392,60.83002315,575433.5,Iran,IR,IRN,Sistan and Baluchestan
+286,Québec,Quebec,46.83996909,-71.24561019,576386,Canada,CA,CAN,Québec
+287,Urmia,Orumiyeh,37.52999473,44.99998165,577307,Iran,IR,IRN,West Azarbaijan
+288,Icel,Icel,36.79998761,34.61999508,577416,Turkey,TR,TUR,Mersin
+289,Tampico,Tampico,22.30001996,-97.87000574,578351.5,Mexico,MX,MEX,Tamaulipas
+290,Bridgeport,Bridgeport,41.17997866,-73.19996118,578545,United States of America,US,USA,Connecticut
+291,Pontianak,Pontianak,-0.029986553,109.3199833,578807.5,Indonesia,ID,IDN,Kalimantan Barat
+292,Honolulu,Honolulu,21.30687644,-157.8579979,578828.5,United States of America,US,USA,Hawaii
+293,Hachioji,Hachioji,35.65770591,139.3260587,579399,Japan,JP,JPN,Tokyo
+294,Cuttack,Cuttack,20.47000246,85.88994055,580000,India,IN,IND,Orissa
+295,Abu Dhabi,Abu Dhabi,24.46668357,54.36659338,581861,United Arab Emirates,AE,ARE,Abu Dhabi
+296,Prague,Prague,50.08333701,14.46597978,582043.5,Czech Republic,CZ,CZE,Prague
+297,Hsinchu,Hsinchu,24.8167914,120.9767395,582778.5,Taiwan,TW,TWN,Hsinchu City
+298,San Pedro Sula,San Pedro Sula,15.50002159,-88.02998621,584778.5,Honduras,HN,HND,Cortés
+299,Blantyre,Blantyre,-15.79000649,34.98994665,584877,Malawi,MW,MWI,Blantyre
+300,Bannu,Bannu,32.98897992,70.59857418,586209.5,Pakistan,PK,PAK,N.W.F.P.
+301,Vladivostok,Vladivostok,43.13001467,131.9100256,586617,Russia,RU,RUS,Primor'ye
+302,Chiclayo,Chiclayo,-6.762908916,-79.83658452,587083.5,Peru,PE,PER,Lambayeque
+303,Nanded,Nanded,19.16997845,77.30002559,587136,India,IN,IND,Maharashtra
+304,Aracaju,Aracaju,-10.90002073,-37.11996708,587765.5,Brazil,BR,BRA,Sergipe
+305,Bandjarmasin,Bandjarmasin,-3.329991843,114.5800756,588206.5,Indonesia,ID,IDN,Kalimantan Selatan
+306,Dortmund,Dortmund,51.52996706,7.450025593,588462,Germany,DE,DEU,Nordrhein-Westfalen
+307,Thessaloniki,Thessaloniki,40.69610638,22.88500077,591145,Greece,GR,GRC,Kentriki Makedonia
+308,Cuernavaca,Cuernavaca,18.92110476,-99.23999964,591551.5,Mexico,MX,MEX,Morelos
+309,Asmara,Asmara,15.33333925,38.93332353,592366,Eritrea,ER,ERI,Anseba
+310,At Taif,At Taif,21.26222801,40.38227901,594065,Saudi Arabia,SA,SAU,Makkah
+311,Al Hillah,Al Hillah,23.4894564,46.75636023,594605,Saudi Arabia,SA,SAU,Ar Riyad
+312,Ogbomosho,Ogbomosho,8.130006326,4.239988972,595063.5,Nigeria,NG,NGA,Oyo
+313,Hamhung,Hamhung,39.91005617,127.5454341,595670.5,North Korea,KP,PRK,Hamgyong-namdo
+314,Louisville,Louisville,38.22501691,-85.74870427,595819.5,United States of America,US,USA,Kentucky
+315,Mangalore,Mangalore,12.90002525,74.84999426,597009.5,India,IN,IND,Karnataka
+316,Poznan,Poznan,52.4057534,16.89993974,597174.5,Poland,PL,POL,Greater Poland
+317,Gdansk,Gdansk,54.3599752,18.64004024,597915,Poland,PL,POL,Pomeranian
+318,Shaoxing,Shaoxing,30.00037681,120.5700459,599141.5,China,CN,CHN,Zhejiang
+319,Namangan,Namangan,41.00001548,71.66998165,599600,Uzbekistan,UZ,UZB,Namangan
+320,Anshun,Anshun,26.25039899,105.9300093,600468,China,CN,CHN,Guizhou
+321,Zaporizhzhya,Zaporizhzhya,47.85729718,35.17680863,600778.5,Ukraine,UA,UKR,Zaporizhzhya
+322,Krasnodar,Krasnodar,45.01997683,39.0000378,601191.5,Russia,RU,RUS,Krasnodar
+323,Sangli,Sangli,16.86040367,74.57502397,601214,India,IN,IND,Maharashtra
+324,Pointe-Noire,Pointe-Noire,-4.770007305,11.88003943,602440.5,Congo (Brazzaville),CG,COG,Kouilou
+325,Cuiaba,Cuiaba,-15.56960651,-56.08498519,603143.5,Brazil,BR,BRA,Mato Grosso
+326,Winnipeg,Winnipeg,49.88298749,-97.16599186,603688,Canada,CA,CAN,Manitoba
+327,Cardiff,Cardiff,51.49999473,-3.22500757,603750,United Kingdom,GB,GBR,Cardiff
+328,Belgaum,Belgaum,15.86501223,74.5050024,609472.5,India,IN,IND,Karnataka
+329,Izhevsk,Izhevsk,56.85002993,53.23002193,611230,Russia,RU,RUS,Udmurt
+330,Naha,Naha,26.20717165,127.6729716,611572,Japan,JP,JPN,Okinawa
+331,Xiangtai,Xiangtai,37.04997235,114.5000288,611739,China,CN,CHN,Hebei
+332,Taizhou,Taizhou,32.4904057,119.9000093,612356,China,CN,CHN,Jiangsu
+333,An Najaf,An Najaf,32.00033225,44.33537105,612776,Iraq,IQ,IRQ,An-Najaf
+334,Krasnoyarsk,Krasnoyarsk,56.01398277,92.86600053,613605,Russia,RU,RUS,Krasnoyarsk
+335,Kandahar,Kandahar,31.61002016,65.69494584,613871,Afghanistan,AF,AFG,Kandahar
+336,Kananga,Kananga,-5.890042299,22.40001745,614273,Congo (Kinshasa),CD,COD,Kasaï-Occidental
+337,Bilbao,Bilbao,43.24998151,-2.929986818,614369.5,Spain,ES,ESP,País Vasco
+338,Zamboanga,Zamboanga,6.919976826,122.0800313,615311.5,Philippines,PH,PHL,Zamboanga del Sur
+339,Jinhua,Jinhua,29.12004295,119.6499987,617529,China,CN,CHN,Zhejiang
+340,Nürnberg,Nurnberg,49.44999066,11.0799849,618270.5,Germany,DE,DEU,Bayern
+341,Morelia,Morelia,19.73338076,-101.189493,618551.5,Mexico,MX,MEX,Michoacán
+342,Hannover,Hannover,52.36697023,9.716657266,618815,Germany,DE,DEU,Niedersachsen
+343,Jhansi,Jhansi,25.45295412,78.55746822,619710.5,India,IN,IND,Uttar Pradesh
+344,Dahuk,Dahuk,36.86670013,43.00000263,620500,Iraq,IQ,IRQ,Dihok
+345,Hamilton,Hamilton,43.24998151,-79.82999577,620501,Canada,CA,CAN,Ontario
+346,Pietermaritzburg,Pietermaritzburg,-29.61004148,30.39002071,620898,South Africa,ZA,ZAF,KwaZulu-Natal
+347,Meknes,Meknes,33.90042299,-5.559981325,621666.5,Morocco,MA,MAR,Meknès - Tafilalet
+348,Wroclaw,Wroclaw,51.11043194,17.03000932,622471,Poland,PL,POL,Lower Silesian
+349,Genoa,Genoa,44.40998822,8.930038614,624724,Italy,IT,ITA,Liguria
+350,Al Hudaydah,Al Hudaydah,14.79794558,42.95297481,627610.5,Yemen,YE,YEM,Al Hudaydah
+351,Jammu,Jammu,32.71178754,74.84673865,628283.5,India,IN,IND,Jammu and Kashmir
+352,Nice,Nice,43.71501772,7.265023965,632810,France,FR,FRA,Provence-Alpes-Côte-d'Azur
+353,Ciudad Guayana,Ciudad Guayana,8.370017516,-62.61998682,634317.5,Venezuela,VE,VEN,Bolívar
+354,Bremen,Bremen,53.08000165,8.80002071,635705,Germany,DE,DEU,Bremen
+355,Lille,Lille,50.64996909,3.080008096,636164,France,FR,FRA,Nord-Pas-de-Calais
+356,Yogyakarta,Yogyakarta,-7.77995278,110.3750093,636660,Indonesia,ID,IDN,Yogyakarta
+357,Yulin,Yulin,22.62997398,110.1500101,637742.5,China,CN,CHN,Guangxi
+358,Haifa,Haifa,32.8204114,34.98002478,639150,Israel,IL,ISR,Haifa
+359,Liverpool,Liverpool,53.41600181,-2.917997886,639972.5,United Kingdom,GB,GBR,Merseyside
+360,Toulouse,Toulouse,43.61995892,1.449926716,640027.5,France,FR,FRA,Midi-Pyrénées
+361,Diyarbakir,Diyarbakir,37.92043601,40.23004024,640586.5,Turkey,TR,TUR,Diyarbakir
+362,San Jose,San Jose,9.93501243,-84.08405135,642862,Costa Rica,CR,CRI,San José
+363,Omaha,Omaha,41.24000083,-96.00999007,643034,United States of America,US,USA,Nebraska
+364,Hue,Hue,16.46998822,107.5800378,645000,Vietnam,VN,VNM,Thừa Thiên–Huế 
+365,Norfolk,Norfolk,36.84995872,-76.28000574,645336,United States of America,US,USA,Virginia
+366,Malacca,Malacca,2.206414407,102.2464615,645916.5,Malaysia,MY,MYS,Melaka
+367,Dehra Dun,Dehra Dun,30.32040895,78.05000565,646321.5,India,IN,IND,Uttaranchal
+368,Lilongwe,Lilongwe,-13.98329507,33.78330196,646750,Malawi,MW,MWI,Lilongwe
+369,Buffalo,Buffalo,42.87997825,-78.88000208,647778.5,United States of America,US,USA,New York
+370,Sokoto,Sokoto,13.06001548,5.240031289,648019.5,Nigeria,NG,NGA,Sokoto
+371,Tolyatti,Tolyatti,53.48039064,49.53004106,648622,Russia,RU,RUS,Samara
+372,Tianshui,Tianshui,34.60001853,105.9199841,649883.5,China,CN,CHN,Gansu
+373,Samarqand,Samarqand,39.67001914,66.94499874,652150,Uzbekistan,UZ,UZB,Samarkand
+374,Zhanyi,Zhanyi,25.6004645,103.8166499,652604,China,CN,CHN,Yunnan
+375,Bien Hoa,Bien Hoa,10.97001385,106.8300577,652646,Vietnam,VN,VNM,Đồng Nai 
+376,Ashgabat,Ashgabat,37.94999493,58.38329911,652841,Turkmenistan,TM,TKM,Ahal
+377,Shiyan,Shiyan,32.57003908,110.7799975,653823.5,China,CN,CHN,Hubei
+378,As Sulaymaniyah,As Sulaymaniyah,35.56127769,45.43085974,654318,Iraq,IQ,IRQ,As-Sulaymaniyah
+379,Leshan,Leshan,29.56709576,103.7333475,655738.5,China,CN,CHN,Sichuan
+380,Kolhapur,Kolhapur,16.70000002,74.22000688,655920.5,India,IN,IND,Maharashtra
+381,Ipoh,Ipoh,4.599989236,101.0649833,656227,Malaysia,MY,MYS,Perak
+382,Yinchuan,Yinchuan,38.46797365,106.2730375,657614,China,CN,CHN,Ningxia Hui
+383,Zunyi,Zunyi,27.70002626,106.9200264,657646,China,CN,CHN,Guizhou
+384,Hegang,Hegang,47.40001243,130.3700162,657833.5,China,CN,CHN,Heilongjiang
+385,Tirana,Tirana,41.32754071,19.81888301,658318,Albania,AL,ALB,Durrës
+386,El Paso,El Paso,31.77998395,-106.5099952,658331,United States of America,US,USA,Texas
+387,Wuhu,Wuhu,31.3504236,118.3699735,658762,China,CN,CHN,Anhui
+388,Olinda,Olinda,-7.999991029,-34.8499506,659554,Brazil,BR,BRA,Pernambuco
+389,Oklahoma City,Oklahoma City,35.47004295,-97.51868351,660475,United States of America,US,USA,Oklahoma
+390,Muscat,Muscat,23.61332481,58.59331213,660779,Oman,OM,OMN,Muscat
+391,Chisinau,Chisinau,47.00502362,28.85771114,662064,Moldova,MD,MDA,Chisinau
+392,Vientiane,Vientiane,17.96669273,102.59998,662174,Laos,LA,LAO,Vientiane [prefecture]
+393,Santo Andre,Santo Andre,-23.65283405,-46.52781661,662373,Brazil,BR,BRA,São Paulo
+394,Sarajevo,Sarajevo,43.8500224,18.38300167,662816.5,Bosnia and Herzegovina,BA,BIH,Sarajevo
+395,Providence,Providence,41.82110231,-71.4149797,663726.5,United States of America,US,USA,Rhode Island
+396,Puyang,Puyang,35.70039064,114.9799996,666322,China,CN,CHN,Henan
+397,Pingxiang,Pingxiang,27.62000531,113.8500427,666561.5,China,CN,CHN,Jiangxi
+398,Amravati,Amravati,20.94997316,77.77002274,669144,India,IN,IND,Maharashtra
+399,Tulsa,Tulsa,36.12000327,-95.93002079,669434,United States of America,US,USA,Oklahoma
+400,Birmingham,Birmingham,33.53000633,-86.82499516,670142,United States of America,US,USA,Alabama
+401,Tucson,Tucson,32.20499676,-110.8899862,670953.5,United States of America,US,USA,Arizona
+402,Gorakhpur,Gorakhpur,26.75039431,83.38001623,674246,India,IN,IND,Uttar Pradesh
+403,Shaoguan,Shaoguan,24.79997072,113.5799816,674507.5,China,CN,CHN,Guangdong
+404,West Palm Beach,West Palm Beach,26.74501996,-80.12362126,675521.5,United States of America,US,USA,Florida
+405,Yichang,Yichang,30.69997235,111.2800187,675862.5,China,CN,CHN,Hubei
+406,Tucumán,San Miguel de Tucuman,-26.81600014,-65.21662419,678803.5,Argentina,AR,ARG,Tucumán
+407,Saltillo,Saltillo,25.41995872,-101.0049823,679286.5,Mexico,MX,MEX,Coahuila
+408,Jeonju,Jeonju,35.83141624,127.1403942,679948.5,South Korea,KR,KOR,Jeollabuk-do
+409,Jaboatao,Jaboatao,-8.110010153,-35.02004358,681214,Brazil,BR,BRA,Pernambuco
+410,Warri,Warri,5.519958922,5.759999551,683064.5,Nigeria,NG,NGA,Delta
+411,Taizz,Taizz,13.60445253,44.03942012,683111,Yemen,YE,YEM,Ta`izz
+412,Acapulco,Acapulco,16.84999086,-99.91597905,683860,Mexico,MX,MEX,Guerrero
+413,Jixi,Jixi,45.29995974,130.9700313,684379.5,China,CN,CHN,Heilongjiang
+414,Shizuoka,Shizuoka,34.98583478,138.3853926,686446.5,Japan,JP,JPN,Shizuoka
+415,Jiaozuo,Jiaozuo,35.2500047,113.2200036,687270,China,CN,CHN,Henan
+416,Campo Grande,Campo Grande,-20.45003213,-54.61662521,687723,Brazil,BR,BRA,Mato Grosso do Sul
+417,Huangshi,Huangshi,30.22000165,115.0999922,688090,China,CN,CHN,Hubei
+418,Enugu,Enugu,6.450031351,7.499996703,688862,Nigeria,NG,NGA,Enugu
+419,Antwerpen,Antwerpen,51.22037355,4.415017048,689902.5,Belgium,BE,BEL,Antwerp
+420,Can Tho,Can Tho,10.04999249,105.7700191,690299,Vietnam,VN,VNM,Can Tho
+421,Islamabad,Islamabad,33.69999595,73.16663448,690800,Pakistan,PK,PAK,F.C.T.
+422,Yingkow,Yingkow,40.67034568,122.2800191,693079.5,China,CN,CHN,Liaoning
+423,Langfang,Langfang,39.5203642,116.6799991,694465.5,China,CN,CHN,Hebei
+424,Huzhou,Huzhou,30.87037539,120.0999971,694660,China,CN,CHN,Zhejiang
+425,Ansan,Ansan,37.34806785,126.8595328,695110.5,South Korea,KR,KOR,Gyeonggi-do
+426,Sao Jose dos Campos,Sao Jose dos Campos,-23.19999347,-45.87994918,695322.5,Brazil,BR,BRA,São Paulo
+427,Culiacan,Culiacan,24.82999473,-107.3799679,695734.5,Mexico,MX,MEX,Sinaloa
+428,Kozhikode,Kozhikode,11.25043601,75.76998979,696461,India,IN,IND,Kerala
+429,Bulawayo,Bulawayo,-20.16999754,28.58000199,697096,Zimbabwe,ZW,ZWE,Bulawayo
+430,Kumamoto,Kumamoto,32.80092938,130.700642,699327.5,Japan,JP,JPN,Kumamoto
+431,Yongzhou,Yongzhou,26.23037437,111.6199979,700180.5,China,CN,CHN,Hunan
+432,Ilorin,Ilorin,8.490010192,4.549995889,701742,Nigeria,NG,NGA,Kwara
+433,Nouakchott,Nouakchott,18.08642702,-15.97534041,701772,Mauritania,MR,MRT,Nouakchott
+434,Antalya,Antalya,36.88998212,30.69997595,703468.5,Turkey,TR,TUR,Antalya
+435,Nashville,Nashville,36.16997438,-86.77998499,703926,United States of America,US,USA,Tennessee
+436,Maiduguri,Maiduguri,11.84996014,13.16001298,704230,Nigeria,NG,NGA,Borno
+437,Pekanbaru,Pekanbaru,0.564964212,101.425013,705218,Indonesia,ID,IDN,Riau
+438,Changzhi,Changzhi,36.18387534,113.1052819,706000,China,CN,CHN,Shanxi
+439,Qingyuan,Qingyuan,23.7003996,113.0300927,706717,China,CN,CHN,Guangdong
+440,Oslo,Oslo,59.91669029,10.74997921,707500,Norway,NO,NOR,Oslo
+441,New Haven,New Haven,41.33038291,-72.90000533,707883,United States of America,US,USA,Connecticut
+442,Joinville,Joinville,-26.31995807,-48.83994938,710737.5,Brazil,BR,BRA,Santa Catarina
+443,Zagreb,Zagreb,45.80000673,15.99999467,710746,Croatia,HR,HRV,Grad Zagreb
+444,Lianyungang,Lianyungang,34.60043194,119.170028,715600,China,CN,CHN,Jiangsu
+445,Geneva,Geneva,46.21000755,6.140028034,716192.5,Switzerland,CH,CHE,Genève
+446,San Salvador,San Salvador,13.71000165,-89.20304122,717903.5,El Salvador,SV,SLV,San Salvador
+447,Konya,Konya,37.87501243,32.47500972,718680,Turkey,TR,TUR,Konya
+448,Tangier,Tangier,35.74728701,-5.832703696,719208,Morocco,MA,MAR,Tanger - Tétouan
+449,Cheongju,Cheongju,36.64389895,127.5011991,719420.5,South Korea,KR,KOR,Chungcheongbuk-do
+450,Cucuta,Cucuta,7.920019144,-72.51997685,721772,Colombia,CO,COL,Norte de Santander
+451,Oran,Oran,35.71000246,-0.61997278,721992,Algeria,DZ,DZA,Oran
+452,Riga,Riga,56.95002382,24.09996537,723802.5,Latvia,LV,LVA,Riga
+453,Zürich,Zurich,47.37998781,8.55001013,724865,Switzerland,CH,CHE,Zürich
+454,Albuquerque,Albuquerque,35.10497479,-106.6413308,725723,United States of America,US,USA,New Mexico
+455,Cotonou,Cotonou,6.400008564,2.519990599,726292,Benin,BJ,BEN,Ouémé
+456,Jiaxing,Jiaxing,30.77040733,120.7499833,727050.5,China,CN,CHN,Zhejiang
+457,Bangui,Bangui,4.366644306,18.55828813,727348,Central African Republic,CF,CAF,Bangui
+458,Fuxin,Fuxin,42.0104706,121.6600052,729525,China,CN,CHN,Liaoning
+459,Bacolod,Bacolod,10.63168825,122.9816817,730587,Philippines,PH,PHL,Negros Occidental
+460,Dhanbad,Dhanbad,23.80039349,86.41998572,732818,India,IN,IND,Jharkhand
+461,Bengbu,Bengbu,32.94999005,117.330037,735324,China,CN,CHN,Anhui
+462,Mexicali,Mexicali,32.64998252,-115.4800161,736138.5,Mexico,MX,MEX,Baja California
+463,Jos,Jos,9.929973978,8.890041055,737068.5,Nigeria,NG,NGA,Plateau
+464,Liaoyang,Liaoyang,41.27999839,123.1800158,740945,China,CN,CHN,Liaoning
+465,Vila Velha,Vila Velha,3.21666282,-51.21665186,742413.5,Brazil,BR,BRA,Amapá
+466,Vila Velha,Vila Velha,-20.36760822,-40.31798893,742413.5,Brazil,BR,BRA,Espírito Santo
+467,Zhenjiang,Zhenjiang,32.21998293,119.4300122,743276,China,CN,CHN,Jiangsu
+468,General Santos,General Santos,6.110827249,125.1747261,744308,Philippines,PH,PHL,South Cotabato
+469,Teresina,Teresina,-5.095000388,-42.7800092,746860.5,Brazil,BR,BRA,Piauí
+470,Chihuahua,Chihuahua,28.64498151,-106.0849823,750633.5,Mexico,MX,MEX,Chihuahua
+471,Quetta,Quetta,30.22000165,67.02499385,750837.5,Pakistan,PK,PAK,Baluchistan
+472,Dandong,Dandong,40.14360781,124.3935852,750986.5,China,CN,CHN,Liaoning
+473,Bhiwandi,Bhiwandi,19.35001914,73.12999589,751017.5,India,IN,IND,Maharashtra
+474,Yangjiang,Yangjiang,21.85040916,111.9700024,751181.5,China,CN,CHN,Guangdong
+475,Agadir,Agadir,30.43998822,-9.620043581,752031.5,Morocco,MA,MAR,Souss - Massa - Draâ
+476,Okayama,Okayama,34.67202964,133.9170865,752872,Japan,JP,JPN,Okayama
+477,Memphis,Memphis,35.1199868,-89.99999516,753843.5,United States of America,US,USA,Tennessee
+478,Moradabad,Moradabad,28.8417912,78.75678422,754069.5,India,IN,IND,Uttar Pradesh
+479,Zaria,Zaria,11.0799813,7.710009724,754836.5,Nigeria,NG,NGA,Kaduna
+480,Rajshahi,Rajshahi,24.37498374,88.6050203,755066.5,Bangladesh,BD,BGD,Rajshahi
+481,Kraków,Krakow,50.05997927,19.96001135,755525,Poland,PL,POL,Lesser Poland
+482,Lódz,Lodz,51.77499086,19.45136023,758000,Poland,PL,POL,Lódz
+483,Montevideo,Montevideo,-34.85804157,-56.17105229,759162,Uruguay,UY,URY,Montevideo
+484,Auckland,Auckland,-36.850013,174.7649808,759510,New Zealand,NZ,NZL,Auckland
+485,Lvov,Lvov,49.83498008,24.02999548,760841.5,Ukraine,UA,UKR,L'viv
+486,Mesa,Mesa,33.42391461,-111.7360844,762217.5,United States of America,US,USA,Arizona
+487,Djibouti,Djibouti,11.59501446,43.14800167,763506.5,Djibouti,DJ,DJI,Djibouti
+488,Aguascalientes,Aguascalientes,21.87945992,-102.2904135,763589.5,Mexico,MX,MEX,Aguascalientes
+489,Xiangfan,Xiangfan,32.01999514,112.1300443,765978,China,CN,CHN,Hubei
+490,Palermo,Palermo,38.12502301,13.35002722,767587.5,Italy,IT,ITA,Sicily
+491,Fuyang,Fuyang,30.0533333,119.9519444,771000,China,CN,CHN,Zhejiang
+492,Vereeniging,Vereeniging,-26.64960203,27.95998816,774340.5,South Africa,ZA,ZAF,Gauteng
+493,Aden,Aden,12.77972251,45.00949011,775301,Yemen,YE,YEM,`Adan
+494,Arequipa,Arequipa,-16.41999388,-71.53001144,775785,Peru,PE,PER,Arequipa
+495,Malang,Malang,-7.97999225,112.610015,775858,Indonesia,ID,IDN,Jawa Timur
+496,Yiyang,Yiyang,28.60041058,112.3300321,777304,China,CN,CHN,Hunan
+497,Raipur,Raipur,21.23499453,81.63500647,777497.5,India,IN,IND,Chhattisgarh
+498,Orlando,Orlando,28.50997683,-81.38003036,778985,United States of America,US,USA,Florida
+499,Aligarh,Aligarh,27.89221092,78.06178788,779103.5,India,IN,IND,Uttar Pradesh
+500,Jinzhou,Jinzhou,41.12036989,121.1000394,780134.5,China,CN,CHN,Liaoning
+501,Bareilly,Bareilly,28.34538739,79.41999955,781217.5,India,IN,IND,Uttar Pradesh
+502,Jiamusi,Jiamusi,46.83002138,130.3500175,784774.5,China,CN,CHN,Heilongjiang
+503,Foshan,Foshan,23.03005292,113.1200097,785174,China,CN,CHN,Guangdong
+504,Callao,Callao,-12.07002684,-77.13496647,786231.5,Peru,PE,PER,Lima
+505,Queretaro,Queretaro,20.63001853,-100.3799817,786392.5,Mexico,MX,MEX,Querétaro
+506,Raleigh,Raleigh,35.81878135,-78.64469344,789991.5,United States of America,US,USA,North Carolina
+507,Bucaramanga,Bucaramanga,7.1300932,-73.12588302,790410,Colombia,CO,COL,Santander
+508,Nampo,Nampo,38.76692078,125.4524338,791000,North Korea,KP,PRK,Namp'o-si
+509,Porto,Porto,41.15000633,-8.620001263,793316.5,Portugal,PT,PRT,Porto
+510,Kota,Kota,25.17999921,75.83499874,795044,India,IN,IND,Rajasthan
+511,Bandar Lampung,Bandar Lampung,-5.430018698,105.2699979,795757,Indonesia,ID,IDN,Lampung
+512,Irbil,Irbil,36.1790436,44.00862097,795870,Iraq,IQ,IRQ,Arbil
+513,Heze,Heze,35.22998008,115.4500484,796301,China,CN,CHN,Shandong
+514,Baoji,Baoji,34.38000612,107.1499865,800000,China,CN,CHN,Shaanxi
+515,Kingston,Kingston,17.97707662,-76.76743371,801336.5,Jamaica,JM,JAM,Kingston
+516,Rotterdam,Rotterdam,51.9199691,4.479974323,801599.5,Netherlands,NL,NLD,Zuid-Holland
+517,Volgograd,Volgograd,48.71000999,44.49996049,801827.5,Russia,RU,RUS,Volgograd
+518,Kigali,Kigali,-1.953590069,30.06053178,802630.5,Rwanda,RW,RWA,Kigali City
+519,Zhangjiakou,Zhangjiakou,40.83000002,114.9299768,802820.5,China,CN,CHN,Hebei
+520,Bhubaneshwar,Bhubaneshwar,20.27042808,85.82736039,803121.5,India,IN,IND,Orissa
+521,Joao Pessoa,Joao Pessoa,-7.10113513,-34.87607117,803441.5,Brazil,BR,BRA,Paraíba
+522,Cochabamba,Cochabamba,-17.41001097,-66.16997685,804138,Bolivia,BO,BOL,Cochabamba
+523,Lingyuan,Lingyuan,41.24,119.4011111,806000,China,CN,CHN,Liaoning
+524,Nantong,Nantong,32.0303821,120.8250175,806625.5,China,CN,CHN,Jiangsu
+525,Valencia,Valencia,39.48501752,-0.400012046,806652,Spain,ES,ESP,Comunidad Valenciana
+526,Cebu,Cebu,10.31997601,123.9000752,806817,Philippines,PH,PHL,Cebu
+527,Chifeng,Chifeng,42.27001548,118.9499898,811827,China,CN,CHN,Nei Mongol
+528,Saratov,Saratov,51.57998985,46.0299963,814586.5,Russia,RU,RUS,Saratov
+529,Newcastle,Newcastle,-32.84534788,151.8150122,816285.5,Australia,AU,AUS,New South Wales
+530,Jining,Jining,35.40040895,116.5500329,818163.5,China,CN,CHN,Shandong
+531,Guilin,Guilin,25.2799931,110.280028,818176,China,CN,CHN,Guangxi
+532,Jullundur,Jullundur,31.33492067,75.56902014,820089,India,IN,IND,Punjab
+533,Bishkek,Bishkek,42.87307945,74.58520422,820606,Kyrgyzstan,KG,KGZ,Bishkek
+534,Xinxiang,Xinxiang,35.32043968,113.8699898,823300.5,China,CN,CHN,Henan
+535,Quanzhou,Quanzhou,24.9000163,118.5799865,823571.5,China,CN,CHN,Fujian
+536,Salem,Salem,11.66999697,78.18007523,825698,India,IN,IND,Tamil Nadu
+537,Yueyang,Yueyang,29.38005292,113.1000109,826000,China,CN,CHN,Hunan
+538,Ulaanbaatar,Ulaanbaatar,47.9166734,106.9166158,827306,Mongolia,MN,MNG,Ulaanbaatar
+539,Mendoza,Mendoza,-32.88333006,-68.81661117,827815,Argentina,AR,ARG,Mendoza
+540,Kermanshah,Kermanshah,34.38000612,47.06001094,828313,Iran,IR,IRN,Kermanshah
+541,Niamey,Niamey,13.51670595,2.116656045,828895.5,Niger,NE,NER,Niamey
+542,Mianyang,Mianyang,31.46997703,104.7699768,830068,China,CN,CHN,Sichuan
+543,Port Elizabeth,Port Elizabeth,-33.97003375,25.60002885,830527,South Africa,ZA,ZAF,Eastern Cape
+544,Torreon,Torreon,25.57005292,-103.4200029,834033,Mexico,MX,MEX,Coahuila
+545,Anyang,Anyang,36.07997988,114.3500122,834064.5,China,CN,CHN,Henan
+546,San Luis Potosi,San Luis Potosi,22.16997622,-100.9999956,834852,Mexico,MX,MEX,San Luis Potosí
+547,Ndjamena,Ndjamena,12.11309654,15.04914831,835193.5,Chad,TD,TCD,Hadjer-Lamis
+548,Helsinki,Helsinki,60.17556337,24.93412634,836728.5,Finland,FI,FIN,Southern Finland
+549,Johor Bahru,Johor Bahru,1.480024637,103.7300402,838744.5,Malaysia,MY,MYS,Johor
+550,Yancheng,Yancheng,33.3855556,120.1252778,839000,China,CN,CHN,Jiangsu
+551,Mombasa,Mombasa,-4.040026022,39.68991817,840834,Kenya,KE,KEN,Coast
+552,Merida,Merida,20.96663881,-89.61663355,841087.5,Mexico,MX,MEX,Yucatán
+553,Hubli,Hubli,15.35997845,75.12501623,841402,India,IN,IND,Karnataka
+554,Duque de Caxias,Duque de Caxias,-22.76999388,-43.30997685,842890,Brazil,BR,BRA,Rio de Janeiro
+555,Az Zarqa,Az Zarqa,32.06999208,36.1000081,843678,Jordan,JO,JOR,Zarqa
+556,Nova Iguacu,Nova Iguacu,-22.74002155,-43.46996708,844583,Brazil,BR,BRA,Rio de Janeiro
+557,Panama City,Panama City,8.96801719,-79.53303715,844584,Panama,PA,PAN,Panama
+558,Odessa,Odessa,46.4900163,30.71000118,847500.5,Ukraine,UA,UKR,Odessa
+559,Padang,Padang,-0.960007305,100.3600134,847676,Indonesia,ID,IDN,Sumatera Barat
+560,Pingdingshan,Pingdingshan,33.73040753,113.2999987,849000,China,CN,CHN,Henan
+561,Yangquan,Yangquan,37.86997398,113.5700081,851801.5,China,CN,CHN,Shanxi
+562,Marrakesh,Marrakesh,31.6299931,-7.999987428,855648,Morocco,MA,MAR,Marrakech - Tensift - Al Haouz
+563,Bogor,Bogor,-6.570000795,106.7500109,859000,Indonesia,ID,IDN,Jawa Barat
+564,Cagayan de Oro,Cagayan de Oro,8.450839456,124.6852986,861824.5,Philippines,PH,PHL,Misamis Oriental
+565,Tiruchirappalli,Tiruchirappalli,10.80999778,78.68996659,863242,India,IN,IND,Tamil Nadu
+566,Xuanzhou,Xuanzhou,30.9525,118.7552778,866000,China,CN,CHN,Anhui
+567,Puch'on,Puch'on,37.4988889,126.7830556,866000,South Korea,KR,KOR,Gyeonggi-do
+568,Abuja,Abuja,9.083333149,7.533328002,869067.5,Nigeria,NG,NGA,Federal Capital Territory
+569,Thiruvananthapuram,Thiruvananthapuram,8.499983743,76.95002112,869076.5,India,IN,IND,Kerala
+570,Basra,Basra,30.51352378,47.81355668,870000,Iraq,IQ,IRQ,Al-Basrah
+571,Kaifeng,Kaifeng,34.85000327,114.3500122,872000,China,CN,CHN,Henan
+572,Donetsk,Donetsk,48.00000165,37.82998002,874137.5,Ukraine,UA,UKR,Donets'k
+573,Aba,Aba,5.100397968,7.34998002,874385,Nigeria,NG,NGA,Abia
+574,Virginia Beach,Virginia Beach,36.85321433,-75.97831873,877475.5,United States of America,US,USA,Virginia
+575,Mysore,Mysore,12.30998374,76.66001298,877656.5,India,IN,IND,Karnataka
+576,Banghazi,Banghazi,32.11673342,20.06672318,881187,Libya,LY,LBY,Benghazi
+577,Qinhuangdao,Qinhuangdao,39.93036501,119.6200264,881359,China,CN,CHN,Hebei
+578,Bandar Lampung,Tanjungkarang-Telubketung,-5.449604066,105.3000219,881801,Indonesia,ID,IDN,Lampung
+579,Zhucheng,Zhucheng,35.98995953,119.3800927,881963.5,China,CN,CHN,Shandong
+580,Duisburg,Duisburg,51.42997316,6.750016641,882381,Germany,DE,DEU,Nordrhein-Westfalen
+581,Dushanbe,Dushanbe,38.56003522,68.77387935,882822,Tajikistan,TJ,TJK,Tadzhikistan Territories
+582,Glasgow,Glasgow,55.87440472,-4.250707236,885134,United Kingdom,GB,GBR,Glasgow
+583,Edmonton,Edmonton,53.55002464,-113.4999819,885195.5,Canada,CA,CAN,Alberta
+584,Lupanshui,Lupanshui,26.59443483,104.8333321,886256,China,CN,CHN,Guizhou
+585,Amsterdam,Amsterdam,52.34996869,4.916640176,886318,Netherlands,NL,NLD,Noord-Holland
+586,Cartagena,Cartagena,10.39973859,-75.51439356,887000,Colombia,CO,COL,Bolívar
+587,Hamamatsu,Hamamatsu,34.71807334,137.7327193,887242.5,Japan,JP,JPN,Shizuoka
+588,Hengyang,Hengyang,26.88002464,112.5900162,887801,China,CN,CHN,Hunan
+589,Hims,Hims,34.72995892,36.72002193,890202,Syria,SY,SYR,Homs (Hims)
+590,Zhuzhou,Zhuzhou,27.82999249,113.1500337,894679,China,CN,CHN,Hunan
+591,Kathmandu,Kathmandu,27.71669191,85.31664221,895000,Nepal,NP,NPL,Bhaktapur
+592,Zigong,Zigong,29.40000002,104.780002,897480.5,China,CN,CHN,Sichuan
+593,Xiantao,Xiantao,30.3704059,113.4400419,897703,China,CN,CHN,Hubei
+594,Tegucigalpa,Tegucigalpa,14.1020449,-87.21752934,898424,Honduras,HN,HND,Francisco Morazán
+595,Ikare,Ikare,7.530430521,5.759999551,899965.5,Nigeria,NG,NGA,Ondo
+596,Goyang,Goyang,37.65273586,126.8372485,903000,South Korea,KR,KOR,Gyeonggi-do
+597,Jacksonville,Jacksonville,30.33002077,-81.66998682,904953.5,United States of America,US,USA,Florida
+598,Düsseldorf,Dusseldorf,51.22037355,6.779988972,906196.5,Germany,DE,DEU,Nordrhein-Westfalen
+599,Xining,Xining,36.6199986,101.7700048,907765.5,China,CN,CHN,Gansu
+600,Huaibei,Huaibei,33.95036826,116.7500207,908019.5,China,CN,CHN,Anhui
+601,Huaiyin,Huaiyin,33.58000327,119.0299849,909615,China,CN,CHN,Jiangsu
+602,Monrovia,Monrovia,6.31055666,-10.80475163,913331,Liberia,LR,LBR,Montserrado
+603,Jerusalem,Jerusalem,31.77840782,35.20662593,915150,Israel,IL,ISR,Jerusalem
+604,Kelang,Kelang,3.020369892,101.5500183,917933.5,Malaysia,MY,MYS,Selangor
+605,Ahvaz,Ahvaz,31.27998863,48.72001298,918572.5,Iran,IR,IRN,Khuzestan
+606,Austin,Austin,30.26694969,-97.74277836,919684,United States of America,US,USA,Texas
+607,Managua,Managua,12.15301658,-86.26849166,920000,Nicaragua,NI,NIC,Managua
+608,Shangrao,Shangrao,28.47039268,117.9699979,922421.5,China,CN,CHN,Jiangxi
+609,Sheffield,Sheffield,53.36667666,-1.499996583,922800,United Kingdom,GB,GBR,South Yorkshire
+610,Benxi,Benxi,41.33038291,123.7500069,923933,China,CN,CHN,Liaoning
+611,Perm,Perm,57.99995974,56.24999263,924154,Russia,RU,RUS,Perm'
+612,Baoshan,Baoshan,25.11997703,99.15000972,925000,China,CN,CHN,Yunnan
+613,Natal,Natal,-5.780023174,-35.24000431,925521.5,Brazil,BR,BRA,Rio Grande do Norte
+614,Benin City,Benin City,6.340477314,5.620008096,929013,Nigeria,NG,NGA,Edo
+615,Nezahualcoyotl,Nezahualcoyotl,19.41001548,-99.02998661,929681.5,Mexico,MX,MEX,México
+616,Gwalior,Gwalior,26.2299868,78.18007523,930229,India,IN,IND,Madhya Pradesh
+617,Qom,Qom,34.65001548,50.95000606,933478,Iran,IR,IRN,Qom
+618,Florence,Florence,43.78000083,11.25000036,935758.5,Italy,IT,ITA,Toscana
+619,Jianmen,Jianmen,30.65005292,113.1600073,937875,China,CN,CHN,Hubei
+620,Asuncion,Asuncion,-25.29640298,-57.64150517,940846.5,Paraguay,PY,PRY,Asunción
+621,Gaziantep,Gaziantep,37.07498374,37.38499426,943262,Turkey,TR,TUR,Gaziantep
+622,Da Nang,Da Nang,16.06003908,108.2499711,943534.5,Vietnam,VN,VNM,Da Nang
+623,Charlotte,Charlotte,35.20499453,-80.83003809,943574.5,United States of America,US,USA,North Carolina
+624,Ranchi,Ranchi,23.37000633,85.33002641,945227,India,IN,IND,Jharkhand
+625,Chandigarh,Chandigarh,30.71999697,76.78000565,946685.5,India,IN,IND,Chandigarh
+626,Lyon,Lyon,45.77000856,4.830030475,947658.5,France,FR,FRA,Rhône-Alpes
+627,Daqing,Daqing,46.57995913,125.0000081,948244,China,CN,CHN,Heilongjiang
+628,Dnipropetrovsk,Dnipropetrovsk,48.47997235,35.00002356,949424.5,Ukraine,UA,UKR,Dnipropetrovs'k
+629,Sharjah,Sharjah,25.37138287,55.40647823,952015.5,United Arab Emirates,AE,ARE,Sharjah
+630,Oakland,Oakland,37.76892071,-122.2211034,953044,United States of America,US,USA,California
+631,The Hague,The Hague,52.08003684,4.269961302,953862.5,Netherlands,NL,NLD,Zuid-Holland
+632,Mudangiang,Mudangiang,44.57501691,129.5900122,954957.5,China,CN,CHN,Heilongjiang
+633,Kansas City,Kansas City,39.10708851,-94.60409422,955272.5,United States of America,US,USA,Missouri
+634,Seville,Seville,37.40501528,-5.980007366,957533,Spain,ES,ESP,Andalucía
+635,Jamshedpur,Jamshedpur,22.78753542,86.19751868,958169,India,IN,IND,Jharkhand
+636,Jodhpur,Jodhpur,26.29176597,73.01677283,958238,India,IN,IND,Rajasthan
+637,Xinyi,Xinyi,34.38000612,118.3500264,962656,China,CN,CHN,Jiangsu
+638,Barquisimeto,Barquisimeto,10.04999249,-69.29996668,962745,Venezuela,VE,VEN,Lara
+639,Shangqiu,Shangqiu,34.45041526,115.6500362,967109,China,CN,CHN,Henan
+640,Ufa,Ufa,54.78997479,56.04003129,969378,Russia,RU,RUS,Bashkortostan
+641,Cincinnati,Cincinnati,39.16188479,-84.45692265,971191,United States of America,US,USA,Ohio
+642,San Bernardino,San Bernardino,34.12038373,-117.3000342,973690.5,United States of America,US,USA,California
+643,Weifang,Weifang,36.7204059,119.1001098,973866,China,CN,CHN,Shandong
+644,Ottawa,Ottawa,45.4166968,-75.7000153,978564.5,Canada,CA,CAN,Ontario
+645,Natal,Natal,-6.983825664,-60.26994938,980588,Brazil,BR,BRA,Amazonas
+646,Yichun,Yichun,27.8333333,114.4,982000,China,CN,CHN,Jiangxi
+647,Fez,Fez,34.05459963,-5.000377239,983445.5,Morocco,MA,MAR,Fès - Boulemane
+648,Milwaukee,Milwaukee,43.05265505,-87.91996708,983590,United States of America,US,USA,Wisconsin
+649,Cologne,Cologne,50.93000368,6.950004434,983697.5,Germany,DE,DEU,Nordrhein-Westfalen
+650,Huambo,Huambo,-12.74998533,15.76000932,986000,Angola,AO,AGO,Huambo
+651,Songnam,Songnam,37.4386111,127.1377778,986967.5,South Korea,KR,KOR,Gyeonggi-do
+652,Mogadishu,Mogadishu,2.066681334,45.36667761,987694,Somalia,SO,SOM,Banaadir
+653,Kitakyushu,Kitakyushu,33.87039899,130.8200146,990286.5,Japan,JP,JPN,Fukuoka
+654,Adelaide,Adelaide,-34.93498777,138.6000048,990677,Australia,AU,AUS,South Australia
+655,Leeds,Leeds,53.83000755,-1.580017539,992061.5,United Kingdom,GB,GBR,West Yorkshire
+656,Ouagadougou,Ouagadougou,12.37031598,-1.524723756,992228.5,Burkina Faso,BF,BFA,Kadiogo
+657,Changde,Changde,29.02999676,111.6800459,993390,China,CN,CHN,Hunan
+658,Niteroi,Niteroi,-22.90001178,-43.09998967,993920,Brazil,BR,BRA,Rio de Janeiro
+659,Samara,Samara,53.19500755,50.15129512,996595,Russia,RU,RUS,Samara
+660,Maanshan,Maanshan,31.73040041,118.4800443,1000121,China,CN,CHN,Anhui
+661,Maceio,Maceio,-9.619995505,-35.72997441,1000215.5,Brazil,BR,BRA,Alagoas
+662,Zhongli,Zhongli,24.96502525,121.2167765,1001193,Taiwan,TW,TWN,Taoyuan
+663,Columbus,Columbus,39.97997438,-82.9900096,1003418,United States of America,US,USA,Ohio
+664,Vijayawada,Vijayawada,16.51995933,80.63000321,1005793.5,India,IN,IND,Andhra Pradesh
+665,Neijiang,Neijiang,29.58037661,105.0500114,1006427,China,CN,CHN,Sichuan
+666,Maracay,Maracay,10.2468797,-67.59580713,1007000,Venezuela,VE,VEN,Aragua
+667,Vitória,Vitoria,-20.32399331,-40.36599634,1008328,Brazil,BR,BRA,Espírito Santo
+668,Sholapur,Sholapur,17.6704059,75.90000769,1009056,India,IN,IND,Maharashtra
+669,Guatemala,Guatemala,14.62113466,-90.52696558,1009469,Guatemala,GT,GTM,Guatemala
+670,Medina,Medina,24.49998903,39.5800024,1010000,Saudi Arabia,SA,SAU,Al Madinah
+671,Ulsan,Ulsan,35.54673077,129.3169539,1011932.5,South Korea,KR,KOR,Ulsan
+672,Calgary,Calgary,51.08299176,-114.0799982,1012661,Canada,CA,CAN,Alberta
+673,Kazan,Kazan,55.74994204,49.12634477,1013635,Russia,RU,RUS,Tatarstan
+674,Dublin,Dublin,53.33306114,-6.248905682,1013988,Ireland,IE,IRL,Dublin
+675,Toluca,Toluca,19.3303821,-99.66999923,1018440.5,Mexico,MX,MEX,México
+676,Chelyabinsk,Chelyabinsk,55.15499127,61.43866817,1018802,Russia,RU,RUS,Chelyabinsk
+677,Port Harcourt,Port Harcourt,4.810002257,7.010000772,1020000,Nigeria,NG,NGA,Rivers
+678,Zhuhai,Zhuhai,22.2769444,113.5677778,1023000,China,CN,CHN,Guangdong
+679,Ankang,Ankang,32.67998069,109.0200016,1025000,China,CN,CHN,Shaanxi
+680,Sofia,Sofia,42.68334943,23.31665401,1029913.5,Bulgaria,BG,BGR,Grad Sofiya
+681,Abbottabad,Abbottabad,34.1495034,73.19950069,1032323.5,Pakistan,PK,PAK,N.W.F.P.
+682,Rostov,Rostov,47.23464785,39.7126558,1032567,Russia,RU,RUS,Rostov
+683,Warangal,Warangal,18.00999758,79.57998979,1034690,India,IN,IND,Andhra Pradesh
+684,Sacramento,Sacramento,38.57502138,-121.4700381,1035949,United States of America,US,USA,California
+685,Baoding,Baoding,38.87042971,115.4800207,1051326,China,CN,CHN,Hebei
+686,Tbilisi,Tbilisi,41.72500999,44.79079545,1052628.5,Georgia,GE,GEO,Tbilisi
+687,Srinagar,Srinagar,34.09997154,74.81500932,1057928.5,India,IN,IND,Jammu and Kashmir
+688,Amman,Amman,31.95002525,35.93329993,1060000,Jordan,JO,JOR,Amman
+689,Santos,Santos,-23.95372393,-46.33294266,1060201.5,Brazil,BR,BRA,São Paulo
+690,Kuwait,Kuwait,29.36971763,47.97830115,1061532,Kuwait,KW,KWT,Al Kuwayt
+691,Kochi,Kochi,10.01500755,76.22391557,1061848,India,IN,IND,Kerala
+692,Aurangabad,Aurangabad,19.89569643,75.32030147,1064720.5,India,IN,IND,Maharashtra
+693,Suwon,Suwon,37.25778912,127.0108931,1078000,South Korea,KR,KOR,Gyeonggi-do
+694,Santo Domingo,Santo Domingo,18.47007285,-69.90008508,1078436.5,Dominican Republic,DO,DOM,Distrito Nacional
+695,Changwon,Masan,35.21910219,128.583562,1081499,South Korea,KR,KOR,Gyeongsangnam-do
+696,Mbuji-Mayi,Mbuji-Mayi,-6.150026429,23.59999589,1084880.5,Congo (Kinshasa),CD,COD,Kasaï-Oriental
+697,København,Kobenhavn,55.67856419,12.56348575,1085000,Denmark,DK,DNK,Hovedstaden
+698,Omsk,Omsk,54.98998842,73.39995357,1089201.5,Russia,RU,RUS,Omsk
+699,Doha,Doha,25.28655601,51.53296789,1090655,Qatar,QA,QAT,Ad Dawhah
+700,Ft. Worth,Ft. Worth,32.73997703,-97.34003809,1090830,United States of America,US,USA,Texas
+701,Rosario,Rosario,-32.95112954,-60.66630762,1094784.5,Argentina,AR,ARG,Santa Fe
+702,Almaty,Almaty,43.32498985,76.91503617,1096256,Kazakhstan,KZ,KAZ,Almaty
+703,Bhilai,Bhilai,21.2166667,81.4333333,1097000,India,IN,IND,Chhattisgarh
+704,Marseille,Marseille,43.28997906,5.37501013,1097405.5,France,FR,FRA,Provence-Alpes-Côte-d'Azur
+705,Yerevan,Yerevan,40.18115074,44.51355139,1097742.5,Armenia,AM,ARM,Erevan
+706,Nanyang,Nanyang,33.00040041,112.5300199,1097766,China,CN,CHN,Henan
+707,Belgrade,Belgrade,44.81864545,20.46799068,1099000,Serbia,RS,SRB,Grad Beograd
+708,Lome,Lome,6.131937072,1.222757119,1100850,Togo,TG,TGO,Maritime
+709,Madurai,Madurai,9.920026264,78.12002722,1101954,India,IN,IND,Tamil Nadu
+710,Fort Lauderdale,Fort Lauderdale,26.13606488,-80.14178552,1103781.5,United States of America,US,USA,Florida
+711,Indianapolis,Indianapolis,39.74998842,-86.17004806,1104641.5,United States of America,US,USA,Indiana
+712,Zhanjiang,Zhanjiang,21.19998374,110.3800219,1113895,China,CN,CHN,Guangdong
+713,Lubumbashi,Lubumbashi,-11.6800248,27.48001745,1114317,Congo (Kinshasa),CD,COD,Katanga
+714,Xianyang,Xianyang,34.3455556,108.7147222,1126000,China,CN,CHN,Shaanxi
+715,Allahabad,Allahabad,25.45499534,81.84000688,1137219,India,IN,IND,Uttar Pradesh
+716,Changzhou,Changzhou,31.77998395,119.9699792,1138009,China,CN,CHN,Jiangsu
+717,Las Vegas,Las Vegas,36.20999778,-115.2200061,1150717,United States of America,US,USA,Nevada
+718,Amritsar,Amritsar,31.63999249,74.86999304,1152225,India,IN,IND,Punjab
+719,Jabalpur,Jabalpur,23.17505699,79.95505733,1157584,India,IN,IND,Madhya Pradesh
+720,Essen,Essen,51.44999778,7.016615355,1157801.5,Germany,DE,DEU,Nordrhein-Westfalen
+721,Zaozhuang,Zaozhuang,34.88000144,117.5700223,1164332.5,China,CN,CHN,Shandong
+722,Mandalay,Mandalay,21.96998842,96.08502885,1167000,Myanmar,MM,MMR,Mandalay
+723,Cleveland,Cleveland,41.4699868,-81.69499821,1169757,United States of America,US,USA,Ohio
+724,Cilacap,Cilacap,-7.718819561,109.0154024,1174964,Indonesia,ID,IDN,Jawa Tengah
+725,Linyi,Linyi,35.07998924,118.329976,1176334.5,China,CN,CHN,Shandong
+726,Rajkot,Rajkot,22.31001935,70.80000891,1179941,India,IN,IND,Dadra and Nagar Haveli
+727,Kaduna,Kaduna,10.52001548,7.440000365,1191296.5,Nigeria,NG,NGA,Kaduna
+728,La Paz,La Paz,-16.49797361,-68.14998519,1201399.5,Bolivia,BO,BOL,La Paz
+729,Perth,Perth,-31.95501463,115.8399987,1206108,Australia,AU,AUS,Western Australia
+730,Portland,Portland,45.52002382,-122.6799901,1207756.5,United States of America,US,USA,Oregon
+731,Tripoli,Tripoli,32.89250002,13.18001176,1209199,Libya,LY,LBY,Tajura' wa an Nawahi al Arba
+732,Novosibirsk,Novosibirsk,55.02996014,82.96004187,1213100.5,Russia,RU,RUS,Novosibirsk
+733,Ganzhou,Ganzhou,25.91997988,114.9500272,1216134.5,China,CN,CHN,Jiangxi
+734,Maoming,Maoming,21.92040489,110.8700179,1217715,China,CN,CHN,Guangdong
+735,Mosul,Mosul,36.34500246,43.14500443,1228467,Iraq,IQ,IRQ,Ninawa
+736,Baotou,Baotou,40.65220725,109.8220198,1229664.5,China,CN,CHN,Nei Mongol
+737,Huainan,Huainan,32.62998374,116.9799808,1239327.5,China,CN,CHN,Anhui
+738,Shiraz,Shiraz,29.62996014,52.57001054,1240000,Iran,IR,IRN,Fars
+739,Adana,Adana,36.99498863,35.32000403,1245445,Turkey,TR,TUR,Adana
+740,Nizhny Novgorod,Nizhny Novgorod,56.33300722,44.00009436,1246463,Russia,RU,RUS,Nizhegorod
+741,Long Beach,Long Beach,33.78696739,-118.1580439,1249195.5,United States of America,US,USA,California
+742,Hohhot,Hohhot,40.81997479,111.6599955,1250238.5,China,CN,CHN,Nei Mongol
+743,Dubai,Dubai,25.22999615,55.27997432,1258173.5,United Arab Emirates,AE,ARE,Dubay
+744,Varanasi,Varanasi,25.32999005,83.00003943,1258202,India,IN,IND,Uttar Pradesh
+745,Turin,Turin,45.07038719,7.669960489,1258631.5,Italy,IT,ITA,Piemonte
+746,Stockholm,Stockholm,59.35075995,18.09733473,1258654.5,Sweden,SE,SWE,Stockholm
+747,Brazzaville,Brazzaville,-4.259185772,15.28468949,1259445,Congo (Brazzaville),CG,COG,Pool
+748,St. Louis,St. Louis,38.63501772,-90.23998051,1259958,United States of America,US,USA,Missouri
+749,Peshawar,Peshawar,34.00501609,71.53500281,1260886.5,Pakistan,PK,PAK,N.W.F.P.
+750,Qiqihar,Qiqihar,47.34497703,123.9899922,1261682,China,CN,CHN,Heilongjiang
+751,Ujungpandang,Ujungpandang,-5.139958884,119.4320275,1262000,Indonesia,ID,IDN,Sulawesi Selatan
+752,Munich,Munich,48.12994204,11.57499345,1267695.5,Germany,DE,DEU,Bayern
+753,Ghaziabad,Ghaziabad,28.66038108,77.40839107,1270095.5,India,IN,IND,Uttar Pradesh
+754,Yekaterinburg,Yekaterinburg,56.85002993,60.59995967,1270488,Russia,RU,RUS,Sverdlovsk
+755,San Jose,San Jose,37.29998293,-121.8499891,1281471.5,United States of America,US,USA,California
+756,Haiphong,Haiphong,20.83000633,106.6800927,1285847.5,Vietnam,VN,VNM,Quảng Ninh
+757,Vishakhapatnam,Vishakhapatnam,17.73001467,83.30498205,1296089,India,IN,IND,Andhra Pradesh
+758,Lusaka,Lusaka,-15.41664427,28.28332759,1297720,Zambia,ZM,ZMB,Lusaka
+759,Leon,Leon,21.1499868,-101.7000304,1301313,Mexico,MX,MEX,Guanajuato
+760,Tabriz,Tabriz,38.08629152,46.30124589,1304713,Iran,IR,IRN,East Azarbaijan
+761,Davao,Davao,7.110016906,125.6299955,1307252,Philippines,PH,PHL,Davao Del Sur
+762,Meerut,Meerut,29.00041201,77.70000118,1310592,India,IN,IND,Uttar Pradesh
+763,Manchester,Manchester,53.50041526,-2.247987103,1312757.5,United Kingdom,GB,GBR,Manchester
+764,Maputo,Maputo,-25.95527749,32.58916296,1318806.5,Mozambique,MZ,MOZ,Maputo
+765,Tainan,Tainan,23.00000307,120.2000427,1319156,Taiwan,TW,TWN,Tainan City
+766,Tampa,Tampa,27.94698793,-82.45862085,1319232.5,United States of America,US,USA,Florida
+767,Ningbo,Ningbo,29.87997072,121.5500378,1321433.5,China,CN,CHN,Zhejiang
+768,Coimbatore,Coimbatore,10.99996035,76.95002112,1327911.5,India,IN,IND,Tamil Nadu
+769,Asansol,Asansol,23.6833333,86.9833333,1328000,India,IN,IND,West Bengal
+770,Yaounde,Yaounde,3.866700662,11.51665076,1335793.5,Cameroon,CM,CMR,Centre
+771,Mannheim,Mannheim,49.50037518,8.470015013,1337587,Germany,DE,DEU,Baden-Württemberg
+772,Pretoria,Pretoria,-25.70692055,28.22942908,1338000,South Africa,ZA,ZAF,Gauteng
+773,Kharkiv,Kharkiv,49.99998293,36.25002478,1338063.5,Ukraine,UA,UKR,Kharkiv
+774,Semarang,Semarang,-6.966617412,110.4200195,1342042,Indonesia,ID,IDN,Jawa Tengah
+775,Ciudad Juárez,Ciudad Juarez,31.69037701,-106.4900481,1343000,Mexico,MX,MEX,Chihuahua
+776,Makkah,Makkah,21.43002138,39.82003943,1354312,Saudi Arabia,SA,SAU,Makkah
+777,San Antonio,San Antonio,29.48733319,-98.50730534,1364905,United States of America,US,USA,Texas
+778,Jinxi,Jinxi,40.7503408,120.8299784,1369623.5,China,CN,CHN,Liaoning
+779,Kawasaki,Kawasaki,35.52998761,139.705002,1372025.5,Japan,JP,JPN,Kanagawa
+780,Córdoba,Cordoba,-31.39995807,-64.18229456,1374467.5,Argentina,AR,ARG,Córdoba
+781,Brussels,Brussels,50.83331708,4.333316608,1381011,Belgium,BE,BEL,Brussels
+782,Nasik,Nasik,20.00041872,73.77998205,1381248.5,India,IN,IND,Maharashtra
+783,Kampala,Kampala,0.316658955,32.58332353,1386594.5,Uganda,UG,UGA,Kampala
+784,Brisbane,Brisbane,-27.45503091,153.0350927,1393176.5,Australia,AU,AUS,Queensland
+785,Faridabad,Faridabad,28.4333333,77.3166667,1394000,India,IN,IND,Haryana
+786,Bamako,Bamako,12.65001467,-8.000039105,1395640.5,Mali,ML,MLI,Bamako
+787,Luan,Luan,31.75034751,116.4800114,1408227.5,China,CN,CHN,Anhui
+788,Ad Damman,Ad Damman,26.42819175,50.09967037,1411656,Saudi Arabia,SA,SAU,Ash Sharqiyah
+789,Xinyang,Xinyang,32.130376,114.0699776,1411944,China,CN,CHN,Henan
+790,Yantai,Yantai,37.53040814,121.4000211,1417666,China,CN,CHN,Shandong
+791,Anshan,Anshan,41.11502138,122.9400305,1419137.5,China,CN,CHN,Liaoning
+792,Hyderabad,Hyderabad,25.379987,68.37498897,1422665,Pakistan,PK,PAK,Sind
+793,Karaj,Karaj,35.8003587,50.97000484,1423000,Iran,IR,IRN,Tehran
+794,Suining,Suining,30.5333333,105.5333333,1425000,China,CN,CHN,Sichuan
+795,Bursa,Bursa,40.1999868,29.06999792,1425544.5,Turkey,TR,TUR,Bursa
+796,Gwangju,Gwangju,35.1709656,126.9104341,1428469,South Korea,KR,KOR,Kwangju-gwangyoksi
+797,Wuxi,Wuxi,31.57999615,120.2999849,1428823.5,China,CN,CHN,Jiangsu
+798,Baltimore,Baltimore,39.29999005,-76.61998499,1432946,United States of America,US,USA,Maryland
+799,Fushun,Fushun,41.86538902,123.8699996,1435323,China,CN,CHN,Liaoning
+800,Liuzhou,Liuzhou,24.28000246,109.2500134,1436030.5,China,CN,CHN,Guangxi
+801,San Juan,San Juan,18.44002301,-66.12997929,1437115.5,Puerto Rico,PR,PRI,
+802,Khulna,Khulna,22.839987,89.56000077,1447669.5,Bangladesh,BD,BGD,Khulna
+803,Kuala Lumpur,Kuala Lumpur,3.166665872,101.6999833,1448000,Malaysia,MY,MYS,Selangor
+804,Gujranwala,Gujranwala,32.16042584,74.18502193,1448735.5,Pakistan,PK,PAK,Punjab
+805,Daejeon,Daejeon,36.33554567,127.425028,1458165,South Korea,KR,KOR,Daejeon
+806,Vancouver,Vancouver,49.27341658,-123.1216442,1458415,Canada,CA,CAN,British Columbia
+807,Datong,Datong,40.08001996,113.2999987,1462839,China,CN,CHN,Shanxi
+808,Tijuana,Tijuana,32.50001752,-117.079996,1464728.5,Mexico,MX,MEX,Baja California
+809,Phnom Penh,Phnom Penh,11.55003013,104.9166345,1466000,Cambodia,KH,KHM,Phnom Penh
+810,Shantou,Shantou,23.37000633,116.6700256,1467486.5,China,CN,CHN,Guangdong
+811,Kumasi,Kumasi,6.689990864,-1.630014487,1468575.5,Ghana,GH,GHA,Ashanti
+812,Santiago,Santiago,19.50000999,-70.67001225,1471007.5,Dominican Republic,DO,DOM,Santiago
+813,Multan,Multan,30.19997703,71.45500769,1479615,Pakistan,PK,PAK,Punjab
+814,Nanning,Nanning,22.81998822,108.3200443,1485394,China,CN,CHN,Guangxi
+815,Minneapolis,Minneapolis,44.97997927,-93.25178634,1491886.5,United States of America,US,USA,Minnesota
+816,Conakry,Conakry,9.531522846,-13.68023503,1494000,Guinea,GN,GIN,Conakry
+817,Handan,Handan,36.5799752,114.4799784,1494659,China,CN,CHN,Hebei
+818,Suzhou,Suzhou,31.30047833,120.620017,1496545.5,China,CN,CHN,Jiangsu
+819,Agra,Agra,27.17042035,78.01502071,1511027.5,India,IN,IND,Uttar Pradesh
+820,Barranquilla,Barranquilla,10.95998863,-74.79996688,1521245.5,Colombia,CO,COL,Atlántico
+821,Katowice,Katowice,50.26038047,19.02001705,1527362,Poland,PL,POL,Silesian
+822,Kobe,Kobe,34.67998781,135.1699816,1528478,Japan,JP,JPN,Hyogo
+823,Pittsburgh,Pittsburgh,40.4299986,-79.99998539,1535267.5,United States of America,US,USA,Pennsylvania
+824,Luzhou,Luzhou,28.87998008,105.380017,1537000,China,CN,CHN,Sichuan
+825,Antananarivo,Antananarivo,-18.91663735,47.5166239,1544216.5,Madagascar,MG,MDG,Antananarivo
+826,Xiamen,Xiamen,24.44999208,118.080017,1548668.5,China,CN,CHN,Fujian
+827,Quito,Quito,-0.214988181,-78.50005111,1550407,Ecuador,EC,ECU,Pichincha
+828,Luoyang,Luoyang,34.67998781,112.4700752,1552790.5,China,CN,CHN,Henan
+829,Harare,Harare,-17.81778969,31.04470943,1557406.5,Zimbabwe,ZW,ZWE,Harare
+830,Valencia,Valencia,10.22998151,-67.9800214,1569526.5,Venezuela,VE,VEN,Carabobo
+831,Tunis,Tunis,36.80277814,10.1796781,1570476.5,Tunisia,TN,TUN,Tunis
+832,Isfahan,Isfahan,32.70000531,51.7000378,1572883,Iran,IR,IRN,Esfahan
+833,Kalyan,Kalyan,19.25023195,73.16017493,1576614,India,IN,IND,Maharashtra
+834,Vadodara,Vadodara,22.31001935,73.18001868,1582738,India,IN,IND,Dadra and Nagar Haveli
+835,Hiroshima,Hiroshima,34.3878351,132.442913,1594420.5,Japan,JP,JPN,Hiroshima
+836,Palembang,Palembang,-2.980039043,104.7500297,1595250,Indonesia,ID,IDN,Sumatera Selatan
+837,Goiania,Goiania,-16.72002724,-49.30002466,1596597.5,Brazil,BR,BRA,Goiás
+838,Ludhiana,Ludhiana,30.92776206,75.87225745,1597184,India,IN,IND,Punjab
+839,Haikou,Haikou,20.05000226,110.3200256,1606808.5,China,CN,CHN,Hainan
+840,Wenzhou,Wenzhou,28.0199809,120.6500927,1607836,China,CN,CHN,Zhejiang
+841,George Town,George Town,5.413613156,100.3293679,1610101,Malaysia,MY,MYS,Pulau Pinang
+842,Irvine,Irvine,33.68041058,-117.8299502,1611303.5,United States of America,US,USA,California
+843,Port-au-Prince,Port-au-Prince,18.5410246,-72.33603459,1616371,Haiti,HT,HTI,Ouest
+844,Naples,Naples,40.84002525,14.24501135,1619486,Italy,IT,ITA,Campania
+845,Douala,Douala,4.060409769,9.709991006,1622041,Cameroon,CM,CMR,Littoral
+846,Taian,Taian,36.19999839,117.1200756,1629000,China,CN,CHN,Shandong
+847,Kyoto,Kyoto,35.02999229,135.7499979,1632320,Japan,JP,JPN,Kyoto
+848,Birmingham,Birmingham,52.47497398,-1.919996787,1634666.5,United Kingdom,GB,GBR,West Midlands
+849,Manaus,Manaus,-3.100031719,-60.00001754,1636622,Brazil,BR,BRA,Amazonas
+850,Sendai,Sendai,38.28710614,141.0217175,1643781,Japan,JP,JPN,Miyagi
+851,Xuzhou,Xuzhou,34.28001223,117.1800203,1645096.5,China,CN,CHN,Jiangsu
+852,Bhopal,Bhopal,23.24998781,77.40999304,1663457,India,IN,IND,Madhya Pradesh
+853,Lisbon,Lisbon,38.72272288,-9.144866305,1664901,Portugal,PT,PRT,Lisboa
+854,Budapest,Budapest,47.50000633,19.08332068,1679000,Hungary,HU,HUN,Budapest
+855,Wanzhou,Wanxian,30.81999086,108.4000394,1680000,China,CN,CHN,Chongqing
+856,Rabat,Rabat,34.02529909,-6.83613082,1680376.5,Morocco,MA,MAR,Rabat - Salé - Zemmour - Zaer
+857,Rome,Rome,41.89595563,12.48325842,1687226,Italy,IT,ITA,Lazio
+858,Minsk,Minsk,53.89997744,27.56662716,1691069,Belarus,BY,BLR,Minsk
+859,Warsaw,Warsaw,52.25000063,20.99999955,1704569.5,Poland,PL,POL,Masovian
+860,Hefei,Hefei,31.85003135,117.2800142,1711952,China,CN,CHN,Anhui
+861,Tangshan,Tangshan,39.62433718,118.194377,1737974.5,China,CN,CHN,Hebei
+862,Tel Aviv-Yafo,Tel Aviv-Yafo,32.07999147,34.77001176,1745179,Israel,IL,ISR,Tel Aviv
+863,Hamburg,Hamburg,53.55002464,9.999999144,1748058.5,Germany,DE,DEU,Hamburg
+864,Maracaibo,Maracaibo,10.72997683,-71.65997766,1764650,Venezuela,VE,VEN,Zulia
+865,Shuyang,Shuyang,34.12986635,118.7733597,1770000,China,CN,CHN,Jiangsu
+866,Stuttgart,Stuttgart,48.77997988,9.199996296,1775644,Germany,DE,DEU,Baden-Württemberg
+867,Beirut,Beirut,33.87197512,35.50970821,1779062.5,Lebanon,LB,LBN,Beirut
+868,Frankfurt,Frankfurt,50.09997683,8.67501542,1787332,Germany,DE,DEU,Hessen
+869,Belem,Belem,-1.450003236,-48.48002303,1787368.5,Brazil,BR,BRA,Pará
+870,Puebla,Puebla,19.04995994,-98.20003727,1793549.5,Mexico,MX,MEX,Puebla
+871,Benoni,Benoni,-26.14958087,28.32993974,1795672,South Africa,ZA,ZAF,Gauteng
+872,Rawalpindi,Rawalpindi,33.59997622,73.04002722,1800550.5,Pakistan,PK,PAK,Punjab
+873,Seattle,Seattle,47.57000205,-122.339985,1821684.5,United States of America,US,USA,Washington
+874,Urumqi,Urumqi,43.80501223,87.57500565,1829612.5,China,CN,CHN,Xinjiang Uygur
+875,Taichung,Taichung,24.15207745,120.681667,1835024,Taiwan,TW,TWN,Taichung City
+876,Bucharest,Bucharest,44.4333718,26.09994665,1842097,Romania,RO,ROU,Bucharest
+877,Santa Cruz,Santa Cruz,-17.75391762,-63.22599634,1859530.5,Bolivia,BO,BOL,Santa Cruz
+878,Saidu,Saidu,34.75003522,72.34999182,1860310,Pakistan,PK,PAK,N.W.F.P.
+879,Zibo,Zibo,36.79998761,118.049993,1865385,China,CN,CHN,Shandong
+880,Patna,Patna,25.62495913,85.13003861,1878960,India,IN,IND,Bihar
+881,Fuzhou,Fuzhou,26.07999595,119.3000459,1892860,China,CN,CHN,Fujian
+882,Campinas,Campinas,-22.90001178,-47.10002975,1911277,Brazil,BR,BRA,São Paulo
+883,Sanaa,Sanaa,15.3547333,44.20659338,1921926.5,Yemen,YE,YEM,Amanat Al Asimah
+884,Denver,Denver,39.73918805,-104.984016,1930799.5,United States of America,US,USA,Colorado
+885,Indore,Indore,22.71505922,75.86502274,1931520.5,India,IN,IND,Madhya Pradesh
+886,Medan,Medan,3.579973978,98.65004024,1932985.5,Indonesia,ID,IDN,Sumatera Utara
+887,San Diego,San Diego,32.82002382,-117.1799899,1938570.5,United States of America,US,USA,California
+888,Bekasi,Bekasi,-6.217257468,106.972323,1949165,Indonesia,ID,IDN,Jakarta Raya
+889,Suzhou,Suzhou,33.6361111,116.9788889,1964000,China,CN,CHN,Anhui
+890,Kunming,Kunming,25.06998008,102.6799751,1977337,China,CN,CHN,Yunnan
+891,Athens,Athens,37.98332623,23.73332108,1985568.5,Greece,GR,GRC,Attiki
+892,Baku,Baku,40.39527203,49.86221716,2007150,Azerbaijan,AZ,AZE,Baki
+893,Accra,Accra,5.550034606,-0.21671574,2042132,Ghana,GH,GHA,Greater Accra
+894,Bandung,Bandung,-6.950029278,107.5700126,2046859.5,Indonesia,ID,IDN,Jawa Barat
+895,Vienna,Vienna,48.20001528,16.36663896,2065500,Austria,AT,AUT,Wien
+896,Tashkent,Tashkent,41.31170188,69.29493282,2081014,Uzbekistan,UZ,UZB,Tashkent
+897,Havana,Havana,23.13195884,-82.36418217,2082458.5,Cuba,CU,CUB,Ciudad de la Habana
+898,San Francisco,San Francisco,37.74000775,-122.4599777,2091036,United States of America,US,USA,California
+899,Fukuoka,Fukuoka,33.59501528,130.4100138,2092144.5,Japan,JP,JPN,Fukuoka
+900,Nanchang,Nanchang,28.67999229,115.8799963,2110675.5,China,CN,CHN,Jiangxi
+901,Milan,Milan,45.4699752,9.20500891,2125830.5,Italy,IT,ITA,Lombardia
+902,Melbourne,Melbourne,-37.82003131,144.9750162,2131812.5,Australia,AU,AUS,Victoria
+903,Jilin,Jilin,43.84997072,126.5500427,2138988.5,China,CN,CHN,Jilin
+904,Kaohsiung,Kaohsiung,22.63330711,120.2666019,2144391.5,Taiwan,TW,TWN,Kaohsiung City
+905,Aleppo,Aleppo,36.22997072,37.1700203,2170132,Syria,SY,SYR,Aleppo (Halab)
+906,Nanchong,Nanchong,30.78043256,106.1299971,2174000,China,CN,CHN,Sichuan
+907,Xiangtan,Xiangtan,27.85043052,112.9000232,2183454,China,CN,CHN,Hunan
+908,Kiev,Kiev,50.43336733,30.51662797,2185754,Ukraine,UA,UKR,Kiev
+909,Sapporo,Sapporo,43.07497927,141.3400443,2202893,Japan,JP,JPN,Hokkaido
+910,Shijianzhuang,Shijianzhuang,38.05001467,114.4799784,2204737,China,CN,CHN,Hebei
+911,Cali,Cali,3.399959126,-76.49996647,2216418,Colombia,CO,COL,Valle del Cauca
+912,Ibadan,Ibadan,7.380026264,3.929982054,2221285,Nigeria,NG,NGA,Oyo
+913,Guayaquil,Guayaquil,-2.220033754,-79.92004195,2233014.5,Ecuador,EC,ECU,Guayas
+914,Qingdao,Qingdao,36.08997927,120.3300089,2254122.5,China,CN,CHN,Shandong
+915,Lanzhou,Lanzhou,36.05602785,103.7920003,2282609,China,CN,CHN,Gansu
+916,Omdurman,Omdurman,15.61668113,32.48002234,2289428.5,Sudan,SD,SDN,Khartoum
+917,Curitiba,Curitiba,-25.420013,-49.3199976,2291430,Brazil,BR,BRA,Paraná
+918,Mashhad,Mashhad,36.27001996,59.5699967,2318126.5,Iran,IR,IRN,Razavi Khorasan
+919,Zhengzhou,Zhengzhou,34.75499615,113.6650927,2325062.5,China,CN,CHN,Henan
+920,Changsha,Changsha,28.19996991,112.969993,2338969,China,CN,CHN,Hunan
+921,Nagpur,Nagpur,21.16995974,79.08999385,2341009,India,IN,IND,Maharashtra
+922,Caracas,Caracas,10.50099855,-66.91703719,2400339.5,Venezuela,VE,VEN,Distrito Capital
+923,Guiyang,Guiyang,26.58004295,106.7200386,2416816.5,China,CN,CHN,Guizhou
+924,Monterrey,Monterrey,25.66999514,-100.3299848,2417437,Mexico,MX,MEX,Nuevo León
+925,Jinan,Jinan,36.67498232,116.9950187,2433633,China,CN,CHN,Shandong
+926,Zhangzhou,Zhangzhou,24.52037539,117.6700162,2434799.5,China,CN,CHN,Fujian
+927,Phoenix,Phoenix,33.53997988,-112.0699917,2436022.5,United States of America,US,USA,Arizona
+928,Hangzhou,Hangzhou,30.24997398,120.1700187,2442564.5,China,CN,CHN,Zhejiang
+929,"Washington, D.C.","Washington, D.C.",38.89954938,-77.00941858,2445216.5,United States of America,US,USA,District of Columbia
+930,Izmir,Izmir,38.43614968,27.15179401,2454909,Turkey,TR,TUR,Izmir
+931,Daegu,Daegu,35.86678876,128.6069714,2460000,South Korea,KR,KOR,Taegu-gwangyoksi
+932,Atlanta,Atlanta,33.83001385,-84.39994938,2464454,United States of America,US,USA,Georgia
+933,Damascus,Damascus,33.500034,36.29999589,2466000,Syria,SY,SYR,Damascus
+934,Detroit,Detroit,42.32996014,-83.08005579,2526135,United States of America,US,USA,Michigan
+935,Boston,Boston,42.32996014,-71.07001367,2528070.5,United States of America,US,USA,Massachusetts
+936,Dakar,Dakar,14.71583173,-17.47313013,2540200,Senegal,SN,SEN,Dakar
+937,Incheon,Incheon,37.47614789,126.6422334,2550000,South Korea,KR,KOR,Inch'on-gwangyoksi
+938,Faisalabad,Faisalabad,31.40998069,73.10999711,2561797.5,Pakistan,PK,PAK,Punjab
+939,Recife,Recife,-8.075645326,-34.91560551,2564549,Brazil,BR,BRA,Pernambuco
+940,Lucknow,Lucknow,26.85503908,80.91499874,2583505.5,India,IN,IND,Uttar Pradesh
+941,Dalian,Dalian,38.92283839,121.6298308,2601153.5,China,CN,CHN,Liaoning
+942,Surabaya,Surabaya,-7.249235821,112.7508333,2609829,Indonesia,ID,IDN,Jawa Timur
+943,Porto Alegre,Porto Alegre,-30.05001463,-51.20001205,2644870.5,Brazil,BR,BRA,Rio Grande do Sul
+944,Medellin,Medellin,6.275003274,-75.57501001,2648489.5,Colombia,CO,COL,Antioquia
+945,Algiers,Algiers,36.7630648,3.05055253,2665831.5,Algeria,DZ,DZA,Alger
+946,El Giza,El Giza,30.00998863,31.19002356,2681863,Egypt,EG,EGY,Al Jizah
+947,Nagoya,Nagoya,35.15499758,136.9149914,2710639.5,Japan,JP,JPN,Aichi
+948,Durban,Durban,-29.865013,30.98001054,2729000,South Africa,ZA,ZAF,KwaZulu-Natal
+949,Johannesburg,Johannesburg,-26.17004474,28.03000972,2730734.5,South Africa,ZA,ZAF,Gauteng
+950,Quezon City,Quezon City,14.6504352,121.0299662,2761720,Philippines,PH,PHL,Metropolitan Manila
+951,Madrid,Madrid,40.40002626,-3.683351686,2808718.5,Spain,ES,ESP,Comunidad de Madrid
+952,Dar es Salaam,Dar es Salaam,-6.800012595,39.26834184,2814326,Tanzania,TZ,TZA,Dar-Es-Salaam
+953,Jaipur,Jaipur,26.92113324,75.80998734,2814379,India,IN,IND,Rajasthan
+954,Taiyuan,Taiyuan,37.87501243,112.5450577,2817737.5,China,CN,CHN,Shanxi
+955,New Taipei,New Taipei,25.01277778,121.465,2821870,Taiwan,TW,TWN,New Taipei City
+956,Cape Town,Cape Town,-33.92001097,18.43498816,2823929,South Africa,ZA,ZAF,Western Cape
+957,Changchun,Changchun,43.86500856,125.3399873,2860210.5,China,CN,CHN,Jilin
+958,Nairobi,Nairobi,-1.283346742,36.81665686,2880273.5,Kenya,KE,KEN,Nairobi
+959,Santiago,Santiago,-33.45001382,-70.66704085,2883305.5,Chile,CL,CHL,Región Metropolitana de Santiago
+960,Pyongyang,Pyongyang,39.0194387,125.7546907,2899398.5,North Korea,KP,PRK,P'yongyang
+961,Hanoi,Hanoi,21.03332725,105.8500142,2904635,Vietnam,VN,VNM,Thái Nguyên
+962,Guadalajara,Guadalajara,20.67001609,-103.3300342,2919294.5,Mexico,MX,MEX,Jalisco
+963,Addis Ababa,Addis Ababa,9.033310363,38.70000443,2928864.5,Ethiopia,ET,ETH,Addis Ababa
+964,Haora,Haora,22.58039044,88.32994665,2934655,India,IN,IND,West Bengal
+965,Jeddah,Jeddah,21.51688946,39.21919755,2939723,Saudi Arabia,SA,SAU,Makkah
+966,Fortaleza,Fortaleza,-3.750017884,-38.57998132,2958717.5,Brazil,BR,BRA,Ceará
+967,Miami,Miami,25.7876107,-80.22410608,2983947,United States of America,US,USA,Florida
+968,Kanpur,Kanpur,26.4599986,80.3199963,2992624.5,India,IN,IND,Uttar Pradesh
+969,Dallas,Dallas,32.82002382,-96.84001693,3004852,United States of America,US,USA,Texas
+970,Montréal,Montréal,45.49999921,-73.58329696,3017278,Canada,CA,CAN,Québec
+971,Salvador,Salvador,-12.9699719,-38.47998743,3081422.5,Brazil,BR,BRA,Bahia
+972,Brasilia,Brasilia,-15.78334023,-47.91605229,3139979.5,Brazil,BR,BRA,Distrito Federal
+973,Kano,Kano,11.99997683,8.5200378,3140000,Nigeria,NG,NGA,Kano
+974,Kabul,Kabul,34.51669029,69.18326005,3160266,Afghanistan,AF,AFG,Kabul
+975,Casablanca,Casablanca,33.59997622,-7.616367433,3162954.5,Morocco,MA,MAR,Grand Casablanca
+976,Berlin,Berlin,52.52181866,13.40154862,3250007,Germany,DE,DEU,Berlin
+977,Barcelona,Barcelona,41.38329958,2.183370319,3250797.5,Spain,ES,ESP,Cataluña
+978,Hechi,Hechi,23.09653465,109.6091129,3275189.5,China,CN,CHN,Guangxi
+979,Khartoum,Khartoum,15.58807823,32.53417924,3364323.5,Sudan,SD,SDN,Khartoum
+980,Surat,Surat,21.19998374,72.84003943,3368252,India,IN,IND,Dadra and Nagar Haveli
+981,Nanjing,Nanjing,32.05001914,118.7799743,3383005,China,CN,CHN,Jiangsu
+982,Harbin,Harbin,45.74998395,126.6499849,3425441.5,China,CN,CHN,Heilongjiang
+983,Busan,Busan,35.09505292,129.0100476,3480000,South Korea,KR,KOR,Busan
+984,Abidjan,Abidjan,5.319996967,-4.04004826,3496197.5,Ivory Coast,CI,CIV,Lagunes
+985,Philadelphia,Philadelphia,39.99997316,-75.16999597,3504775,United States of America,US,USA,Pennsylvania
+986,Ankara,Ankara,39.92723859,32.86439164,3511689.5,Turkey,TR,TUR,Ankara
+987,Luanda,Luanda,-8.838286114,13.23442704,3562086,Angola,AO,AGO,Luanda
+988,Xian,Xian,34.27502545,108.8949963,3617406,China,CN,CHN,Shaanxi
+989,Rangoon,Rangoon,16.7833541,96.16667761,3694910,Myanmar,MM,MMR,Yangon
+990,Yokohama,Yokohama,35.32002626,139.5800484,3697894,Japan,JP,JPN,Kanagawa
+991,Pune,Pune,18.53001752,73.85000362,3803872,India,IN,IND,Maharashtra
+992,Belo Horizonte,Belo Horizonte,-19.91502602,-43.91500452,3974112,Brazil,BR,BRA,Minas Gerais
+993,Alexandria,Alexandria,31.20001935,29.94999589,3988258,Egypt,EG,EGY,Al Iskandariyah
+994,St. Petersburg,St. Petersburg,59.93901451,30.31602006,4023106,Russia,RU,RUS,City of St. Petersburg
+995,Chengdu,Chengdu,30.67000002,104.0700195,4036718.5,China,CN,CHN,Sichuan
+996,Houston,Houston,29.81997438,-95.33997929,4053287,United States of America,US,USA,Texas
+997,Sydney,Sydney,-33.92001097,151.1851798,4135711,Australia,AU,AUS,New South Wales
+998,Shenyeng,Shenyeng,41.80497927,123.4499735,4149596,China,CN,CHN,Liaoning
+999,Chittagong,Chittagong,22.32999229,91.79996741,4224611,Bangladesh,BD,BGD,Chittagong
+1000,Singapore,Singapore,1.293033466,103.8558207,4236614.5,Singapore,SG,SGP,
+1001,Shenzhen,Shenzhen,22.55237051,114.1221231,4291796,China,CN,CHN,Guangdong
+1002,Riyadh,Riyadh,24.64083315,46.77274166,4335480.5,Saudi Arabia,SA,SAU,Ar Riyad
+1003,Ho Chi Minh City,Ho Chi Minh City,10.78002545,106.6950272,4390665.5,Vietnam,VN,VNM,Ho Chi Minh City
+1004,Dongguan,Dongguan,23.0488889,113.7447222,4528000,China,CN,CHN,Guangdong
+1005,Ahmedabad,Ahmedabad,23.03005292,72.58000362,4547355,India,IN,IND,Dadra and Nagar Haveli
+1006,Toronto,Toronto,43.69997988,-79.42002079,4573710.5,Canada,CA,CAN,Ontario
+1007,Lagos,Lagos,6.443261653,3.391531071,4733768,Nigeria,NG,NGA,Lagos
+1008,Taipei,Taipei,25.03583333,121.5683333,4759522.5,Taiwan,TW,TWN,Taipei City
+1009,Paris,Paris,48.86669293,2.333335326,4957588.5,France,FR,FRA,Île-de-France
+1010,Hyderabad,Hyderabad,17.39998313,78.47995357,4986908,India,IN,IND,Andhra Pradesh
+1011,Baghdad,Baghdad,33.3386485,44.39386877,5054000,Iraq,IQ,IRQ,Baghdad
+1012,Chongqing,Chongqing,29.56497703,106.5949816,5214014,China,CN,CHN,Chongqing
+1013,Tianjin,Tianjin,39.13002626,117.2000191,5473103.5,China,CN,CHN,Tianjin
+1014,Wuhan,Wuhan,30.58003135,114.270017,5713603,China,CN,CHN,Hubei
+1015,Chennai,Chennai,13.08998781,80.27999874,5745531.5,India,IN,IND,Tamil Nadu
+1016,Hong Kong,Hong Kong,22.3049809,114.1850093,5878789.5,Hong Kong S.A.R.,HK,HKG,
+1017,Bangkok,Bangkok,13.74999921,100.5166447,5904238,Thailand,TH,THA,Bangkok Metropolis
+1018,Chicago,Chicago,41.82999066,-87.75005497,5915976,United States of America,US,USA,Illinois
+1019,Bangalore,Bangalore,12.96999514,77.56000972,5945523.5,India,IN,IND,Karnataka
+1020,Guangzhou,Guangzhou,23.1449813,113.3250101,5990912.5,China,CN,CHN,Guangdong
+1021,Lahore,Lahore,31.55997154,74.35002478,6443944,Pakistan,PK,PAK,Punjab
+1022,Kinshasa,Kinshasa,-4.329724102,15.31497188,6704351.5,Congo (Kinshasa),CD,COD,Kinshasa City
+1023,Rio de Janeiro,Rio de Janeiro,-22.92502317,-43.22502079,6879087.5,Brazil,BR,BRA,Rio de Janeiro
+1024,Osaka,Osaka,34.75003522,135.4601448,6943206.5,Japan,JP,JPN,Osaka
+1025,Bogota,Bogota,4.596423563,-74.08334396,7052830.5,Colombia,CO,COL,Bogota
+1026,Manila,Manila,14.60415895,120.9822172,7088787.5,Philippines,PH,PHL,Metropolitan Manila
+1027,Lima,Lima,-12.04801268,-77.05006209,7385117,Peru,PE,PER,Lima
+1028,Tehran,Tehran,35.67194277,51.42434403,7513154.5,Iran,IR,IRN,Tehran
+1029,London,London,51.49999473,-0.116721844,7994104.5,United Kingdom,GB,GBR,Westminster
+1030,Los Angeles,Los Angeles,33.98997825,-118.1799805,8097410,United States of America,US,USA,California
+1031,Jakarta,Jakarta,-6.174417705,106.8294376,8832560.5,Indonesia,ID,IDN,Jakarta Raya
+1032,Beijing,Beijing,39.92889223,116.3882857,9293300.5,China,CN,CHN,Beijing
+1033,Kolkata,Kolkata,22.4949693,88.32467566,9709196,India,IN,IND,West Bengal
+1034,Seoul,Seoul,37.5663491,126.999731,9796000,South Korea,KR,KOR,Seoul
+1035,Cairo,Cairo,30.04996035,31.24996822,9813807,Egypt,EG,EGY,Al Qahirah
+1036,Dhaka,Dhaka,23.72305971,90.40857947,9899167,Bangladesh,BD,BGD,Dhaka
+1037,Istanbul,Istanbul,41.10499615,29.01000159,10003305,Turkey,TR,TUR,Istanbul
+1038,Moscow,Moscow,55.75216412,37.61552283,10452000,Russia,RU,RUS,Moskva
+1039,Delhi,Delhi,28.6699929,77.23000403,11779606.5,India,IN,IND,Delhi
+1040,Buenos Aires,Buenos Aires,-34.60250161,-58.39753137,11862073,Argentina,AR,ARG,Ciudad de Buenos Aires
+1041,Karachi,Karachi,24.86999229,66.99000891,11877109.5,Pakistan,PK,PAK,Sind
+1042,New York,New York,40.74997906,-73.98001693,13524139,United States of America,US,USA,New York
+1043,Sao Paulo,Sao Paulo,-23.55867959,-46.62501998,14433147.5,Brazil,BR,BRA,São Paulo
+1044,Shanghai,Shanghai,31.21645245,121.4365047,14797756,China,CN,CHN,Shanghai
+1045,Mexico City,Mexico City,19.44244244,-99.1309882,14919501,Mexico,MX,MEX,Distrito Federal
+1046,Mumbai,Mumbai,19.01699038,72.8569893,15834918,India,IN,IND,Maharashtra
+1047,Tokyo,Tokyo,35.68501691,139.7514074,22006299.5,Japan,JP,JPN,Tokyo

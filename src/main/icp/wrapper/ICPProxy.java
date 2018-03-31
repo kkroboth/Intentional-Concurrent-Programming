@@ -48,19 +48,47 @@ public final class ICPProxy {
       throw new RuntimeException("Proxy is not a java.reflect.Proxy");
     }
 
-    // Note: The ProxyInfo class must be from ICPLoader or the loader that created the proxy class.
-    // Otherwise ClassCastException will be thrown.
     try {
       //noinspection unchecked
-      Class<ProxyInfo> proxyInfoClass = (Class<ProxyInfo>) Class.forName("icp.wrapper.ICPProxy$ProxyInfo", true,
-        proxy.getClass().getClassLoader());
+      Class<ProxyInfo> proxyInfoClass = getReflectionProxyInfo(proxy);
       Method method = proxyInfoClass.getMethod("ICPGetPermissionHolder");
       method.setAccessible(true);
       Object permissionHolder = method.invoke(proxy);
       ICP.setPermission(permissionHolder, permission);
-    } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  // TODO: Should be private to icp.core, however classes in that package are not edited or add the permission field.
+  public static Object getHolderPermissionObject(Object proxy) {
+    if (!Proxy.isProxyClass(proxy.getClass())) {
+      throw new RuntimeException("Proxy is not a java.reflect.Proxy");
+    }
+
+    try {
+      //noinspection unchecked
+      Class<ProxyInfo> proxyInfoClass = getReflectionProxyInfo(proxy);
+      Method method = proxyInfoClass.getMethod("ICPGetPermissionHolder");
+      method.setAccessible(true);
+      return method.invoke(proxy);
+    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  private static Class<ProxyInfo> getReflectionProxyInfo(Object proxy) {
+    // Note: The ProxyInfo class must be from ICPLoader or the loader that created the proxy class.
+    // Otherwise ClassCastException will be thrown.
+    try {
+      //noinspection unchecked
+      return (Class<ProxyInfo>) Class.forName("icp.wrapper.ICPProxy$ProxyInfo", true,
+        proxy.getClass().getClassLoader());
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+
   }
 
   private static class PermissionInvocationHandler implements InvocationHandler {

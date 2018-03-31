@@ -9,7 +9,7 @@
                              :value="selected"
                              transition="scale-transition">
                         <template v-if="selected">
-                            Selected <strong>{{ selected.place }}</strong> at <strong>{{ selected.country}}</strong>
+                            Selected <strong>{{ selected.city }}</strong> at <strong>{{ selected.country}}</strong>
                             <div style="float: right">
                                 <v-btn @click="selected = null">Cancel</v-btn>
                                 <v-btn color="primary" @click="confirmSelection">Travel!</v-btn>
@@ -25,8 +25,10 @@
                 </div>
 
                 <!-- Information and events of location -->
-                <div>
-
+                <div v-if="confirmSelected != null">
+                    <ApiSource v-for="source in sources" :key="source.id"
+                            :source="source">
+                    </ApiSource>
                 </div>
             </v-container>
         </v-content>
@@ -35,10 +37,11 @@
 
 <script>
     import LocationMap from '../components/LocationMap.vue'
-    import { mapPoints, retrievePoint } from '../api'
+    import ApiSource from '../components/Source.vue'
+    import { mapPoints, retrieveAggregation, retrievePoint } from '../api'
 
     export default {
-        components: {LocationMap},
+        components: {LocationMap, ApiSource},
 
         created() {
             mapPoints().then(locations => this.locations = locations)
@@ -48,7 +51,8 @@
             return {
                 locations: [],
                 selected: null,
-                confirmSelected: null
+                confirmSelected: null,
+                sources: []
             }
         },
 
@@ -68,6 +72,9 @@
                 // Invalidate map
                 this.$refs.locationMap.leafletMap.invalidateSize()
                 this.$refs.locationMap.centerSelected()
+
+                retrieveAggregation(this.confirmSelected.id)
+                    .then(sources => this.sources = sources)
             }
         }
     }

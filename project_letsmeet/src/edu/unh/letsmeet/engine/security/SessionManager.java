@@ -49,9 +49,9 @@ public class SessionManager implements Middleware, Serializable {
 
   // Session cookie value -> Storage
   // Guarded-by: SessionMapLock
-  private transient final Object sessionMapLock = new Object();
+  private final Object sessionMapLock = new Object[0];
   private transient Map<String, SessionStorage> sessionMap;
-  private transient final Object authPathsLock = new Object();
+  private final Object authPathsLock = new Object[0];
   private transient List<String> authPaths;
 
   // Private -- Only used for serialization
@@ -59,7 +59,6 @@ public class SessionManager implements Middleware, Serializable {
 
 
   public static SessionManager readFromStorage(Path path) {
-    if (1 == 1) return new SessionManager(true);
     if (Files.exists(path)) {
       try {
         ObjectInputStream in = new ObjectInputStream(Files.newInputStream(path));
@@ -172,6 +171,7 @@ public class SessionManager implements Middleware, Serializable {
   @Override
   public Response.Builder onRequest(ServerProvider provider, Map<String, Object> meta, Request request) throws HttpException {
     // If session cookie is valid -- put session storage into meta
+    boolean reqInvalid = false;
     Cookie sessionCookie = request.getCookie("sessionid");
     if (sessionCookie != null) {
       String sessionId = Utils.base64Decode(sessionCookie.getValue());
@@ -179,11 +179,16 @@ public class SessionManager implements Middleware, Serializable {
       if (storage == null) {
         logger.log(Level.WARNING, "Suspicious operation: sessionId invalid");
         meta.put("delete-session", true);
+        reqInvalid = true;
       } else {
         meta.put("session-key", sessionId);
         meta.put("session", storage);
       }
     } else {
+      reqInvalid = true;
+    }
+
+    if (reqInvalid) {
       // If path belongs to authPaths or subpath. Response 403.
       String path = request.getUri().getPath();
       synchronized (authPathsLock) {
@@ -191,7 +196,6 @@ public class SessionManager implements Middleware, Serializable {
           throw new HttpException(403, "Unauthorized access to " + path);
         }
       }
-
     }
 
     return null;

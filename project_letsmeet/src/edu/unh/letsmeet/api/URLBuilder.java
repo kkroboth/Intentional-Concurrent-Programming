@@ -1,9 +1,13 @@
 package edu.unh.letsmeet.api;
 
+import icp.core.ICP;
+import icp.core.Permissions;
 import icp.wrapper.ICPProxy;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +33,9 @@ public final class URLBuilder {
     paths = ICPProxy.newPrivateInstance(List.class, new ArrayList<>());
     //noinspection unchecked
     queries = ICPProxy.newPrivateInstance(List.class, new ArrayList<>());
+
+    ICP.setPermission(paths, Permissions.getSamePermissionAs(this));
+    ICP.setPermission(queries, Permissions.getSamePermissionAs(this));
   }
 
   /**
@@ -48,12 +55,19 @@ public final class URLBuilder {
   }
 
   public URLBuilder query(String name, String value) {
-    queries.add(name + "=" + value);
+    try {
+      queries.add(name + "=" + URLEncoder.encode(value, "UTF-8"));
+    } catch (UnsupportedEncodingException e) {
+      // Unusual to throw
+      throw new RuntimeException(e);
+    }
     return this;
   }
 
   public String buildString() {
-    endpoint.insertKey(this);
+    if (endpoint instanceof AuthEndpoint) {
+      ((AuthEndpoint) endpoint).insertKey(this);
+    }
     StringBuilder sb = new StringBuilder();
     sb.append(endpoint.endpoint());
     sb.append(String.join("/", paths));

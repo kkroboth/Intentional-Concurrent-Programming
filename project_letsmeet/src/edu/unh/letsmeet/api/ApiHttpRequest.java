@@ -4,6 +4,8 @@ import com.krobothsoftware.commons.network.http.HttpHelper;
 import com.krobothsoftware.commons.network.http.HttpRequest;
 import com.krobothsoftware.commons.network.http.HttpResponse;
 import com.krobothsoftware.commons.network.http.Method;
+import icp.core.ICP;
+import icp.core.Permissions;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -22,11 +24,19 @@ import java.util.function.Consumer;
 public class ApiHttpRequest extends HttpRequest {
   private final URLBuilder urlBuilder;
   private final Endpoint endpoint;
+  private Extractor extractor;
 
   ApiHttpRequest(Endpoint endpoint) {
+    this(endpoint, null);
+  }
+
+  ApiHttpRequest(Endpoint endpoint, Extractor extractor) {
     super(Method.GET, null);
     this.endpoint = endpoint;
     this.urlBuilder = URLBuilder.ofEndpoint(endpoint);
+    this.extractor = extractor;
+
+    ICP.setPermission(urlBuilder, Permissions.getSamePermissionAs(this));
   }
 
   public ApiHttpRequest method(String method) {
@@ -39,10 +49,22 @@ public class ApiHttpRequest extends HttpRequest {
     return this;
   }
 
+  public URLBuilder buildUrl() {
+    return urlBuilder;
+  }
+
   @Override
-  public HttpResponse execute(HttpHelper httpHelper) throws IOException {
+  public ApiHttpResponse execute(HttpHelper httpHelper) throws IOException {
     endpoint.onRequest(this);
     this.url = urlBuilder.buildURL();
-    return super.execute(httpHelper);
+    HttpResponse response = super.execute(httpHelper);
+    // Convert to ApiResponse and use optional extractor to parse json
+    ApiHttpResponse apiResponse = new ApiHttpResponse(response.getConnection(),
+      response.getStream(), response.getStatusCode(), response.getCharset());
+    if (extractor != null) {
+      apiResponse.parse(extractor);
+    }
+
+    return apiResponse;
   }
 }

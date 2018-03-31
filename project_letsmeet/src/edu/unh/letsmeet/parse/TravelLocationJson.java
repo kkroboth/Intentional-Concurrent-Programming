@@ -5,13 +5,15 @@ import edu.unh.letsmeet.storage.TravelLocation;
 public class TravelLocationJson {
   public int id;
   public String country;
-  public String place;
+  public String city;
+  public double population;
   public float[] latlong;
 
   public TravelLocationJson(TravelLocation travelLocation) {
     this.id = travelLocation.getId();
     this.country = travelLocation.getCountry();
-    this.place = travelLocation.getPlace();
+    this.city = travelLocation.getCity();
+    this.population = travelLocation.getPopulation();
     this.latlong = travelLocation.getLatlong();
   }
 }

@@ -1,5 +1,7 @@
 package edu.unh.letsmeet.api;
 
+import com.krobothsoftware.commons.network.http.HttpHelper;
+import com.krobothsoftware.commons.network.http.HttpResponse;
 import edu.unh.letsmeet.Constants;
 import edu.unh.letsmeet.engine.Settings;
 import icp.core.ICP;
@@ -17,21 +19,32 @@ import java.util.logging.Logger;
 /**
  * All registered Api endpoints
  */
-public class ApiHelper {
-  private static final Logger logger = Logger.getLogger("ApiHelper");
+public class ApiRegistry {
+  private static final Logger logger = Logger.getLogger("ApiRegistry");
   private Map<String, Endpoint> endpoints;
   private Map<String, Endpoint> domainEndpointMap;
+  private final HttpHelper httpHelper;
 
-  public ApiHelper() {
+  public ApiRegistry(HttpHelper httpHelper) {
+    this.httpHelper = httpHelper;
     //noinspection unchecked
     endpoints = ICPProxy.newPrivateInstance(Map.class, new HashMap<>());
     //noinspection unchecked
     domainEndpointMap = ICPProxy.newPrivateInstance(Map.class, new HashMap<>());
 
     // Add default apis
-    for (DefaultApi api : DefaultApi.values()) {
+    // TODO: Move out and allow *user* to select which apis to register
+    for (RequireAuthApi api : RequireAuthApi.values()) {
       endpoints.put(api.name().toLowerCase(), api);
     }
+
+    for (PublicApi api : PublicApi.values()) {
+      endpoints.put(api.name().toLowerCase(), api);
+    }
+  }
+
+  public HttpHelper getHttpHelper() {
+    return httpHelper;
   }
 
   /**
@@ -56,8 +69,16 @@ public class ApiHelper {
   }
 
   public ApiHttpRequest startCall(Endpoint endpoint) {
+    return startCall(endpoint, null);
+  }
+
+  public ApiHttpRequest startCall(Endpoint endpoint, Extractor extractor) {
     Objects.requireNonNull(endpoint);
-    return new ApiHttpRequest(endpoint);
+    return new ApiHttpRequest(endpoint, extractor);
+  }
+
+  public ApiHttpRequest startCall(String endpointName, Extractor extractor) {
+    return startCall(endpoints.get(endpointName), extractor);
   }
 
   /**
@@ -104,5 +125,18 @@ public class ApiHelper {
     }
 
     ICP.setPermission(this, Permissions.getFrozenPermission());
+  }
+
+  public static class BulkCall {
+    private final Map<String, HttpResponse> calls;
+
+    BulkCall() {
+      //noinspection unchecked
+      calls = ICPProxy.newPrivateInstance(Map.class, new HashMap<>());
+    }
+
+    public ApiHttpRequest startCall(String identifier, Endpoint endpoint, Extractor extractor) {
+      return null;
+    }
   }
 }

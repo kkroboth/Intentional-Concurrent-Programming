@@ -6,7 +6,10 @@ import icp.core.Permissions;
 
 import java.util.Objects;
 
-public enum DefaultApi implements Endpoint, ReadableApiKey {
+/**
+ * Api that require authentication or access tokens.
+ */
+public enum RequireAuthApi implements AuthEndpoint, ReadableApiKey {
   WEATHER("api.openweathermap.org", "https://api.openweathermap.org/data/2.5/", "APPID"),
 
   NEWS("newsapi.org", "https://newsapi.org/v2/", "apiKey"),
@@ -31,7 +34,7 @@ public enum DefaultApi implements Endpoint, ReadableApiKey {
   final String endpoint;
   final String keyName;
 
-  DefaultApi(String domain, String endpoint, String keyName) {
+  RequireAuthApi(String domain, String endpoint, String keyName) {
     this.domain = domain;
     this.endpoint = endpoint;
     this.keyName = keyName;

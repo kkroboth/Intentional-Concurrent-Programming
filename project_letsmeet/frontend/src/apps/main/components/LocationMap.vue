@@ -26,10 +26,7 @@
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(leafletMap)
 
-            this.markerGroup = L.markerClusterGroup({
-                disableClusteringAtZoom: 7,
-                spiderfyOnMaxZoom: false
-            })
+            this.markerGroup = L.markerClusterGroup()
             leafletMap.addLayer(this.markerGroup)
             this.leafletMap = leafletMap
 
@@ -64,7 +61,7 @@
         markerGroup.clearLayers()
         locations.forEach(l => {
             const marker = L.marker(l.latlong, {icon: getDivIcon()})
-                .bindTooltip(l.place + "")
+                .bindTooltip(l.city + "")
                 .on('click', function () {
                     // Optional zoom into marker if far out
                     if (leafletMap.getZoom() >= 5) return
