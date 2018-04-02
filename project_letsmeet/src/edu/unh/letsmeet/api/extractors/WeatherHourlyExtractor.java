@@ -37,7 +37,8 @@ public class WeatherHourlyExtractor extends JsonExtractor {
       JsonObject item = iterator.next().getAsJsonObject();
       JsonObject filteredItem = new JsonObject();
 
-      filteredItem.add("date", item.get("dt"));
+      Number seconds = item.get("dt").getAsNumber();
+      filteredItem.addProperty("date", seconds.longValue() * 1000);
       JsonObject main = item.get("main").getAsJsonObject();
       filteredItem.add("temp", main.get("temp"));
       filteredItem.add("humidity", main.get("humidity"));

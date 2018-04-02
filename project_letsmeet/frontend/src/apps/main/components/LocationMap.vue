@@ -68,10 +68,10 @@
                     leafletMap.fitBounds(L.latLngBounds([this.getLatLng()]))
                     leafletMap.setZoom(5)
                 }).on('click', (e) => {
-                    vm.$emit('selected', e.target.locationId)
+                    vm.$emit('selected', e.target.location)
                     vm.internalSelected = e.target
                 })
-            marker.locationId = l.id
+            marker.location = l
             markerGroup.addLayer(marker)
         })
     }

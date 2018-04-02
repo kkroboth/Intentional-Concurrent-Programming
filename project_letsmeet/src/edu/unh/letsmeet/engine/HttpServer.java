@@ -45,7 +45,6 @@ public class HttpServer {
   private final List<Middleware> middlewares; // immutable list of middleware -- order matters!
 
   private final ICPExecutorService executorService;
-  private volatile boolean started;
 
   // Concurrent
   private final DisjointSemaphore connectionLimiter;
@@ -90,7 +89,6 @@ public class HttpServer {
    */
   public void start() throws IOException {
     serverProvider.getSettings().freeze();
-    started = true;
     serverSocket.bind(new InetSocketAddress(serverProvider.getHost(), serverProvider.getPort()));
 
     new Thread(Task.ofThreadSafe(() -> {
@@ -122,7 +120,6 @@ public class HttpServer {
   }
 
   public void stop() throws IOException {
-    if (!started) throw new IllegalStateException("HttpServer not started");
     serverSocket.close();
     executorService.shutdown();
   }

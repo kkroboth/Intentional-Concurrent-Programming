@@ -14,6 +14,7 @@ public final class ContentTypes {
     contentTypes.put("js", new ContentType("application/javascript", true));
     contentTypes.put("map", new ContentType("application/json", true));
     contentTypes.put("png", new ContentType("image/png", false));
+    contentTypes.put("jpg", new ContentType("image/jpg", false));
   }
 
   public static ContentType getContentType(String extensionName) {

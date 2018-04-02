@@ -16,19 +16,10 @@ import edu.unh.letsmeet.api.extractors.EventsExtractor;
 import edu.unh.letsmeet.api.extractors.JsonExtractor;
 import edu.unh.letsmeet.api.extractors.RestaurantsExtractor;
 import edu.unh.letsmeet.api.extractors.WeatherHourlyExtractor;
-import edu.unh.letsmeet.command.CommandLineScanner;
-import edu.unh.letsmeet.engine.HttpException;
-import edu.unh.letsmeet.engine.HttpServer;
-import edu.unh.letsmeet.engine.Method;
-import edu.unh.letsmeet.engine.Middleware;
-import edu.unh.letsmeet.engine.Request;
-import edu.unh.letsmeet.engine.Response;
-import edu.unh.letsmeet.engine.Route;
-import edu.unh.letsmeet.engine.ServerProvider;
-import edu.unh.letsmeet.engine.Settings;
+import edu.unh.letsmeet.engine.*;
 import edu.unh.letsmeet.engine.security.SessionManager;
-import edu.unh.letsmeet.server.ApiRequestHandler;
 import edu.unh.letsmeet.server.PagesRequestHandler;
+import edu.unh.letsmeet.server.PatternRequestHandler;
 import edu.unh.letsmeet.server.StaticFilesRequestHandler;
 import edu.unh.letsmeet.server.routes.HtmlRoute;
 import edu.unh.letsmeet.storage.TravelLocation;
@@ -84,7 +75,7 @@ public class Main implements ServiceProvider {
   private final Cache<Integer, String> aggregateCache =
     Caffeine.newBuilder()
       .maximumSize(100)
-      .expireAfterWrite(Duration.ofMinutes(10))
+      .expireAfterWrite(Duration.ofMinutes(60))
       .build();
 
 
@@ -119,13 +110,10 @@ public class Main implements ServiceProvider {
     // RequestHandlers use the decorator pattern, messy but gets job done
     httpServer = new HttpServer(this,
       ICPExecutors.newICPExecutorService(Executors.newCachedThreadPool()),
-      new PagesRequestHandler(
-        createPageRoutes(),
-
-        // Static files
-        new StaticFilesRequestHandler(
-          // Finally the api handler
-          createApiHandler())
+      new StaticFilesRequestHandler(
+        createApiHandler(
+          createPageRoutes(null)
+        )
       ), middlewares);
     DatabaseHelper noop = DatabaseHelper.getInstance(); // Starts database
 
@@ -143,8 +131,9 @@ public class Main implements ServiceProvider {
     // Add static directories
     List<Path> dirs = new ArrayList<>();
     dirs.add(props.getStaticDirectory());
-    dirs.add(props.getStaticDirectory());
     dirs.add(props.getNodemodulesDirectory());
+    // Add frontend static directory
+    dirs.add(props.getProjectPath().resolve("frontend/static/"));
 
     settings.set(StaticFilesRequestHandler.SETTING_STATIC_DIRECTORIES, dirs);
     settings.set(StaticFilesRequestHandler.SETTING_URL_PATH, "/static/");
@@ -173,8 +162,8 @@ public class Main implements ServiceProvider {
     }
   }
 
-  private ApiRequestHandler createApiHandler() {
-    return new ApiRequestHandler.Builder("/api/")
+  private PatternRequestHandler createApiHandler(RequestHandler handler) {
+    return new PatternRequestHandler.Builder("/api/")
 
       // Map sub routes
       .enterSubRoute("map/")
@@ -352,7 +341,7 @@ public class Main implements ServiceProvider {
           throw new HttpException(404, "TravelLocation not found: " + id)
             .body("Invalid id: " + id);
 
-
+        String city = location.getCity();
         String countryCode = location.getIso2();
         float lat = location.getLatlong()[0];
         float lng = location.getLatlong()[1];
@@ -363,18 +352,25 @@ public class Main implements ServiceProvider {
         // Guarded-by: Itself and the countdown latch
         Map<String, ApiHttpRequest> requests = new HashMap<>();
 
+//        ApiHttpRequest weatherReq = apiRegistry.startCall("weather",
+//          WeatherHourlyExtractor.get());
+//        weatherReq.buildUrl().path("forecast")
+//          .query("lat", latStr)
+//          .query("lon", lngStr)
+//          .query("units", "imperial");
         ApiHttpRequest weatherReq = apiRegistry.startCall("weather",
           WeatherHourlyExtractor.get());
         weatherReq.buildUrl().path("forecast")
-          .query("lat", latStr)
-          .query("lon", lngStr)
+          .query("q", city + "," + countryCode)
           .query("units", "imperial");
         requests.put("weather", weatherReq);
 
         ApiHttpRequest eventsReq = getApiRegistry().startCall("events",
           EventsExtractor.get())
           .buildUrl(url -> url.path("events.join")
-            .query("geoPoint", geohash)
+//            .query("geoPoint", geohash)
+            .query("city", city)
+            .query("countryCode", countryCode)
             .query("size", "10"));
         requests.put("events", eventsReq);
 
@@ -434,30 +430,12 @@ public class Main implements ServiceProvider {
         }
       }))
       .exitSubRoute()
-
-      .build();
+      .build(handler);
   }
 
-  private Map<String, Route> createPageRoutes() {
-    return new Route.Builder()
-      .addRoute("/", new Route() {
-        private final HtmlRoute htmlRoute = new HtmlRoute("index.html");
-
-        {
-          ICP.setPermission(this, Permissions.getThreadSafePermission());
-        }
-
-        @Override
-        public Response.Builder accept(Method method, String path, Map<String, String> params, Map<String, String> query,
-                                       Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
-          if (!meta.containsKey("session")) {
-            return Response.create(302).header("Location", "/login");
-          }
-
-          return htmlRoute.accept(method, path, request, meta, provider);
-        }
-      })
-      .addRoute("/login", new Route() {
+  private PatternRequestHandler createPageRoutes(RequestHandler handler) {
+    return new PatternRequestHandler.Builder("/")
+      .addRoute("login", new Route() {
         private final HtmlRoute htmlRoute = new HtmlRoute("login.html");
 
         {
@@ -499,7 +477,24 @@ public class Main implements ServiceProvider {
 
         }
       })
-      .done();
+      .addRoute(".*", new Route() {
+        private final HtmlRoute htmlRoute = new HtmlRoute("index.html");
+
+        {
+          ICP.setPermission(this, Permissions.getThreadSafePermission());
+        }
+
+        @Override
+        public Response.Builder accept(Method method, String path, Map<String, String> params, Map<String, String> query,
+                                       Request request, Map<String, Object> meta, ServerProvider provider) throws HttpException, IOException {
+          if (!meta.containsKey("session")) {
+            return Response.create(302).header("Location", "/login");
+          }
+
+          return htmlRoute.accept(method, path, request, meta, provider);
+        }
+      })
+      .build(handler);
   }
 
   @Override
@@ -551,9 +546,5 @@ public class Main implements ServiceProvider {
     Main main = new Main();
     Runtime.getRuntime().addShutdownHook(new Thread(Task.ofThreadSafe(main::stop)));
     main.start();
-
-
-    CommandLineScanner cmdline = new CommandLineScanner();
-    cmdline.parseInput();
   }
 }

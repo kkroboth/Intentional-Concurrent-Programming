@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -23,16 +24,14 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// TODO: Handle case where trailing slash is missing but regex has it. Vice-versa too
-public class ApiRequestHandler extends RequestHandlerDecorator {
-  private static final Logger logger = Logger.getLogger("ApiRequestHandler");
+public class PatternRequestHandler extends RequestHandlerDecorator {
+  private static final Logger logger = Logger.getLogger("PatternRequestHandler");
 
-  private final String rootPath;
-
+  protected final String rootPath;
   // TODO: Convert to list of pairs
-  private final Map<Pattern, Route> routes;
+  protected final Map<Pattern, Route> routes;
 
-  protected ApiRequestHandler(RequestHandler handler, Builder builder) {
+  protected PatternRequestHandler(RequestHandler handler, Builder builder) {
     super(handler);
     this.rootPath = builder.rootPath;
     this.routes = builder.routes;
@@ -51,7 +50,6 @@ public class ApiRequestHandler extends RequestHandlerDecorator {
         Pattern pattern = routeEntry.getKey();
         Matcher matcher = pattern.matcher(routePath);
         if (matcher.matches()) {
-          // TODO: Retrieve url parameters
           try {
             // url params
             Map<String, String> namedGroups = getNamedGroups(matcher);
@@ -87,7 +85,7 @@ public class ApiRequestHandler extends RequestHandlerDecorator {
 
     public Builder(String rootPath) {
       this.rootPath = rootPath;
-      this.routes = new HashMap<>();
+      this.routes = new LinkedHashMap<>();
     }
 
     public Builder addRoute(String path, Route route) {
@@ -139,14 +137,14 @@ public class ApiRequestHandler extends RequestHandlerDecorator {
       return parent;
     }
 
-    public ApiRequestHandler build(RequestHandler handler) {
+    public PatternRequestHandler build(RequestHandler handler) {
       if (parent != null) {
         throw new IllegalStateException("Cannot build child router. Only top-most parent router may be built");
       }
-      return new ApiRequestHandler(handler, this);
+      return new PatternRequestHandler(handler, this);
     }
 
-    public ApiRequestHandler build() {
+    public PatternRequestHandler build() {
       return build(null);
     }
   }
@@ -203,5 +201,6 @@ public class ApiRequestHandler extends RequestHandlerDecorator {
 
   private static final Field FIELD_MATCHER_PARENTPATTERN;
   private static final java.lang.reflect.Method METHOD_PATTERN_NAMEDGROUPS;
+
 
 }

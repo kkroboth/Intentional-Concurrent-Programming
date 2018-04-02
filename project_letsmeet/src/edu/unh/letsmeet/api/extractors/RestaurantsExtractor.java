@@ -37,7 +37,11 @@ public class RestaurantsExtractor extends JsonExtractor {
 
       filteredItem.add("name", item.get("name"));
       filteredItem.add("url", item.get("url"));
-      filteredItem.add("image", item.get("featured_image"));
+      String image = item.get("featured_image").getAsString();
+      if (image.isEmpty()) image = "/static/img/restaurant-no-image.jpg";
+      filteredItem.addProperty("image", image);
+      filteredItem.add("location", item.get("location"));
+      filteredItem.add("rating", item.get("user_rating"));
 
       payload.add(filteredItem);
     }
