@@ -4,7 +4,7 @@ import icp.core.ICP;
 import icp.core.IntentError;
 import icp.core.Permission;
 import icp.core.Permissions;
-import icp.core.SingleCheckPermission;
+import icp.core.SingleCheckTaskPermission;
 import icp.core.TaskLocal;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,7 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * General CountDownLatch with a positive number.
  */
-public final class CountDownLatch {
+public final class CountDownLatch extends DisjointTaskRegistration {
+  private static final String COUNTDOWNER = "Countdowner";
+  private static final String WAITER = "Waiter";
+
   private final java.util.concurrent.CountDownLatch latch;
 
   // Instead of dealing with AQS, CAS our count and if not zero then we can countdown the latch.
@@ -22,8 +25,6 @@ public final class CountDownLatch {
   private final AtomicInteger remainingCountDowners; // can't register more countdowners than count
   private final Permission permission;
 
-  private final TaskLocal<Boolean> countDowners;
-  private final TaskLocal<Boolean> waiters;
   private final TaskLocal<Boolean> calledCountDown;
 
 
@@ -34,24 +35,26 @@ public final class CountDownLatch {
    *              latch is opened.
    */
   public CountDownLatch(int count) {
+    super(COUNTDOWNER, WAITER);
     latch = new java.util.concurrent.CountDownLatch(count);
     latchCount = new AtomicInteger(count);
     remainingCountDowners = new AtomicInteger(count);
 
-    countDowners = Utils.newTaskLocal(false);
-    waiters = Utils.newTaskLocal(false);
     calledCountDown = Utils.newTaskLocal(false);
 
-    permission = new SingleCheckPermission("TODO: Failed") {
+    permission = new SingleCheckTaskPermission() {
       @Override
-      protected boolean singleCheck() {
+      protected String singleCheck() {
         // Task is countdowner
-        if (countDowners.get()) {
-          return latch.getCount() != 0;
+        if (isTaskRegistered(COUNTDOWNER) && latch.getCount() == 0) {
+          return "Countdowner: latch is open";
         }
-        // Task has to be a waiter
-        else
-          return waiters.get() && latch.getCount() == 0;
+        // Task is a waiter
+        else if (isTaskRegistered(WAITER) && latch.getCount() > 0) {
+          return "Waiter: latch is closed";
+        }
+
+        return null;
       }
     };
 
@@ -68,29 +71,22 @@ public final class CountDownLatch {
     if (remainingCountDowners.decrementAndGet() < 0) // do we care if this value is continuous negative?
       throw new IntentError("Cannot register more countdowners than latch count");
 
-    if (waiters.get())
-      throw new IntentError("Task cannot be a waiter and countdowner");
-    if (countDowners.get())
-      throw new IntentError("Task already a countdowner");
-    countDowners.set(true);
+    registerTaskIntent(COUNTDOWNER);
   }
 
   /**
    * Decrements latch by one. If latch reaches zero,
    * it will be opened.
-   * <p>
+   *
    * <em>Violations:</em>
    * <ul>
    * <li>Calling <em>countDown()</em> after count has reached zero</li>
    * </ul>
    */
   public void countDown() {
-    if (!countDowners.get())
-      throw new IntentError("Task is not a countdowner");
-    // Note: Don't care if a task calls countdown multiple times. As long as the count is
-    // never at zero of another countdown call.
-//    if (calledCountDown.get())
-//      throw new IntentError("Countdowner task already called countDown()");
+    checkTaskRegistered(COUNTDOWNER);
+    if (calledCountDown.get())
+      throw new IntentError("Countdowner task already called countDown()");
 
     int count;
     do {
@@ -103,16 +99,12 @@ public final class CountDownLatch {
   }
 
   public void registerWaiter() {
-    if (countDowners.get())
-      throw new IntentError("Task cannot be a waiter and countdowner");
-    if (waiters.get())
-      throw new IntentError("Task already a waiter");
-    waiters.set(true);
+    registerTaskIntent(WAITER);
   }
 
   /**
    * Block until the latch becomes zero.
-   * <p>
+   *
    * <em>Violations:</em>
    * <ul>
    * <li>Current task called <em>countDown()</em></li>
