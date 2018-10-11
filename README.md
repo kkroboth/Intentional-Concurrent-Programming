@@ -24,3 +24,6 @@ From the `sbt` shell, one can also run TestNG tests:
 ```
 
 The tests to run are specified in the file `resources/testng.yaml`.  There are also commands to run specific TestNG tests/suites only, but I have not tried them.
+
+# URC
+<img src="poster.png" />
